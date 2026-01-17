@@ -1,0 +1,25 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.3.11/schema.json",
+    "files": {
+        "includes": [
+            "**/*.{js,ts,json,css}",
+            "!**/node_modules/*",
+            "!**/dist/*",
+            "!**/build/*",
+            "!**/public/*"
+        ]
+    },
+    "formatter": {
+        "lineWidth": 100,
+        "indentWidth": 4,
+        "indentStyle": "space",
+        "includes": ["**/*.{ts,json}"]
+    },
+    "linter": {
+        "rules": {
+            "a11y": {
+                "noStaticElementInteractions": "off"
+            }
+        }
+    }
+}

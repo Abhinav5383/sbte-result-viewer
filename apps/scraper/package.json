@@ -1,0 +1,21 @@
+{
+    "name": "sbte-result-scraper",
+    "module": "src/main.ts",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "start": "bun run src/server.tsx",
+        "dev": "bun run --watch src/server.tsx"
+    },
+    "devDependencies": {
+        "@types/bun": "latest",
+        "unpdf": "^1.4.0"
+    },
+    "peerDependencies": {
+        "typescript": "^5"
+    },
+    "dependencies": {
+        "@app/shared": "workspace:*",
+        "hono": "^4.11.4"
+    }
+}
