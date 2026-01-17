@@ -11,7 +11,7 @@ To run:
 Server:
 ```
 cd apps/scraper
-bun runs src/server.ts
+bun run src/server.ts
 ```
 
 Frontend:
