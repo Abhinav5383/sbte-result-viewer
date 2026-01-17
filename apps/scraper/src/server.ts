@@ -1,5 +1,6 @@
 import type { ParsedResult } from "@app/shared/types";
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import config from "./config";
 import { parseAllStudentsData } from "./lib/downloader";
 
@@ -17,6 +18,12 @@ async function getParsedResults() {
 }
 
 const app = new Hono();
+
+app.use(
+    cors({
+        origin: "*",
+    }),
+);
 
 app.get("/", (c) => c.text("Scraper is running"));
 app.get("/students-data", async (c) => {

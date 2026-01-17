@@ -1,1 +1,203 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+
+@layer base;
+
+@theme {
+    /* text colors */
+    --color-bright-fg: lch(10.0% 0.0 0.0);
+    --color-normal-fg: lch(25.0% 5.0 220.0);
+    --color-dim-fg: lch(40.0% 10.0 220.0);
+
+    --color-accent-fg-light: lch(80.0% 40.0 190.0);
+    --color-accent-fg: lch(55.0% 40.0 190.0);
+    --color-accent-fg-dark: lch(40.0% 40.0 190.0);
+
+    /* backgrounds */
+    --color-accent-bg: lch(66% 40 185);
+    --color-accent-bg-text: lch(100% 18 200);
+
+    --font-body: 'Space Grotesk', sans-serif;
+
+    --color-border: lch(84% 8 190);
+}
+
+html,
+body {
+    @apply font-body;
+    scrollbar-gutter: stable;
+    background-color: var(--color-zinc-50);
+}
+
+@layer base {
+    svg {
+        width: 1.2em;
+        height: 1.2em;
+        color: currentColor;
+        fill: currentColor;
+    }
+
+    a {
+        @apply text-accent-fg-light underline-offset-2 hover:underline;
+    }
+
+    a,
+    button,
+    select,
+    input,
+    textarea {
+        outline: none;
+
+        &:focus-visible {
+            @apply ring-2 ring-accent-fg-light;
+
+            &.no-focus-ring {
+                @apply ring-transparent;
+            }
+        }
+
+        &.no-focus-ring {
+            border-width: 0;
+        }
+    }
+
+    button,
+    select,
+    input,
+    textarea {
+        @apply rounded-md h-10 px-3 py-2;
+    }
+
+
+    select,
+    input {
+        @apply text-normal-fg border-2 border-border;
+    }
+
+    select {
+        appearance: none;
+
+        @supports (appearance: base-select) {
+
+            &,
+            &::picker(select) {
+                appearance: base-select;
+                animation: rotateHue 10s infinite;
+                animation-play-state: paused;
+            }
+
+            &:open {
+                animation-play-state: running;
+
+                @media (prefers-reduced-motion) {
+                    animation-play-state: paused;
+                }
+            }
+        }
+    }
+
+    select {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border: var(--color-border);
+        cursor: pointer;
+        min-width: 18ch;
+        width: 100%;
+
+        @supports (appearance: base-select) {
+            /* padding-inline: 20px; */
+            background-image: none;
+
+            img {
+                width: 1.1em;
+                line-height: 1;
+            }
+
+            &::picker-icon {
+                content: "";
+                width: 1.1em;
+                height: 1.1em;
+                background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke-width='1.5' stroke='%23011' class='size-6'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5' /%3E%3C/svg%3E%0A");
+                transition: rotate 0.15s ease-out;
+            }
+
+            &:open::picker-icon {
+                rotate: 180deg;
+            }
+
+            &::picker(select) {
+                @apply rounded-md font-normal border border-accent-bg shadow-md shadow-zinc-400;
+                padding: 0;
+                margin-top: 0.2em;
+
+                opacity: 0;
+                height: 0;
+                overflow: clip;
+                transition: height 0.2s ease-out, opacity 0.2s ease-out, overlay 0.2s,
+                    display 0.2s;
+
+                transition-behavior: allow-discrete;
+            }
+
+            &:open::picker(select) {
+                opacity: 1;
+                height: calc-size(auto, size);
+                overflow: auto;
+
+                @starting-style {
+                    opacity: 0;
+                    height: 0;
+                }
+            }
+
+            option {
+                display: flex;
+                align-items: center;
+                outline: none;
+                padding: 0.3em 0.6em;
+                gap: 0.4em;
+                cursor: pointer;
+                transition-property: color, background-color;
+                transition-duration: 0.2s;
+                transition-timing-function: ease-out;
+
+                &:where(:hover, :focus, :active) {
+                    background: var(--color-accent-fg-light);
+                    color: var(--color-bright-fg);
+                }
+
+                &::checkmark {
+                    display: none;
+                }
+            }
+        }
+    }
+
+    label {
+        font-weight: 600;
+        margin-bottom: 0.2em;
+        display: inline-block;
+        color: var(--color-dim-fg);
+    }
+
+    .class-excellent {
+        color: var(--color-accent-fg)
+    }
+
+    .class-good {
+        color: var(--color-lime-600)
+    }
+
+    .class-average {
+        color: var(--color-amber-600)
+    }
+
+    .class-pass {
+        color: var(--color-orange-600)
+    }
+
+    .class-fail {
+        color: var(--color-red-600)
+    }
+}

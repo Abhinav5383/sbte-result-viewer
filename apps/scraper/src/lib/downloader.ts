@@ -1,3 +1,4 @@
+import { apiUrl } from "@app/shared/consts";
 import type { BranchConfig, ParsedResult } from "@app/shared/types";
 import { getInvalidRolls, saveInvalidRolls } from "~/lib/fs/invalid-rolls";
 import { getSavedResults, saveResults } from "~/lib/fs/saved-results";
@@ -87,8 +88,4 @@ async function fetchResultPdf(roll: string) {
     if (!res.ok) return null;
     console.log(`Fetched result for roll number: ${roll}`);
     return await res.arrayBuffer();
-}
-
-function apiUrl(roll: string) {
-    return `https://sbte-api.anantdrishti.com/util/downloadResult?rollNumber=${roll}`;
 }

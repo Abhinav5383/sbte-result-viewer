@@ -1,0 +1,34 @@
+dialog {
+    margin: 0;
+    padding: 0;
+    align-self: center;
+    justify-self: center;
+    width: 100%;
+    max-width: 80ch;
+    border: none;
+    outline: none;
+
+    opacity: 1;
+    transform: translateY(0);
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+
+    @starting-style {
+        opacity: 0;
+        transform: translateY(-1rem);
+    }
+
+    scrollbar-width: thin;
+}
+
+::backdrop {
+    background-image: linear-gradient(180deg,
+            #000A,
+            lch(from var(--color-accent-fg-dark) calc(l - 90) c h / 0.8));
+    backdrop-filter: blur(3px);
+    opacity: 1;
+    transition: opacity 0.17s ease-in-out;
+
+    @starting-style {
+        opacity: 0;
+    }
+}
