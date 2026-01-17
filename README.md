@@ -8,8 +8,14 @@ bun install
 
 To run:
 
-```bash
-bun run index.ts
+Server:
+```
+cd apps/scraper
+bun runs src/server.ts
 ```
 
-This project was created using `bun init` in bun v1.3.5. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.
+Frontend:
+```
+cd apps/frontend
+bun run dev
+```
