@@ -16,6 +16,7 @@ async function getParsedResults() {
 
     return allResults;
 }
+const parsedData = await getParsedResults();
 
 const app = new Hono();
 
@@ -26,12 +27,9 @@ app.use(
 );
 
 app.get("/", (c) => c.text("Scraper is running"));
-app.get("/students-data", async (c) => {
-    return c.json(await getParsedResults());
+app.get("/students-data", (c) => {
+    return c.json(parsedData);
 });
-
-// Preload parsed results on server start
-await getParsedResults();
 
 Bun.serve({
     fetch: app.fetch,
