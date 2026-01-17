@@ -8,12 +8,12 @@ export type BranchConfig = {
 };
 
 export enum BRANCH_NAME {
-    CIVIL = "CIVIL",
+    CIVIL = "Civil",
     CSE = "CSE",
-    ELECTRICAL = "ELECTRICAL",
-    ELECTRONICS = "ELECTRONICS",
-    MECHANICAL = "MECHANICAL",
-    AUTOMOBILE = "AUTOMOBILE",
+    ELECTRICAL = "Electrical",
+    ELECTRONICS = "Electronics",
+    MECHANICAL = "Mechanical",
+    AUTOMOBILE = "Automobile",
     UNKNOWN = "-_-",
 }
 
