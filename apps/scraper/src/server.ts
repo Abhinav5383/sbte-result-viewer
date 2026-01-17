@@ -3,11 +3,7 @@ import { Hono } from "hono";
 import config from "./config";
 import { parseAllStudentsData } from "./lib/downloader";
 
-const app = new Hono();
-
-app.get("/", (c) => c.text("Scraper is running"));
-
-app.get("/students-data", async (c) => {
+async function getParsedResults() {
     const allResults: ParsedResult[] = [];
 
     for (const branch of config.BRANCHES_LIST) {
@@ -17,8 +13,18 @@ app.get("/students-data", async (c) => {
         }
     }
 
-    return c.json(allResults);
+    return allResults;
+}
+
+const app = new Hono();
+
+app.get("/", (c) => c.text("Scraper is running"));
+app.get("/students-data", async (c) => {
+    return c.json(await getParsedResults());
 });
+
+// Preload parsed results on server start
+await getParsedResults();
 
 Bun.serve({
     fetch: app.fetch,
