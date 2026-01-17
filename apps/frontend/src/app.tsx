@@ -3,9 +3,17 @@ import { Show, createResource } from "solid-js";
 import Navbar from "./components/navbar";
 import { ResultListPage } from "./pages/results";
 
+// Declare the global embedded data (injected at build time)
+declare const __EMBEDDED_RESULTS__: Record<string, ParsedResult> | undefined;
+
 export default function App() {
     const [results, { refetch }] = createResource(async () => {
+        if (typeof __EMBEDDED_RESULTS__ !== "undefined") {
+            return __EMBEDDED_RESULTS__;
+        }
+
         const res = await fetch("http://localhost:5500/students-data");
+
         if (!res.ok) {
             throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         }

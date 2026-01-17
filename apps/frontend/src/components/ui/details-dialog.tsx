@@ -1,6 +1,7 @@
 import { apiUrl } from "@app/shared/consts";
 import { PAPER_TYPE, type ParsedResult, type SubjectResult } from "@app/shared/types";
-import { DownloadIcon, XIcon } from "lucide-solid";
+import DownloadIcon from "lucide-solid/icons/download";
+import XIcon from "lucide-solid/icons/x";
 import { For, Show, createEffect, createSignal } from "solid-js";
 import { alphabeticalGradeClass, marksClass, sgpaClass } from "~/lib/grade-utils";
 import { OrdinalSuffix, cn } from "../utils";
