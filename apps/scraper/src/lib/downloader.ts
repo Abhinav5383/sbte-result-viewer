@@ -51,7 +51,9 @@ export async function parseAllStudentsData(branch: BranchConfig) {
 
         await Promise.all(fetchPromises);
     }
-    console.log(`Fetched results for branch: ${branch.branchName}\n`);
+    console.log(
+        `Fetched ${Object.keys(parsedData).length} results for branch: ${branch.branchName}\n`,
+    );
 
     const invalidRolls_appendList: string[] = [];
     for (const roll of newInvalidRolls) {
