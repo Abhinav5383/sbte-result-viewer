@@ -205,7 +205,7 @@ function ResultRow(props: ResultRowProps) {
             <span>{props.item.student.name}</span>
             <div>
                 <span
-                    class={`branch-badge ${branchClass} inline-block ps-2 pe-0.5 rounded-lg text-sm`}
+                    class={`branch-badge ${branchClass} inline-block ps-2 pe-0.5 rounded-lg text-sm text-nowrap`}
                 >
                     {props.item.student.branch}
                     <em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 rounded-md">

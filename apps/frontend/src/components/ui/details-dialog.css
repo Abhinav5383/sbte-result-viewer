@@ -3,7 +3,7 @@ dialog {
     padding: 0;
     align-self: center;
     justify-self: center;
-    width: 100%;
+    width: calc(100% - 2em);
     max-width: 80ch;
     border: none;
     outline: none;

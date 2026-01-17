@@ -162,12 +162,12 @@ interface ControlProps {
 
 function Controls(props: ControlProps) {
     return (
-        <div class="grid grid-cols-3 gap-4 py-4 px-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 px-6">
             <div class="grid">
                 <label for="searchBy" class="w-fit">
                     Search
                 </label>
-                <div class="grid grid-cols-[2fr_5fr] gap-0">
+                <div class="grid grid-cols-[12ch_1fr] gap-0">
                     <Select
                         value={props.searchBy}
                         onChange={(val) => {
