@@ -93,48 +93,14 @@ export function ResultsListTable(props: ResultsListTableProps) {
 
                     <For each={props.displayedResults}>
                         {(item, index) => (
-                            // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
-                            <div
-                                class="grid items-center col-span-full grid-cols-subgrid py-3 border-b border-border hover:bg-zinc-100 cursor-pointer"
-                                onClick={() => {
+                            <ResultRow
+                                item={item}
+                                index={index()}
+                                onSelect={() => {
                                     setSelectedRoll(item.student.roll);
                                     setDialogOpen(true);
                                 }}
-                            >
-                                <span class="text-dim-fg">{index() + 1}</span>
-                                <span class="text-dim-fg">{item.student.roll}</span>
-                                <span class="">{item.student.name}</span>
-                                <div>
-                                    <span
-                                        class={`branch-badge ${item.student.branch.toLowerCase()} inline-block ps-2 pe-0.5 rounded-lg text-sm`}
-                                    >
-                                        {item.student.branch}
-                                        <em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 rounded-md">
-                                            {item.student.roll.charAt(0)}
-                                            {OrdinalSuffix(item.student.roll.charAt(0))} sem
-                                        </em>
-                                    </span>
-                                </div>
-                                <div>
-                                    <span
-                                        class={cn(
-                                            "font-medium text-lg",
-                                            marksClass(
-                                                item.grandTotal.obtained,
-                                                item.grandTotal.maximum,
-                                            ),
-                                        )}
-                                    >
-                                        {item.grandTotal.obtained}
-                                    </span>{" "}
-                                    <span class="text-sm text-dim-fg">
-                                        /{item.grandTotal.maximum}
-                                    </span>
-                                </div>
-                                <span class={cn("font-medium", sgpaClass(item.sgpa))}>
-                                    {item.sgpa.toFixed(2)}
-                                </span>
-                            </div>
+                            />
                         )}
                     </For>
                 </div>
@@ -206,5 +172,55 @@ function SortableHeaderItem(props: SortableHeaderItemProps) {
                 </Show>
             </Show>
         </button>
+    );
+}
+
+// Extracted row component for better performance - avoids re-renders of entire list
+interface ResultRowProps {
+    item: ParsedResult;
+    index: number;
+    onSelect: () => void;
+}
+
+function ResultRow(props: ResultRowProps) {
+    // Pre-compute static values that don't change for this row
+    const semester = props.item.student.roll.charAt(0);
+    const semesterSuffix = OrdinalSuffix(semester);
+    const branchClass = props.item.student.branch.toLowerCase();
+    const marksClassName = marksClass(
+        props.item.grandTotal.obtained,
+        props.item.grandTotal.maximum,
+    );
+    const sgpaClassName = sgpaClass(props.item.sgpa);
+    const formattedSgpa = props.item.sgpa.toFixed(2);
+
+    return (
+        // biome-ignore lint/a11y/useKeyWithClickEvents: Row click handler
+        <div
+            class="grid items-center col-span-full grid-cols-subgrid py-3 border-b border-border hover:bg-zinc-100 cursor-pointer"
+            onClick={props.onSelect}
+        >
+            <span class="text-dim-fg">{props.index + 1}</span>
+            <span class="text-dim-fg">{props.item.student.roll}</span>
+            <span>{props.item.student.name}</span>
+            <div>
+                <span
+                    class={`branch-badge ${branchClass} inline-block ps-2 pe-0.5 rounded-lg text-sm`}
+                >
+                    {props.item.student.branch}
+                    <em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 rounded-md">
+                        {semester}
+                        {semesterSuffix} sem
+                    </em>
+                </span>
+            </div>
+            <div>
+                <span class={cn("font-medium text-lg", marksClassName)}>
+                    {props.item.grandTotal.obtained}
+                </span>{" "}
+                <span class="text-sm text-dim-fg">/{props.item.grandTotal.maximum}</span>
+            </div>
+            <span class={cn("font-medium", sgpaClassName)}>{formattedSgpa}</span>
+        </div>
     );
 }

@@ -1,9 +1,28 @@
 import type { ParsedResult } from "@app/shared/types";
-import { type Setter, createMemo, createSignal } from "solid-js";
+import { type Setter, Show, createMemo, createSignal, onCleanup } from "solid-js";
 import { ResultsListTable } from "~/components/ui/results-table";
 import { Select } from "~/components/ui/select";
 import { OrdinalSuffix } from "~/components/utils";
 import { SearchBy, SortBy, SortOrder } from "~/lib/types";
+
+// Debounce hook for search input
+function createDebouncedSignal<T>(initialValue: T, delay = 150) {
+    const [value, setValue] = createSignal(initialValue);
+    const [debouncedValue, setDebouncedValue] = createSignal(initialValue);
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    const setValueDebounced = (newValue: T) => {
+        setValue(() => newValue);
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => setDebouncedValue(() => newValue), delay);
+    };
+
+    onCleanup(() => {
+        if (timeoutId) clearTimeout(timeoutId);
+    });
+
+    return [value, debouncedValue, setValueDebounced] as const;
+}
 
 interface ResultListPageProps {
     studentResultList: Record<string, ParsedResult>;
@@ -11,7 +30,8 @@ interface ResultListPageProps {
 
 export function ResultListPage(props: ResultListPageProps) {
     const [searchBy, setSearchBy] = createSignal(SearchBy.Name);
-    const [searchQuery, setSearchQuery] = createSignal("");
+    // Use debounced signal for search - immediate value for input, debounced for filtering
+    const [searchQuery, debouncedSearchQuery, setSearchQuery] = createDebouncedSignal("", 200);
     const [branch, setBranch] = createSignal("");
     const [semester, setSemester] = createSignal("");
 
@@ -39,21 +59,25 @@ export function ResultListPage(props: ResultListPageProps) {
 
     const filteredResults = createMemo(() => {
         const filtered: ParsedResult[] = [];
+        const branchFilter = branch();
+        const semesterFilter = semester();
+        const searchQ = debouncedSearchQuery().trim();
+        const searchMode = searchBy();
+        const searchLower = searchQ.toLowerCase();
 
         for (const key in props.studentResultList) {
             const item = props.studentResultList[key];
 
-            if (branch() && item.student.branch !== branch()) continue;
-            if (semester() && item.student.roll.charAt(0) !== semester()) continue;
-
-            const searchQ = searchQuery().trim();
+            if (branchFilter && item.student.branch !== branchFilter) continue;
+            if (semesterFilter && item.student.roll.charAt(0) !== semesterFilter) continue;
 
             if (searchQ) {
-                if (searchBy() === SearchBy.Roll && !item.student.roll.includes(searchQ)) {
+                if (searchMode === SearchBy.Roll && !item.student.roll.includes(searchQ)) {
                     continue;
-                } else if (
-                    searchBy() === SearchBy.Name &&
-                    !item.student.name.toLowerCase().includes(searchQ.toLowerCase())
+                }
+                if (
+                    searchMode === SearchBy.Name &&
+                    !item.student.name.toLowerCase().includes(searchLower)
                 ) {
                     continue;
                 }
@@ -105,6 +129,7 @@ export function ResultListPage(props: ResultListPageProps) {
                 setSemester={setSemester}
                 semesterOptions={semesterOptions()}
                 branchOptions={branchOptions()}
+                isFiltering={searchQuery() !== debouncedSearchQuery()}
             />
 
             <ResultsListTable
@@ -123,7 +148,7 @@ interface ControlProps {
     searchBy: SearchBy;
     setSearchBy: Setter<SearchBy>;
     searchQuery: string;
-    setSearchQuery: Setter<string>;
+    setSearchQuery: (val: string) => void;
 
     branch: string;
     setBranch: Setter<string>;
@@ -132,6 +157,7 @@ interface ControlProps {
 
     semesterOptions: string[];
     branchOptions: string[];
+    isFiltering?: boolean;
 }
 
 function Controls(props: ControlProps) {
@@ -160,14 +186,21 @@ function Controls(props: ControlProps) {
                         class="rounded-e-none border-2 border-e min-w-[10ch] border-border focus:border-accent-bg"
                     />
 
-                    <input
-                        id="searchBy"
-                        type="text"
-                        placeholder={`Enter ${props.searchBy} to search`}
-                        class="no-focus-ring rounded-s-none border-s border-2 border-border focus:border-accent-bg"
-                        value={props.searchQuery}
-                        onInput={(e) => props.setSearchQuery(e.currentTarget.value)}
-                    />
+                    <div class="relative">
+                        <input
+                            id="searchBy"
+                            type="text"
+                            placeholder={`Enter ${props.searchBy} to search`}
+                            class="no-focus-ring rounded-s-none border-s border-2 border-border focus:border-accent-bg w-full"
+                            value={props.searchQuery}
+                            onInput={(e) => props.setSearchQuery(e.currentTarget.value)}
+                        />
+                        <Show when={props.isFiltering}>
+                            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-dim-fg text-xs animate-pulse">
+                                ...
+                            </span>
+                        </Show>
+                    </div>
                 </div>
             </div>
 
