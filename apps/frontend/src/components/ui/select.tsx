@@ -1,6 +1,14 @@
 import { For } from "solid-js";
 import { cn } from "~/components/utils";
 
+declare module "solid-js" {
+    namespace JSX {
+        interface SelectHTMLAttributes<T> {
+            "prop:value"?: string;
+        }
+    }
+}
+
 interface SelectProps {
     value: string;
     onChange: (value: string) => void;
@@ -16,7 +24,7 @@ export function Select(props: SelectProps) {
     return (
         <select
             id={props.id}
-            value={props.value}
+            prop:value={props.value}
             onChange={(e) => {
                 props.onChange(e.target.value);
             }}

@@ -16,117 +16,137 @@ interface ResultsListTableProps {
     setSortOrder: Setter<SortOrder>;
 
     displayedResults: ParsedResult[];
+    totalItems: number;
 }
 
 export function ResultsListTable(props: ResultsListTableProps) {
     const [dialogOpen, setDialogOpen] = createSignal(false);
-    const [dialogDataIndex, setDialogDataIndex] = createSignal<number | null>(null);
+    const [selectedRoll, setSelectedRoll] = createSignal<string | null>(null);
+
+    // Find the current data by roll number to handle list changes while dialog is open
+    const dialogData = () => {
+        const roll = selectedRoll();
+        if (!roll) return undefined;
+        return props.displayedResults.find((r) => r.student.roll === roll);
+    };
 
     return (
         <div>
-            <div class="grid gap-x-8 grid-cols-[max-content_1fr_1fr_1fr_1fr_1fr] [&>div>*:first-child]:ps-6 [&>div>*:last-child]:pe-6">
-                <div class="grid col-span-full grid-cols-subgrid gap-x-0 *:px-4 *:py-3 border-b border-border bg-zinc-700 text-zinc-200">
-                    <div>
-                        <strong>Sl no</strong>
+            <Show
+                when={props.displayedResults.length > 0}
+                fallback={
+                    <div class="flex flex-col items-center justify-center gap-2 py-16 text-dim-fg">
+                        <span class="text-xl font-semibold">No results found</span>
+                        <span class="text-sm">Try adjusting your search or filters</span>
                     </div>
-
-                    <SortableHeaderItem
-                        title="Roll No"
-                        value={SortBy.Roll}
-                        sortBy={props.sortBy}
-                        setSortBy={props.setSortBy}
-                        sortOrder={props.sortOrder}
-                        setSortOrder={props.setSortOrder}
-                    />
-                    <SortableHeaderItem
-                        title="Name"
-                        value={SortBy.Name}
-                        sortBy={props.sortBy}
-                        setSortBy={props.setSortBy}
-                        sortOrder={props.sortOrder}
-                        setSortOrder={props.setSortOrder}
-                    />
-
-                    <div>
-                        <strong>Branch</strong>
-                    </div>
-
-                    <SortableHeaderItem
-                        title="Marks"
-                        value={SortBy.Marks}
-                        sortBy={props.sortBy}
-                        setSortBy={props.setSortBy}
-                        sortOrder={props.sortOrder}
-                        setSortOrder={props.setSortOrder}
-                    />
-                    <SortableHeaderItem
-                        title="SGPA"
-                        value={SortBy.sgpa}
-                        sortBy={props.sortBy}
-                        setSortBy={props.setSortBy}
-                        sortOrder={props.sortOrder}
-                        setSortOrder={props.setSortOrder}
-                    />
+                }
+            >
+                <div class="text-sm text-dim-fg px-6 py-2 border-b border-border bg-zinc-50">
+                    Showing {props.displayedResults.length} of {props.totalItems}{" "}
+                    {props.displayedResults.length !== 1 ? "results" : "result"}
                 </div>
 
-                <For each={props.displayedResults}>
-                    {(item, index) => (
-                        // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
-                        <div
-                            class="grid items-center col-span-full grid-cols-subgrid py-3 border-b border-border hover:bg-zinc-100 cursor-pointer"
-                            onClick={() => {
-                                setDialogDataIndex(index());
-                                setDialogOpen(true);
-                            }}
-                        >
-                            <span class="text-dim-fg">{index() + 1}</span>
-                            <span class="text-dim-fg">{item.student.roll}</span>
-                            <span class="">{item.student.name}</span>
-                            <div>
-                                <span
-                                    class={`branch-badge ${item.student.branch.toLowerCase()} inline-block ps-2 pe-0.5 rounded-lg text-sm`}
-                                >
-                                    {item.student.branch}
-                                    <em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 rounded-md">
-                                        {item.student.roll.charAt(0)}
-                                        {OrdinalSuffix(item.student.roll.charAt(0))} sem
-                                    </em>
+                <div class="grid gap-x-8 grid-cols-[max-content_1fr_1fr_1fr_1fr_1fr] [&>div>*:first-child]:ps-6 [&>div>*:last-child]:pe-6">
+                    <div class="grid col-span-full grid-cols-subgrid gap-x-0 *:px-4 *:py-3 border-b border-border bg-zinc-700 text-zinc-200">
+                        <div>
+                            <strong>Sl no</strong>
+                        </div>
+
+                        <SortableHeaderItem
+                            title="Roll No"
+                            value={SortBy.Roll}
+                            sortBy={props.sortBy}
+                            setSortBy={props.setSortBy}
+                            sortOrder={props.sortOrder}
+                            setSortOrder={props.setSortOrder}
+                        />
+                        <SortableHeaderItem
+                            title="Name"
+                            value={SortBy.Name}
+                            sortBy={props.sortBy}
+                            setSortBy={props.setSortBy}
+                            sortOrder={props.sortOrder}
+                            setSortOrder={props.setSortOrder}
+                        />
+
+                        <div>
+                            <strong>Branch</strong>
+                        </div>
+
+                        <SortableHeaderItem
+                            title="Marks"
+                            value={SortBy.Marks}
+                            sortBy={props.sortBy}
+                            setSortBy={props.setSortBy}
+                            sortOrder={props.sortOrder}
+                            setSortOrder={props.setSortOrder}
+                        />
+                        <SortableHeaderItem
+                            title="SGPA"
+                            value={SortBy.sgpa}
+                            sortBy={props.sortBy}
+                            setSortBy={props.setSortBy}
+                            sortOrder={props.sortOrder}
+                            setSortOrder={props.setSortOrder}
+                        />
+                    </div>
+
+                    <For each={props.displayedResults}>
+                        {(item, index) => (
+                            // biome-ignore lint/a11y/useKeyWithClickEvents: <explanation>
+                            <div
+                                class="grid items-center col-span-full grid-cols-subgrid py-3 border-b border-border hover:bg-zinc-100 cursor-pointer"
+                                onClick={() => {
+                                    setSelectedRoll(item.student.roll);
+                                    setDialogOpen(true);
+                                }}
+                            >
+                                <span class="text-dim-fg">{index() + 1}</span>
+                                <span class="text-dim-fg">{item.student.roll}</span>
+                                <span class="">{item.student.name}</span>
+                                <div>
+                                    <span
+                                        class={`branch-badge ${item.student.branch.toLowerCase()} inline-block ps-2 pe-0.5 rounded-lg text-sm`}
+                                    >
+                                        {item.student.branch}
+                                        <em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 rounded-md">
+                                            {item.student.roll.charAt(0)}
+                                            {OrdinalSuffix(item.student.roll.charAt(0))} sem
+                                        </em>
+                                    </span>
+                                </div>
+                                <div>
+                                    <span
+                                        class={cn(
+                                            "font-medium text-lg",
+                                            marksClass(
+                                                item.grandTotal.obtained,
+                                                item.grandTotal.maximum,
+                                            ),
+                                        )}
+                                    >
+                                        {item.grandTotal.obtained}
+                                    </span>{" "}
+                                    <span class="text-sm text-dim-fg">
+                                        /{item.grandTotal.maximum}
+                                    </span>
+                                </div>
+                                <span class={cn("font-medium", sgpaClass(item.sgpa))}>
+                                    {item.sgpa.toFixed(2)}
                                 </span>
                             </div>
-                            <div>
-                                <span
-                                    class={cn(
-                                        "font-medium text-lg",
-                                        marksClass(
-                                            item.grandTotal.obtained,
-                                            item.grandTotal.maximum,
-                                        ),
-                                    )}
-                                >
-                                    {item.grandTotal.obtained}
-                                </span>{" "}
-                                <span class="text-sm text-dim-fg">/{item.grandTotal.maximum}</span>
-                            </div>
-                            <span class={cn("font-medium", sgpaClass(item.sgpa))}>
-                                {item.sgpa.toFixed(2)}
-                            </span>
-                        </div>
-                    )}
-                </For>
-            </div>
+                        )}
+                    </For>
+                </div>
+            </Show>
 
             <DetailsDialog
                 open={dialogOpen()}
                 onClose={() => {
-                    setDialogDataIndex(null);
+                    setSelectedRoll(null);
                     setDialogOpen(false);
                 }}
-                data={
-                    dialogDataIndex() !== null
-                        ? // biome-ignore lint/style/noNonNullAssertion: <explanation>
-                          props.displayedResults[dialogDataIndex()!]
-                        : undefined
-                }
+                data={dialogData()}
             />
         </div>
     );

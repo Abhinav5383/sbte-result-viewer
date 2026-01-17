@@ -105,7 +105,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                                         SGPA
                                     </h2>
                                     <span class={cn("text-4xl font-bold", sgpaClass(data.sgpa))}>
-                                        {data.sgpa}
+                                        {data.sgpa.toFixed(2)}
                                     </span>
                                     <span class="text-dim-fg">{data.remarks}</span>
                                 </div>
@@ -116,50 +116,60 @@ export function DetailsDialog(props: DetailsDialogProps) {
                                     Subjects
                                 </h2>
 
-                                <div class="grid grid-cols-2 gap-3 border-b border-border pb-6">
-                                    <span class="capitalize text-lg font-bold text-dim-fg col-span-full">
-                                        {PAPER_TYPE.THEORY.toLowerCase()}
-                                    </span>
-                                    <For
-                                        each={data.subjects.filter(
-                                            (sub) => sub.type === PAPER_TYPE.THEORY,
-                                        )}
-                                    >
-                                        {(subject) => <SubjectMarksDetails sub={subject} />}
-                                    </For>
-                                </div>
+                                <SubjectCategory
+                                    title={PAPER_TYPE.THEORY.toLowerCase()}
+                                    subjects={data.subjects.filter(
+                                        (sub) => sub.type === PAPER_TYPE.THEORY,
+                                    )}
+                                    showBorder
+                                />
 
-                                <div class="grid grid-cols-2 gap-3 border-b border-border pb-6">
-                                    <span class="capitalize text-lg font-bold text-dim-fg col-span-full">
-                                        {PAPER_TYPE.PRACTICAL.toLowerCase()}
-                                    </span>
-                                    <For
-                                        each={data.subjects.filter(
-                                            (sub) => sub.type === PAPER_TYPE.PRACTICAL,
-                                        )}
-                                    >
-                                        {(subject) => <SubjectMarksDetails sub={subject} />}
-                                    </For>
-                                </div>
+                                <SubjectCategory
+                                    title={PAPER_TYPE.PRACTICAL.toLowerCase()}
+                                    subjects={data.subjects.filter(
+                                        (sub) => sub.type === PAPER_TYPE.PRACTICAL,
+                                    )}
+                                    showBorder
+                                />
 
-                                <div class="grid grid-cols-2 gap-3">
-                                    <span class="capitalize text-lg font-bold text-dim-fg col-span-full">
-                                        {PAPER_TYPE.TERM_WORK.toLowerCase()}
-                                    </span>
-                                    <For
-                                        each={data.subjects.filter(
-                                            (sub) => sub.type === PAPER_TYPE.TERM_WORK,
-                                        )}
-                                    >
-                                        {(subject) => <SubjectMarksDetails sub={subject} />}
-                                    </For>
-                                </div>
+                                <SubjectCategory
+                                    title={PAPER_TYPE.TERM_WORK.toLowerCase().replace("_", " ")}
+                                    subjects={data.subjects.filter(
+                                        (sub) => sub.type === PAPER_TYPE.TERM_WORK,
+                                    )}
+                                />
                             </div>
                         </div>
                     </div>
                 )}
             </Show>
         </dialog>
+    );
+}
+
+interface SubjectCategoryProps {
+    title: string;
+    subjects: SubjectResult[];
+    showBorder?: boolean;
+}
+
+function SubjectCategory(props: SubjectCategoryProps) {
+    return (
+        <Show when={props.subjects.length > 0}>
+            <div
+                class="grid grid-cols-2 gap-3"
+                classList={{
+                    "border-b border-border pb-6": props.showBorder,
+                }}
+            >
+                <span class="capitalize text-lg font-bold text-dim-fg col-span-full">
+                    {props.title}
+                </span>
+                <For each={props.subjects}>
+                    {(subject) => <SubjectMarksDetails sub={subject} />}
+                </For>
+            </div>
+        </Show>
     );
 }
 

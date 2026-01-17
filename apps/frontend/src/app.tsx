@@ -4,8 +4,11 @@ import Navbar from "./components/navbar";
 import { ResultListPage } from "./pages/results";
 
 export default function App() {
-    const [results] = createResource(async () => {
+    const [results, { refetch }] = createResource(async () => {
         const res = await fetch("http://localhost:5500/students-data");
+        if (!res.ok) {
+            throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+        }
         return (await res.json()) as Record<string, ParsedResult>;
     });
 
@@ -14,17 +17,29 @@ export default function App() {
             <Navbar />
 
             <main class="min-h-screen">
-                <Show
-                    keyed
-                    when={results()}
-                    fallback={
-                        <div class="flex items-center justify-center">
-                            <span class="text-lg text-dim-fg font-semibold">
-                                Loading results...
-                            </span>
-                        </div>
-                    }
-                >
+                <Show when={results.error}>
+                    <div class="flex flex-col items-center justify-center gap-4 p-8">
+                        <span class="text-lg text-red-600 font-semibold">
+                            Failed to load results
+                        </span>
+                        <span class="text-dim-fg text-sm">
+                            {results.error?.message || "Unknown error occurred"}
+                        </span>
+                        <button
+                            type="button"
+                            class="bg-accent-bg text-white px-4 py-2 rounded-md hover:opacity-90"
+                            onClick={() => refetch()}
+                        >
+                            Retry
+                        </button>
+                    </div>
+                </Show>
+                <Show when={results.loading}>
+                    <div class="flex items-center justify-center p-8">
+                        <span class="text-lg text-dim-fg font-semibold">Loading results...</span>
+                    </div>
+                </Show>
+                <Show keyed when={!results.loading && !results.error && results()}>
                     {(list) => <ResultListPage studentResultList={list} />}
                 </Show>
             </main>

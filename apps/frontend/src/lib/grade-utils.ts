@@ -21,6 +21,8 @@ export function sgpaClass(sgpa: number) {
 }
 
 export function marksClass(obtained: number, total: number) {
+    if (total <= 0) return GradeClass.FAIL;
+
     const percentage = (obtained / total) * 100;
 
     if (percentage >= 85) {

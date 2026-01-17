@@ -35,6 +35,8 @@ export function ResultListPage(props: ResultListPageProps) {
         return Array.from(options).sort();
     });
 
+    const totalItems = createMemo(() => Object.keys(props.studentResultList).length);
+
     const filteredResults = createMemo(() => {
         const filtered: ParsedResult[] = [];
 
@@ -43,12 +45,15 @@ export function ResultListPage(props: ResultListPageProps) {
 
             if (branch() && item.student.branch !== branch()) continue;
             if (semester() && item.student.roll.charAt(0) !== semester()) continue;
-            if (searchQuery()) {
-                if (searchBy() === SearchBy.Roll && !item.student.roll.includes(searchQuery())) {
+
+            const searchQ = searchQuery().trim();
+
+            if (searchQ) {
+                if (searchBy() === SearchBy.Roll && !item.student.roll.includes(searchQ)) {
                     continue;
                 } else if (
                     searchBy() === SearchBy.Name &&
-                    !item.student.name.toLowerCase().includes(searchQuery().toLowerCase())
+                    !item.student.name.toLowerCase().includes(searchQ.toLowerCase())
                 ) {
                     continue;
                 }
@@ -108,6 +113,7 @@ export function ResultListPage(props: ResultListPageProps) {
                 sortOrder={sortOrder()}
                 setSortOrder={setSortOrder}
                 displayedResults={sortedResults()}
+                totalItems={totalItems()}
             />
         </div>
     );
