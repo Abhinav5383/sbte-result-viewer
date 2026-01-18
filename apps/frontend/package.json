@@ -12,6 +12,7 @@
         "@app/shared": "workspace:*",
         "@tailwindcss/vite": "^4.1.18",
         "clsx": "^2.1.1",
+        "html-to-image": "^1.11.13",
         "lucide-solid": "^0.562.0",
         "solid-js": "^1.9.10",
         "tailwind-merge": "^3.4.0",

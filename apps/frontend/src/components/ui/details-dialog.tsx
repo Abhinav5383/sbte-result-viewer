@@ -1,10 +1,12 @@
 import { apiUrl } from "@app/shared/consts";
 import { PAPER_TYPE, type ParsedResult, type SubjectResult } from "@app/shared/types";
-import DownloadIcon from "lucide-solid/icons/download";
+import { toPng } from "html-to-image";
+import ExternalLinkIcon from "lucide-solid/icons/external-link";
+import ImageIcon from "lucide-solid/icons/image";
 import XIcon from "lucide-solid/icons/x";
 import { For, Show, createEffect, createSignal } from "solid-js";
+import { OrdinalSuffix, cn } from "~/components/utils";
 import { alphabeticalGradeClass, marksClass, sgpaClass } from "~/lib/grade-utils";
-import { OrdinalSuffix, cn } from "../utils";
 import "./details-dialog.css";
 
 interface DetailsDialogProps {
@@ -16,8 +18,36 @@ interface DetailsDialogProps {
 export function DetailsDialog(props: DetailsDialogProps) {
     const [dialogRef, setDialogRef] = createSignal<HTMLDialogElement | null>(null);
 
+    const [contentRef, setContentRef] = createSignal<HTMLDivElement | null>(null);
+    const [saving, setSaving] = createSignal(false);
+
     function closeDialog() {
         props.onClose();
+    }
+
+    async function saveAsImage() {
+        const content = contentRef();
+        if (!content || !props.data) return;
+
+        setSaving(true);
+        try {
+            // wait to apply the saving state
+            // not doing this block the whole shit
+            await new Promise((resolve) => setTimeout(resolve, 10));
+
+            const dataUrl = await toPng(content, {
+                backgroundColor: "#ffffff",
+                pixelRatio: 1.5,
+            });
+            const link = document.createElement("a");
+            link.download = `${props.data.student.roll}-result.png`;
+            link.href = dataUrl;
+            link.click();
+        } catch (err) {
+            console.error("Failed to save image:", err);
+        } finally {
+            setSaving(false);
+        }
     }
 
     createEffect(() => {
@@ -43,9 +73,9 @@ export function DetailsDialog(props: DetailsDialogProps) {
         >
             <Show keyed when={props.data}>
                 {(data) => (
-                    <div>
+                    <div ref={setContentRef} class="@container">
                         <div class="grid gap-y-3 p-6 bg-accent-bg text-zinc-50">
-                            <div class="flex flex-wrap items-center gap-4">
+                            <div class="flex flex-wrap items-center gap-3">
                                 <h1 class="text-3xl font-extrabold">{data.student.name}</h1>
                                 <span
                                     class={`branch-badge ${data.student.branch.toLowerCase()} inline-block ps-2 pe-0.5 rounded-lg text-sm`}
@@ -57,26 +87,38 @@ export function DetailsDialog(props: DetailsDialogProps) {
                                     </em>
                                 </span>
 
-                                <button
-                                    type="button"
-                                    class="ms-auto flex items-center justify-center gap-2 bg-zinc-50 text-normal-fg rounded-full cursor-pointer ring-zinc-600 hover:scale-105 transition-transform duration-500"
-                                    onclick={async () => {
-                                        window.open(apiUrl(data.student.roll));
-                                    }}
-                                >
-                                    <DownloadIcon />
-                                    Download
-                                </button>
+                                <div class="ms-auto flex items-center gap-2">
+                                    <button
+                                        type="button"
+                                        class="flex items-center justify-center gap-2 bg-zinc-50 text-normal-fg rounded-full cursor-pointer ring-zinc-600 hover:scale-105 transition-transform duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                        disabled={saving()}
+                                        onclick={saveAsImage}
+                                    >
+                                        <ImageIcon />
+                                        {saving() ? "Saving..." : "Save Image"}
+                                    </button>
 
-                                <button
-                                    type="button"
-                                    class="bg-zinc-50 text-normal-fg rounded-full cursor-pointer ring-zinc-600 hover:scale-105 transition-transform duration-500"
-                                    onclick={closeDialog}
-                                >
-                                    <XIcon />
-                                </button>
+                                    <button
+                                        type="button"
+                                        class="bg-zinc-50 text-normal-fg rounded-full cursor-pointer ring-zinc-600 hover:scale-105 transition-transform duration-500"
+                                        onclick={closeDialog}
+                                    >
+                                        <XIcon />
+                                    </button>
+                                </div>
                             </div>
-                            <span class="font-semibold">{data.student.roll}</span>
+                            <div class="flex items-center gap-3">
+                                <span class="font-semibold py-1">{data.student.roll}</span>
+                                <a
+                                    href={apiUrl(data.student.roll)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="flex items-center font-medium gap-1 text-sm px-2 py-1 rounded-md text-white underline decoration-white/50 hover:text-normal-fg hover:bg-white transition-colors"
+                                >
+                                    View original PDF
+                                    <ExternalLinkIcon />
+                                </a>
+                            </div>
                         </div>
 
                         <div class="grid gap-4 p-4">
@@ -150,7 +192,7 @@ interface SubjectCategoryProps {
 function SubjectCategory(props: SubjectCategoryProps) {
     return (
         <Show when={props.subjects.length > 0}>
-            <div class="grid grid-cols-2 gap-3 border-t border-border mt-3 pt-3">
+            <div class="grid grid-cols-1 @md:grid-cols-2 @4xl:grid-cols-3 gap-3 border-t border-border mt-3 pt-3">
                 <span class="capitalize text-xl font-bold text-dim-fg col-span-full">
                     {props.title}
                 </span>

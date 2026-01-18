@@ -7,8 +7,9 @@ dialog {
     padding: 0;
     align-self: center;
     justify-self: center;
-    width: calc(100% - 2em);
-    max-width: 80ch;
+    width: 100%;
+    max-width: min(calc(100% - 3rem), 72rem);
+    max-height: calc(100% - max(4rem, 5vh));
     border: none;
     outline: none;
 
