@@ -113,16 +113,11 @@ export function DetailsDialog(props: DetailsDialogProps) {
                             </div>
 
                             <div class="grid gap-6">
-                                <h2 class="text-dim-fg text-2xl font-medium border-b-2 border-border">
-                                    Subjects
-                                </h2>
-
                                 <SubjectCategory
                                     title={PAPER_TYPE.THEORY.toLowerCase()}
                                     subjects={data.subjects.filter(
                                         (sub) => sub.type === PAPER_TYPE.THEORY,
                                     )}
-                                    showBorder
                                 />
 
                                 <SubjectCategory
@@ -130,7 +125,6 @@ export function DetailsDialog(props: DetailsDialogProps) {
                                     subjects={data.subjects.filter(
                                         (sub) => sub.type === PAPER_TYPE.PRACTICAL,
                                     )}
-                                    showBorder
                                 />
 
                                 <SubjectCategory
@@ -151,19 +145,13 @@ export function DetailsDialog(props: DetailsDialogProps) {
 interface SubjectCategoryProps {
     title: string;
     subjects: SubjectResult[];
-    showBorder?: boolean;
 }
 
 function SubjectCategory(props: SubjectCategoryProps) {
     return (
         <Show when={props.subjects.length > 0}>
-            <div
-                class="grid grid-cols-2 gap-3"
-                classList={{
-                    "border-b border-border pb-6": props.showBorder,
-                }}
-            >
-                <span class="capitalize text-lg font-bold text-dim-fg col-span-full">
+            <div class="grid grid-cols-2 gap-3 border-t border-border mt-3 pt-3">
+                <span class="capitalize text-xl font-bold text-dim-fg col-span-full">
                     {props.title}
                 </span>
                 <For each={props.subjects}>

@@ -29,6 +29,10 @@ body {
     background-color: var(--color-zinc-50);
 }
 
+html {
+    background-color: var(--color-zinc-900);
+}
+
 @layer base {
     svg {
         width: 1.2em;

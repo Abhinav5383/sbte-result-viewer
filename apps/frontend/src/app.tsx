@@ -59,8 +59,8 @@ export default function App() {
 
 function Footer() {
     return (
-        <footer class="bg-zinc-900 text-zinc-50 py-4 grid gap-3 place-items-center">
-            <div class="grid place-items-center">
+        <footer class="bg-zinc-900 text-zinc-50 py-4 px-8 grid gap-3 place-items-center">
+            <div class="grid place-items-center text-center">
                 <span>
                     COPYRIGHT &copy; {new Date().getFullYear()}{" "}
                     <a href="https://github.com/Abhinav5383">Abhinav5383</a>;
