@@ -31,6 +31,7 @@ interface ResultsListTableProps {
     maxStrSizes: {
         name: number;
         branch: number;
+        college: number;
     };
 }
 
@@ -68,6 +69,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                         "--max-name-len": `${props.maxStrSizes.name}ch`,
                         // adding extra for the semester suffix + spacing
                         "--max-branch-len": `${props.maxStrSizes.branch + 10}ch`,
+                        "--max-college-len": `${props.maxStrSizes.college}ch`,
                     }}
                 >
                     <div class="grid col-span-full grid-cols-subgrid gap-x-0 *:px-4 *:py-3 border-b border-border bg-zinc-700 text-zinc-200">
@@ -94,6 +96,10 @@ export function ResultsListTable(props: ResultsListTableProps) {
 
                         <div>
                             <strong>Branch</strong>
+                        </div>
+
+                        <div>
+                            <strong>College</strong>
                         </div>
 
                         <SortableHeaderItem
@@ -335,6 +341,7 @@ function ResultRow(props: ResultRowProps) {
                     </em>
                 </span>
             </div>
+            <span class="text-dim-fg text-sm">{props.item.student.college}</span>
             <div>
                 <span class={cn("font-medium text-lg", marksClassName)}>
                     {props.item.grandTotal.obtained}

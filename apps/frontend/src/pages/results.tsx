@@ -41,6 +41,7 @@ export function ResultListPage(props: ResultListPageProps) {
 
         let maxNameLen = 0;
         let maxBranchLen = 0;
+        let maxCollegeLen = 0;
 
         for (const item of props.studentResultList) {
             semesters.add(item.student.roll.charAt(0));
@@ -51,6 +52,8 @@ export function ResultListPage(props: ResultListPageProps) {
             if (nameLength > maxNameLen) maxNameLen = nameLength;
             const branchLength = item.student.branch.length;
             if (branchLength > maxBranchLen) maxBranchLen = branchLength;
+            const collegeLength = item.student.college.length;
+            if (collegeLength > maxCollegeLen) maxCollegeLen = collegeLength;
         }
 
         return {
@@ -62,6 +65,7 @@ export function ResultListPage(props: ResultListPageProps) {
             maxStrSizes: {
                 name: maxNameLen,
                 branch: maxBranchLen,
+                college: maxCollegeLen,
             },
         };
     });

@@ -13,6 +13,8 @@ export function getAllCollegeBranches() {
     const allBranches: BranchConfig[] = [];
 
     for (const collegeCode of Object.values(COLLEGE_CODES)) {
+        if (!collegeCode) continue;
+
         const collegeBranches = getCollegeBranches(collegeCode, defaultSemesters);
         allBranches.push(...collegeBranches);
     }

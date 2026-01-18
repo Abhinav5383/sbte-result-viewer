@@ -1,5 +1,10 @@
 import { apiUrl } from "@app/shared/consts";
-import { PAPER_TYPE, type ParsedResult, type SubjectResult } from "@app/shared/types";
+import {
+    COLLEGE_FULL_NAME,
+    PAPER_TYPE,
+    type ParsedResult,
+    type SubjectResult,
+} from "@app/shared/types";
 import { toPng } from "html-to-image";
 import CheckIcon from "lucide-solid/icons/check";
 import ClipboardIcon from "lucide-solid/icons/clipboard";
@@ -79,16 +84,21 @@ export function DetailsDialog(props: DetailsDialogProps) {
                     <div class="relative">
                         <div ref={setContentRef} class="@container">
                             <div class="grid gap-y-3 p-6 bg-accent-bg text-zinc-50">
-                                <div class="flex flex-wrap items-center gap-3">
-                                    <h1 class="text-3xl font-extrabold">{data.student.name}</h1>
-                                    <span
-                                        class={`branch-badge ${data.student.branch.toLowerCase()} inline-block ps-2 pe-0.5 rounded-lg text-sm`}
-                                    >
-                                        {data.student.branch}
-                                        <em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 rounded-md">
-                                            {data.student.roll.charAt(0)}
-                                            {OrdinalSuffix(data.student.roll.charAt(0))} sem
-                                        </em>
+                                <div class="grid gap-1">
+                                    <div class="flex flex-wrap items-center gap-3">
+                                        <h1 class="text-3xl font-extrabold">{data.student.name}</h1>
+                                        <span
+                                            class={`branch-badge ${data.student.branch.toLowerCase()} inline-block ps-2 pe-0.5 rounded-lg text-sm`}
+                                        >
+                                            {data.student.branch}
+                                            <em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 rounded-md">
+                                                {data.student.roll.charAt(0)}
+                                                {OrdinalSuffix(data.student.roll.charAt(0))} sem
+                                            </em>
+                                        </span>
+                                    </div>
+                                    <span class="text-accent-bg-text font-medium">
+                                        {COLLEGE_FULL_NAME[data.student.college]}
                                     </span>
                                 </div>
                                 <div class="flex items-center gap-3">

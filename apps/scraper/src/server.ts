@@ -20,6 +20,7 @@ async function getParsedResults() {
 
     return allResults;
 }
+console.log("Starting scraper server...");
 const parsedData = await getParsedResults();
 
 const app = new Hono();

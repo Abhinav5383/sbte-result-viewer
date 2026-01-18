@@ -6,7 +6,7 @@ import { extractTextFromPdfBuffer } from "~/lib/parser/extract-text";
 import { parseTxtToJson } from "~/lib/parser/parse-txt";
 import { formatRollList } from "~/lib/utils";
 
-const BATCH_SIZE = 100;
+const BATCH_SIZE = 60;
 export async function parseAllStudentsData(branch: BranchConfig): Promise<ParsedResult[]> {
     const requestedItems: ParsedResult[] = [];
     const requestedRolls = formatRollList(branch.rollList, branch);
