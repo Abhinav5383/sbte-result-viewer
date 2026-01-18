@@ -1,15 +1,36 @@
+import { type EncodedResult, decodeResult } from "@app/shared/encoder";
 import type { ParsedResult } from "@app/shared/types";
 import { Show, createResource } from "solid-js";
 import Navbar from "./components/navbar";
 import { ResultListPage } from "./pages/results";
 
-// Declare the global embedded data (injected at build time)
-declare const __EMBEDDED_RESULTS__: ParsedResult[] | undefined;
+// Declare the global embedded data (injected at build time) - gzip+base64 encoded string
+declare const __EMBEDDED_RESULTS__: string | undefined;
+
+async function decodeEmbeddedResults(base64: string): Promise<ParsedResult[]> {
+    // base64 -> gzip -> JSON
+    const binary = atob(base64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) {
+        bytes[i] = binary.charCodeAt(i);
+    }
+
+    // Decompress using DecompressionStream (browser native)
+    const ds = new DecompressionStream("gzip");
+    const writer = ds.writable.getWriter();
+    writer.write(bytes);
+    writer.close();
+
+    const decompressed = await new Response(ds.readable).text();
+    const encoded = JSON.parse(decompressed) as EncodedResult[];
+
+    return encoded.map(decodeResult);
+}
 
 export default function App() {
     const [results, { refetch }] = createResource(async (): Promise<ParsedResult[]> => {
         if (typeof __EMBEDDED_RESULTS__ !== "undefined") {
-            return __EMBEDDED_RESULTS__;
+            return decodeEmbeddedResults(__EMBEDDED_RESULTS__);
         }
 
         const res = await fetch("http://localhost:5500/students-data");
@@ -17,8 +38,8 @@ export default function App() {
         if (!res.ok) {
             throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         }
-        const records = (await res.json()) as Record<string, ParsedResult>;
-        return Object.values(records);
+        const data = (await res.json()) as ParsedResult[];
+        return data;
     });
 
     return (

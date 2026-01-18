@@ -3,6 +3,7 @@ import path from "path";
 import { defineConfig } from "vite";
 import { viteSingleFile } from "vite-plugin-singlefile";
 import solid from "vite-plugin-solid";
+import { gzipSync } from "zlib";
 import { type EncodedResult, encodeResult } from "../shared/src/encoder";
 import type { ParsedResult } from "../shared/src/types";
 
@@ -21,17 +22,26 @@ export default defineConfig(async (ctx) => ({
     },
 }));
 
-async function getEmbeddedResults() {
+async function getEmbeddedResults(): Promise<string> {
     const res = await fetch("http://localhost:5500/students-data");
     if (!res.ok) {
         throw new Error(`Failed to fetch embedded results: ${res.status} ${res.statusText}.`);
     }
-    const data = (await res.json()) as Record<string, ParsedResult>;
-    const embedResults: EncodedResult[] = [];
+    const data = (await res.json()) as ParsedResult[];
 
-    for (const item of Object.values(data)) {
-        embedResults.push(encodeResult(item));
-    }
+    // Encode to compact array format
+    const encoded: EncodedResult[] = data.map(encodeResult);
 
-    return embedResults;
+    // JSON -> gzip -> base64
+    const json = JSON.stringify(encoded);
+    const gzipped = gzipSync(json, { level: 9 });
+    const base64 = gzipped.toString("base64");
+
+    console.log(
+        `Embedded data: ${data.length} results, ${(json.length / 1024 / 1024).toFixed(
+            2,
+        )}MB JSON -> ${(base64.length / 1024 / 1024).toFixed(2)}MB gzipped+base64`,
+    );
+
+    return JSON.stringify(base64);
 }

@@ -1,4 +1,4 @@
-import { PAPER_TYPE, ParsedResult, SubjectResult } from "./types";
+import { PAPER_TYPE, type ParsedResult, type SubjectResult } from "./types";
 import { getBranchFromRoll, getCollegeFromRoll } from "./utils";
 
 export type EncodedResult = [
