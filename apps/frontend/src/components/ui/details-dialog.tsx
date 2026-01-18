@@ -202,7 +202,9 @@ export function DetailsDialog(props: DetailsDialogProps) {
                 open={previewOpen()}
                 onClose={() => setPreviewOpen(false)}
                 imageUrl={previewImage()}
-                filename={`${props.data?.student.roll}-result.png`}
+                filename={`${props.data?.student.name.replace(" ", "_")}-${
+                    props.data?.student.roll
+                }-result.png`}
             />
         </dialog>
     );
@@ -267,7 +269,7 @@ function ImagePreviewDialog(props: ImagePreviewDialogProps) {
             class="rounded-xl overflow-clip"
         >
             <Show when={props.imageUrl}>
-                <div class="grid max-h-full grid-rows-[max-content_1fr_max-content] gap-4 p-4">
+                <div class="flex flex-col max-h-[90vh] gap-4 p-4">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-semibold">Image Preview</h2>
                         <button
@@ -279,20 +281,18 @@ function ImagePreviewDialog(props: ImagePreviewDialogProps) {
                         </button>
                     </div>
 
-                    <div class="max-h-[70vh]">
-                        <div class="overflow-auto max-h-full rounded-lg border border-zinc-200">
-                            <img src={props.imageUrl ?? ""} alt="Result preview" class="w-full" />
-                        </div>
+                    <div class="flex-1 min-h-0 overflow-auto rounded-lg border border-zinc-200">
+                        <img src={props.imageUrl ?? ""} alt="Result preview" class="w-full" />
                     </div>
 
                     <div class="flex gap-3 justify-end">
                         <button
                             type="button"
-                            class="flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-300 hover:bg-zinc-100 transition-colors"
+                            class="flex items-center gap-2 px-4 py-2 rounded-lg border text-dim-fg border-zinc-300 hover:bg-zinc-100 transition-colors"
                             onclick={copyToClipboard}
                         >
                             <Show when={copied()} fallback={<ClipboardIcon />}>
-                                <CheckIcon class="text-green-600" />
+                                <CheckIcon class="text-accent-fg" />
                             </Show>
                             {copied() ? "Copied!" : "Copy to Clipboard"}
                         </button>
