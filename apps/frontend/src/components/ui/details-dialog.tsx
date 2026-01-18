@@ -46,7 +46,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
 
             const dataUrl = await toPng(content, {
                 backgroundColor: "#ffffff",
-                pixelRatio: 3,
+                pixelRatio: 2,
             });
             setPreviewImage(dataUrl);
             setPreviewOpen(true);
