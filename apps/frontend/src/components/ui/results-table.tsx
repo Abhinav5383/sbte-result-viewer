@@ -1,7 +1,17 @@
 import { type ParsedResult } from "@app/shared/types";
 import ArrowDownWideNarrow from "lucide-solid/icons/arrow-down-wide-narrow";
-import ArrowUpNarrowWide from "lucide-solid/icons/arrow-up-narrow-wide";
-import { For, type Setter, Show, batch, createSignal } from "solid-js";
+import ArrowUpWideNarrow from "lucide-solid/icons/arrow-up-wide-narrow";
+import {
+    type ComponentProps,
+    For,
+    type Setter,
+    Show,
+    batch,
+    createMemo,
+    createSignal,
+    onCleanup,
+    onMount,
+} from "solid-js";
 import { marksClass, sgpaClass } from "~/lib/grade-utils";
 import { SortBy, SortOrder } from "~/lib/types";
 import { OrdinalSuffix, cn } from "../utils";
@@ -23,12 +33,11 @@ export function ResultsListTable(props: ResultsListTableProps) {
     const [dialogOpen, setDialogOpen] = createSignal(false);
     const [selectedRoll, setSelectedRoll] = createSignal<string | null>(null);
 
-    // Find the current data by roll number to handle list changes while dialog is open
-    const dialogData = () => {
+    function dialogData() {
         const roll = selectedRoll();
         if (!roll) return undefined;
         return props.displayedResults.find((r) => r.student.roll === roll);
-    };
+    }
 
     return (
         <div>
@@ -46,7 +55,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                     {props.displayedResults.length !== 1 ? "results" : "result"}
                 </div>
 
-                <div class="grid gap-x-8 grid-cols-[max-content_1fr_1fr_1fr_1fr_1fr] [&>div>*:first-child]:ps-6 [&>div>*:last-child]:pe-6">
+                <div class="grid gap-x-8 grid-cols-[max-content_minmax(max-content,1fr)_minmax(max-content,1fr)_minmax(max-content,1fr)_minmax(max-content,1fr)_minmax(max-content,1fr)]">
                     <div class="grid col-span-full grid-cols-subgrid gap-x-0 *:px-4 *:py-3 border-b border-border bg-zinc-700 text-zinc-200">
                         <div>
                             <strong>Sl no</strong>
@@ -91,18 +100,13 @@ export function ResultsListTable(props: ResultsListTableProps) {
                         />
                     </div>
 
-                    <For each={props.displayedResults}>
-                        {(item, index) => (
-                            <ResultRow
-                                item={item}
-                                index={index()}
-                                onSelect={() => {
-                                    setSelectedRoll(item.student.roll);
-                                    setDialogOpen(true);
-                                }}
-                            />
-                        )}
-                    </For>
+                    <ResultTableContents
+                        results={props.displayedResults}
+                        onSelect={(roll) => {
+                            setSelectedRoll(roll);
+                            setDialogOpen(true);
+                        }}
+                    />
                 </div>
             </Show>
 
@@ -166,7 +170,7 @@ function SortableHeaderItem(props: SortableHeaderItemProps) {
             <Show when={props.sortBy === props.value}>
                 <Show
                     when={props.sortOrder === SortOrder.Descending}
-                    fallback={<ArrowUpNarrowWide class="text-accent-fg-light" />}
+                    fallback={<ArrowUpWideNarrow class="text-accent-fg-light" />}
                 >
                     <ArrowDownWideNarrow class="text-accent-fg-light" />
                 </Show>
@@ -175,15 +179,117 @@ function SortableHeaderItem(props: SortableHeaderItemProps) {
     );
 }
 
-// Extracted row component for better performance - avoids re-renders of entire list
+interface ResultTableContentsProps {
+    results: ParsedResult[];
+    onSelect: (roll: string) => void;
+}
+
+function ResultTableContents(props: ResultTableContentsProps) {
+    const DEFAULT_ROW_HEIGHT = 52;
+    const OVERSCAN = 10;
+
+    let measureRef: HTMLDivElement | undefined;
+    let containerRef: HTMLDivElement | undefined;
+    const [rowHeight, setRowHeight] = createSignal(DEFAULT_ROW_HEIGHT);
+    const [scrollOffset, setScrollOffset] = createSignal(0);
+    const [viewportHeight, setViewportHeight] = createSignal(window.innerHeight);
+
+    // all rows have the same height
+    // and because each column has a min-width of 'max-content', text can't (or rather won't) wrap in our case
+    // really long names might still cause wrapping, but meh
+    function measureRowHeight() {
+        if (measureRef) {
+            const measured = measureRef.offsetHeight;
+            if (measured > 0) setRowHeight(measured);
+        }
+    }
+
+    function handleScroll() {
+        if (!containerRef) return;
+        const rect = containerRef.getBoundingClientRect();
+        setScrollOffset(Math.max(0, -rect.top));
+    }
+
+    function handleResize() {
+        setViewportHeight(window.innerHeight);
+        // measure row height again in case layout changed
+        requestAnimationFrame(measureRowHeight);
+        handleScroll();
+    }
+
+    // track window scroll position relative to container
+    onMount(() => {
+        window.addEventListener("scroll", handleScroll, { passive: true });
+        window.addEventListener("resize", handleResize, { passive: true });
+
+        // init
+        requestAnimationFrame(() => {
+            measureRowHeight();
+            handleScroll();
+        });
+
+        onCleanup(() => {
+            window.removeEventListener("scroll", handleScroll);
+            window.removeEventListener("resize", handleResize);
+        });
+    });
+
+    const visibleRange = createMemo(() => {
+        const rh = rowHeight();
+        const offset = scrollOffset();
+        const vh = viewportHeight();
+        const total = props.results.length;
+
+        const startIndex = Math.max(0, Math.floor(offset / rh) - OVERSCAN);
+        const visibleCount = Math.ceil(vh / rh) + OVERSCAN * 2;
+        const endIndex = Math.min(total, startIndex + visibleCount);
+
+        return { startIndex, endIndex };
+    });
+
+    const visibleItems = createMemo(() => {
+        const { startIndex, endIndex } = visibleRange();
+        return props.results.slice(startIndex, endIndex);
+    });
+
+    const topPadding = () => visibleRange().startIndex * rowHeight();
+    const bottomPadding = () => (props.results.length - visibleRange().endIndex) * rowHeight();
+
+    return (
+        <div
+            ref={(el) => {
+                containerRef = el;
+            }}
+            class="grid col-span-full grid-cols-subgrid"
+            style={{
+                "padding-top": `${topPadding()}px`,
+                "padding-bottom": `${bottomPadding()}px`,
+            }}
+        >
+            <For each={visibleItems()}>
+                {(item, index) => (
+                    <ResultRow
+                        item={item}
+                        index={visibleRange().startIndex + index()}
+                        onSelect={() => props.onSelect(item.student.roll)}
+                        ref={(el) => {
+                            if (index() === 0) measureRef = el;
+                        }}
+                    />
+                )}
+            </For>
+        </div>
+    );
+}
+
 interface ResultRowProps {
     item: ParsedResult;
     index: number;
     onSelect: () => void;
+    ref?: ComponentProps<"div">["ref"];
 }
 
 function ResultRow(props: ResultRowProps) {
-    // Pre-compute static values that don't change for this row
     const semester = props.item.student.roll.charAt(0);
     const semesterSuffix = OrdinalSuffix(semester);
     const branchClass = props.item.student.branch.toLowerCase();
@@ -197,8 +303,9 @@ function ResultRow(props: ResultRowProps) {
     return (
         // biome-ignore lint/a11y/useKeyWithClickEvents: Row click handler
         <div
-            class="grid items-center col-span-full grid-cols-subgrid py-3 border-b border-border hover:bg-zinc-100 cursor-pointer"
+            class="grid items-center col-span-full grid-cols-subgrid py-3 border-b border-border hover:bg-zinc-100 cursor-pointer px-6"
             onClick={props.onSelect}
+            ref={props.ref}
         >
             <span class="text-dim-fg">{props.index + 1}</span>
             <span class="text-dim-fg">{props.item.student.roll}</span>
