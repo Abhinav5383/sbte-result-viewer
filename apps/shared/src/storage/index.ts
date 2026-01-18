@@ -1,4 +1,5 @@
-import { BRANCH_NAME, PAPER_TYPE, ParsedResult, SubjectResult } from "~/types";
+import { PAPER_TYPE, ParsedResult, SubjectResult } from "~/types";
+import { getBranchFromCode, getCollegeFromCode } from "~/utils";
 
 export type EncodedResultsDB = Record<string, EncodedResult>;
 export function encodeResultsDB(results: Record<string, ParsedResult>): EncodedResultsDB {
@@ -20,7 +21,6 @@ export function decodeResultsDB(encoded: EncodedResultsDB): Record<string, Parse
 // Note: roll is used as the key in the object, so not duplicated in the array
 type EncodedResult = [
     string, // name
-    BRANCH_NAME, // branch
     [number, number, number], // [grandTotalMax, grandTotalPassing, grandTotalObtained]
     EncodedSubject[],
     number, // sgpa
@@ -29,7 +29,6 @@ type EncodedResult = [
 export function encodeResultData(data: ParsedResult): EncodedResult {
     return [
         data.student.name,
-        data.student.branch,
         [data.grandTotal.maximum, data.grandTotal.passing, data.grandTotal.obtained],
         data.subjects.map(encodeSubject),
         data.sgpa,
@@ -41,17 +40,18 @@ export function decodeResultData(roll: string, arr: EncodedResult): ParsedResult
     return {
         student: {
             name: arr[0],
-            roll,
-            branch: arr[1],
+            roll: roll,
+            branch: getBranchFromCode(roll.substring(5, 7)),
+            college: getCollegeFromCode(roll.substring(2, 5)),
         },
         grandTotal: {
-            maximum: arr[2][0],
-            passing: arr[2][1],
-            obtained: arr[2][2],
+            maximum: arr[1][0],
+            passing: arr[1][1],
+            obtained: arr[1][2],
         },
-        subjects: arr[3].map(decodeSubject),
-        sgpa: arr[4],
-        remarks: arr[5],
+        subjects: arr[2].map(decodeSubject),
+        sgpa: arr[3],
+        remarks: arr[4],
     };
 }
 

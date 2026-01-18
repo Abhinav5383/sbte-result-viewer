@@ -40,6 +40,10 @@ body {
         @apply text-accent-fg-light underline-offset-2 hover:underline;
     }
 
+    button {
+        cursor: pointer;
+    }
+
     a,
     button,
     select,
