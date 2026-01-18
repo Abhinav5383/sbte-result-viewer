@@ -19,10 +19,14 @@ type FilterOptions = {
     [K in keyof Filters]: Filters[K][];
 };
 
+interface IndexedResult {
+    result: ParsedResult;
+    nameLower: string;
+    semester: string;
+}
+
 export function ResultListPage(props: ResultListPageProps) {
     const [searchBy, setSearchBy] = createSignal(SearchBy.Name);
-
-    // Use debounced signal for search - immediate value for input, debounced for filtering
     const [searchQuery, debouncedSearchQuery, setSearchQuery] = createDebouncedSignal("", 200);
 
     const [filters, setFilters] = createSignal({
@@ -34,7 +38,8 @@ export function ResultListPage(props: ResultListPageProps) {
     const [sortBy, setSortBy] = createSignal(SortBy.Marks);
     const [sortOrder, setSortOrder] = createSignal(SortOrder.Descending);
 
-    const computedValues = createMemo(() => {
+    // pre-index all data once
+    const indexedData = createMemo(() => {
         const semesters = new Set<string>();
         const branches = new Set<string>();
         const colleges = new Set<string>();
@@ -43,20 +48,31 @@ export function ResultListPage(props: ResultListPageProps) {
         let maxBranchLen = 0;
         let maxCollegeLen = 0;
 
-        for (const item of props.studentResultList) {
-            semesters.add(item.student.roll.charAt(0));
+        const indexed: IndexedResult[] = new Array(props.studentResultList.length);
+
+        for (let i = 0; i < props.studentResultList.length; i++) {
+            const item = props.studentResultList[i];
+            const semester = item.student.roll.charAt(0);
+
+            semesters.add(semester);
             branches.add(item.student.branch);
             colleges.add(item.student.college);
 
-            const nameLength = item.student.name.length;
-            if (nameLength > maxNameLen) maxNameLen = nameLength;
-            const branchLength = item.student.branch.length;
-            if (branchLength > maxBranchLen) maxBranchLen = branchLength;
-            const collegeLength = item.student.college.length;
-            if (collegeLength > maxCollegeLen) maxCollegeLen = collegeLength;
+            if (item.student.name.length > maxNameLen) maxNameLen = item.student.name.length;
+            if (item.student.branch.length > maxBranchLen)
+                maxBranchLen = item.student.branch.length;
+            if (item.student.college.length > maxCollegeLen)
+                maxCollegeLen = item.student.college.length;
+
+            indexed[i] = {
+                result: item,
+                nameLower: item.student.name.toLowerCase(),
+                semester,
+            };
         }
 
         return {
+            indexed,
             filters: {
                 semester: Array.from(semesters).sort(),
                 branch: Array.from(branches).sort(),
@@ -70,72 +86,78 @@ export function ResultListPage(props: ResultListPageProps) {
         };
     });
 
-    const totalItems = createMemo(() => props.studentResultList.length);
-
     const filteredResults = createMemo(() => {
-        const filtered: ParsedResult[] = [];
+        const { indexed } = indexedData();
         const filterValues = filters();
         const searchQ = debouncedSearchQuery().trim();
         const searchMode = searchBy();
         const searchLower = searchQ.toLowerCase();
 
-        for (const item of props.studentResultList) {
-            if (filterValues.college.length && item.student.college !== filterValues.college) {
-                continue;
-            }
-            if (filterValues.branch.length && item.student.branch !== filterValues.branch) {
-                continue;
-            }
-            if (
-                filterValues.semester.length &&
-                item.student.roll.charAt(0) !== filterValues.semester
-            ) {
-                continue;
+        const hasCollegeFilter = filterValues.college.length > 0;
+        const hasBranchFilter = filterValues.branch.length > 0;
+        const hasSemesterFilter = filterValues.semester.length > 0;
+        const hasSearch = searchQ.length > 0;
+
+        // fast path: no filters
+        if (!hasCollegeFilter && !hasBranchFilter && !hasSemesterFilter && !hasSearch) {
+            return indexed.slice();
+        }
+
+        const filtered: IndexedResult[] = [];
+
+        for (let i = 0; i < indexed.length; i++) {
+            const entry = indexed[i];
+            const item = entry.result;
+
+            if (hasCollegeFilter && item.student.college !== filterValues.college) continue;
+            if (hasBranchFilter && item.student.branch !== filterValues.branch) continue;
+            if (hasSemesterFilter && entry.semester !== filterValues.semester) continue;
+
+            if (hasSearch) {
+                if (searchMode === SearchBy.Roll) {
+                    if (!item.student.roll.includes(searchQ)) continue;
+                } else {
+                    if (!entry.nameLower.includes(searchLower)) continue;
+                }
             }
 
-            if (searchQ) {
-                if (searchMode === SearchBy.Roll && !item.student.roll.includes(searchQ)) {
-                    continue;
-                }
-                if (
-                    searchMode === SearchBy.Name &&
-                    !item.student.name.toLowerCase().includes(searchLower)
-                ) {
-                    continue;
-                }
-            }
-
-            filtered.push(item);
+            filtered.push(entry);
         }
 
         return filtered;
     });
 
     const sortedResults = createMemo(() => {
-        const results = [...filteredResults()];
+        const sorted = filteredResults();
+        const sort = sortBy();
+        const order = sortOrder();
+        const asc = order === SortOrder.Ascending;
 
-        results.sort((a, b) => {
-            switch (sortBy()) {
+        sorted.sort((a, b) => {
+            const ar = a.result;
+            const br = b.result;
+
+            switch (sort) {
                 case SortBy.Roll:
-                    return sortOrder() === SortOrder.Ascending
-                        ? a.student.roll.localeCompare(b.student.roll)
-                        : b.student.roll.localeCompare(a.student.roll);
+                    if (ar.student.roll < br.student.roll) return asc ? -1 : 1;
+                    if (ar.student.roll > br.student.roll) return asc ? 1 : -1;
+                    return 0;
                 case SortBy.Name:
-                    return sortOrder() === SortOrder.Ascending
-                        ? a.student.name.localeCompare(b.student.name)
-                        : b.student.name.localeCompare(a.student.name);
+                    if (ar.student.name < br.student.name) return asc ? -1 : 1;
+                    if (ar.student.name > br.student.name) return asc ? 1 : -1;
+                    return 0;
                 case SortBy.Marks:
-                    return sortOrder() === SortOrder.Ascending
-                        ? a.grandTotal.obtained - b.grandTotal.obtained
-                        : b.grandTotal.obtained - a.grandTotal.obtained;
+                    return asc
+                        ? ar.grandTotal.obtained - br.grandTotal.obtained
+                        : br.grandTotal.obtained - ar.grandTotal.obtained;
                 case SortBy.sgpa:
-                    return sortOrder() === SortOrder.Ascending ? a.sgpa - b.sgpa : b.sgpa - a.sgpa;
+                    return asc ? ar.sgpa - br.sgpa : br.sgpa - ar.sgpa;
                 default:
                     return 0;
             }
         });
 
-        return results;
+        return sorted.map((s) => s.result);
     });
 
     return (
@@ -147,7 +169,7 @@ export function ResultListPage(props: ResultListPageProps) {
                 setSearchQuery={setSearchQuery}
                 filters={filters()}
                 setFilters={setFilters}
-                filterOptions={computedValues().filters}
+                filterOptions={indexedData().filters}
                 isFiltering={searchQuery() !== debouncedSearchQuery()}
             />
 
@@ -157,8 +179,8 @@ export function ResultListPage(props: ResultListPageProps) {
                 sortOrder={sortOrder()}
                 setSortOrder={setSortOrder}
                 displayedResults={sortedResults()}
-                totalItems={totalItems()}
-                maxStrSizes={computedValues().maxStrSizes}
+                totalItems={props.studentResultList.length}
+                maxStrSizes={indexedData().maxStrSizes}
             />
         </div>
     );
