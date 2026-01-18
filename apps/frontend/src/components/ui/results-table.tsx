@@ -98,10 +98,6 @@ export function ResultsListTable(props: ResultsListTableProps) {
                             <strong>Branch</strong>
                         </div>
 
-                        <div>
-                            <strong>College</strong>
-                        </div>
-
                         <SortableHeaderItem
                             title="Marks"
                             value={SortBy.Marks}
@@ -118,6 +114,10 @@ export function ResultsListTable(props: ResultsListTableProps) {
                             sortOrder={props.sortOrder}
                             setSortOrder={props.setSortOrder}
                         />
+
+                        <div>
+                            <strong>College</strong>
+                        </div>
                     </div>
 
                     <ResultTableContents
@@ -341,7 +341,6 @@ function ResultRow(props: ResultRowProps) {
                     </em>
                 </span>
             </div>
-            <span class="text-dim-fg text-sm">{props.item.student.college}</span>
             <div>
                 <span class={cn("font-medium text-lg", marksClassName)}>
                     {props.item.grandTotal.obtained}
@@ -349,6 +348,7 @@ function ResultRow(props: ResultRowProps) {
                 <span class="text-sm text-dim-fg">/{props.item.grandTotal.maximum}</span>
             </div>
             <span class={cn("font-medium", sgpaClassName)}>{formattedSgpa}</span>
+            <span class="text-dim-fg text-sm">{props.item.student.college}</span>
         </div>
     );
 }

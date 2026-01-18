@@ -106,7 +106,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                                         href={apiUrl(data.student.roll)}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        class="flex items-center font-medium gap-1 text-sm px-2 py-1 rounded-md text-white underline decoration-white/50 hover:text-normal-fg hover:bg-white transition-colors"
+                                        class="flex items-center font-medium gap-1 text-sm px-2 py-1 rounded-md text-white underline decoration-white/50 hover:text-accent-fg hover:bg-white transition-colors"
                                     >
                                         View original PDF
                                         <ExternalLinkIcon />
