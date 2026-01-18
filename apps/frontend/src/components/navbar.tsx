@@ -3,7 +3,7 @@ import GithubIcon from "./icons/github";
 export default function Navbar() {
     return (
         <header class="grid bg-linear-to-r from-[lch(from_var(--color-accent-bg)_calc(l-10)_c_calc(h+10))] to-accent-bg py-4">
-            <div class="flex gap-3 justify-between text-accent-bg-text text-center px-6">
+            <div class="flex flex-wrap gap-3 justify-between text-accent-bg-text text-center px-6">
                 <span class="font-extrabold text-2xl">Semester Exam Results</span>
 
                 <a
