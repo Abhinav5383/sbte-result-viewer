@@ -36,7 +36,7 @@ function getBranches_ForSemester(collegeCode: number, semester: number, admissio
 
     for (const [branch, branchCode] of Object.entries(BRANCH_CODES)) {
         branchConfigs.push({
-            branchName: BRANCH_NAME[branch as keyof typeof BRANCH_NAME],
+            branchName: branch as BRANCH_NAME,
             semester: semester,
             collegeCode: collegeCode,
             branchCode: branchCode,

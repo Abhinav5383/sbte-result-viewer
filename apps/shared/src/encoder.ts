@@ -1,34 +1,19 @@
-import { PAPER_TYPE, ParsedResult, SubjectResult } from "~/types";
-import { getBranchFromCode, getCollegeFromCode } from "~/utils";
+import { PAPER_TYPE, ParsedResult, SubjectResult } from "./types";
+import { getBranchFromRoll, getCollegeFromRoll } from "./utils";
 
-export type EncodedResultsDB = Record<string, EncodedResult>;
-export function encodeResultsDB(results: Record<string, ParsedResult>): EncodedResultsDB {
-    const encoded: EncodedResultsDB = {};
-    for (const [roll, data] of Object.entries(results)) {
-        encoded[roll] = encodeResultData(data);
-    }
-    return encoded;
-}
-
-export function decodeResultsDB(encoded: EncodedResultsDB): Record<string, ParsedResult> {
-    const results: Record<string, ParsedResult> = {};
-    for (const [roll, data] of Object.entries(encoded)) {
-        results[roll] = decodeResultData(roll, data);
-    }
-    return results;
-}
-
-// Note: roll is used as the key in the object, so not duplicated in the array
-type EncodedResult = [
+export type EncodedResult = [
     string, // name
+    string, // roll
     [number, number, number], // [grandTotalMax, grandTotalPassing, grandTotalObtained]
     EncodedSubject[],
     number, // sgpa
     string, // remarks
 ];
-export function encodeResultData(data: ParsedResult): EncodedResult {
+
+export function encodeResult(data: ParsedResult): EncodedResult {
     return [
         data.student.name,
+        data.student.roll,
         [data.grandTotal.maximum, data.grandTotal.passing, data.grandTotal.obtained],
         data.subjects.map(encodeSubject),
         data.sgpa,
@@ -36,26 +21,7 @@ export function encodeResultData(data: ParsedResult): EncodedResult {
     ];
 }
 
-export function decodeResultData(roll: string, arr: EncodedResult): ParsedResult {
-    return {
-        student: {
-            name: arr[0],
-            roll: roll,
-            branch: getBranchFromCode(roll.substring(5, 7)),
-            college: getCollegeFromCode(roll.substring(2, 5)),
-        },
-        grandTotal: {
-            maximum: arr[1][0],
-            passing: arr[1][1],
-            obtained: arr[1][2],
-        },
-        subjects: arr[2].map(decodeSubject),
-        sgpa: arr[3],
-        remarks: arr[4],
-    };
-}
-
-type EncodedSubject = [
+export type EncodedSubject = [
     string, // name
     PAPER_TYPE, // type
     number, // credits
@@ -75,6 +41,26 @@ function encodeSubject(subject: SubjectResult): EncodedSubject {
         [subject.total.max, subject.total.passing, subject.total.obtained],
         subject.grade,
     ];
+}
+
+export function decodeResult(arr: EncodedResult): ParsedResult {
+    const roll = arr[1];
+    return {
+        student: {
+            name: arr[0],
+            roll: roll,
+            branch: getBranchFromRoll(roll),
+            college: getCollegeFromRoll(roll),
+        },
+        grandTotal: {
+            maximum: arr[2][0],
+            passing: arr[2][1],
+            obtained: arr[2][2],
+        },
+        subjects: arr[3].map(decodeSubject),
+        sgpa: arr[4],
+        remarks: arr[5],
+    };
 }
 
 function decodeSubject(arr: EncodedSubject): SubjectResult {

@@ -3,6 +3,7 @@ import path from "path";
 import { defineConfig } from "vite";
 import { viteSingleFile } from "vite-plugin-singlefile";
 import solid from "vite-plugin-solid";
+import { type EncodedResult, encodeResult } from "../shared/src/encoder";
 import type { ParsedResult } from "../shared/src/types";
 
 export default defineConfig(async (ctx) => ({
@@ -26,5 +27,11 @@ async function getEmbeddedResults() {
         throw new Error(`Failed to fetch embedded results: ${res.status} ${res.statusText}.`);
     }
     const data = (await res.json()) as Record<string, ParsedResult>;
-    return JSON.stringify(data);
+    const embedResults: EncodedResult[] = [];
+
+    for (const item of Object.values(data)) {
+        embedResults.push(encodeResult(item));
+    }
+
+    return embedResults;
 }

@@ -5,92 +5,89 @@ import { Select } from "~/components/ui/select";
 import { OrdinalSuffix } from "~/components/utils";
 import { SearchBy, SortBy, SortOrder } from "~/lib/types";
 
-// Debounce hook for search input
-function createDebouncedSignal<T>(initialValue: T, delay = 150) {
-    const [value, setValue] = createSignal(initialValue);
-    const [debouncedValue, setDebouncedValue] = createSignal(initialValue);
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
-
-    const setValueDebounced = (newValue: T) => {
-        setValue(() => newValue);
-        if (timeoutId) clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => setDebouncedValue(() => newValue), delay);
-    };
-
-    onCleanup(() => {
-        if (timeoutId) clearTimeout(timeoutId);
-    });
-
-    return [value, debouncedValue, setValueDebounced] as const;
-}
-
 interface ResultListPageProps {
-    studentResultList: Record<string, ParsedResult>;
+    studentResultList: ParsedResult[];
 }
+
+interface Filters {
+    college: string;
+    branch: string;
+    semester: string;
+}
+
+type FilterOptions = {
+    [K in keyof Filters]: Filters[K][];
+};
 
 export function ResultListPage(props: ResultListPageProps) {
     const [searchBy, setSearchBy] = createSignal(SearchBy.Name);
+
     // Use debounced signal for search - immediate value for input, debounced for filtering
     const [searchQuery, debouncedSearchQuery, setSearchQuery] = createDebouncedSignal("", 200);
-    const [branch, setBranch] = createSignal("");
-    const [semester, setSemester] = createSignal("");
+
+    const [filters, setFilters] = createSignal({
+        college: "",
+        branch: "",
+        semester: "",
+    });
 
     const [sortBy, setSortBy] = createSignal(SortBy.Marks);
     const [sortOrder, setSortOrder] = createSignal(SortOrder.Descending);
 
-    // Compute available options from the full data (not filtered)
-    const semesterOptions = createMemo(() => {
-        const options = new Set<string>();
-        for (const key in props.studentResultList) {
-            options.add(props.studentResultList[key].student.roll.charAt(0));
-        }
-        return Array.from(options).sort();
-    });
+    const computedValues = createMemo(() => {
+        const semesters = new Set<string>();
+        const branches = new Set<string>();
+        const colleges = new Set<string>();
 
-    const branchOptions = createMemo(() => {
-        const options = new Set<string>();
-        for (const key in props.studentResultList) {
-            options.add(props.studentResultList[key].student.branch);
-        }
-        return Array.from(options).sort();
-    });
+        let maxNameLen = 0;
+        let maxBranchLen = 0;
 
-    const maxStrSizes = createMemo(() => {
-        let name = 0;
-        let branch = 0;
+        for (const item of props.studentResultList) {
+            semesters.add(item.student.roll.charAt(0));
+            branches.add(item.student.branch);
+            colleges.add(item.student.college);
 
-        for (const key in props.studentResultList) {
-            const nameLength = props.studentResultList[key].student.name.length;
-            if (nameLength > name) {
-                name = nameLength;
-            }
-            const branchLength = props.studentResultList[key].student.branch.length;
-            if (branchLength > branch) {
-                branch = branchLength;
-            }
+            const nameLength = item.student.name.length;
+            if (nameLength > maxNameLen) maxNameLen = nameLength;
+            const branchLength = item.student.branch.length;
+            if (branchLength > maxBranchLen) maxBranchLen = branchLength;
         }
 
         return {
-            name,
-            branch,
+            filters: {
+                semester: Array.from(semesters).sort(),
+                branch: Array.from(branches).sort(),
+                college: Array.from(colleges).sort(),
+            } satisfies FilterOptions,
+            maxStrSizes: {
+                name: maxNameLen,
+                branch: maxBranchLen,
+            },
         };
     });
 
-    const totalItems = createMemo(() => Object.keys(props.studentResultList).length);
+    const totalItems = createMemo(() => props.studentResultList.length);
 
     const filteredResults = createMemo(() => {
         const filtered: ParsedResult[] = [];
-        const branchFilter = branch();
-        const semesterFilter = semester();
+        const filterValues = filters();
         const searchQ = debouncedSearchQuery().trim();
         const searchMode = searchBy();
         const searchLower = searchQ.toLowerCase();
 
-        for (const key in props.studentResultList) {
-            const item = props.studentResultList[key];
-
-            if (branchFilter && item.student.branch !== branchFilter) continue;
-            if (semesterFilter && item.student.roll.charAt(0) !== semesterFilter) continue;
+        for (const item of props.studentResultList) {
+            if (filterValues.college.length && item.student.college !== filterValues.college) {
+                continue;
+            }
+            if (filterValues.branch.length && item.student.branch !== filterValues.branch) {
+                continue;
+            }
+            if (
+                filterValues.semester.length &&
+                item.student.roll.charAt(0) !== filterValues.semester
+            ) {
+                continue;
+            }
 
             if (searchQ) {
                 if (searchMode === SearchBy.Roll && !item.student.roll.includes(searchQ)) {
@@ -144,12 +141,9 @@ export function ResultListPage(props: ResultListPageProps) {
                 setSearchBy={setSearchBy}
                 searchQuery={searchQuery()}
                 setSearchQuery={setSearchQuery}
-                branch={branch()}
-                setBranch={setBranch}
-                semester={semester()}
-                setSemester={setSemester}
-                semesterOptions={semesterOptions()}
-                branchOptions={branchOptions()}
+                filters={filters()}
+                setFilters={setFilters}
+                filterOptions={computedValues().filters}
                 isFiltering={searchQuery() !== debouncedSearchQuery()}
             />
 
@@ -160,7 +154,7 @@ export function ResultListPage(props: ResultListPageProps) {
                 setSortOrder={setSortOrder}
                 displayedResults={sortedResults()}
                 totalItems={totalItems()}
-                maxStrSizes={maxStrSizes()}
+                maxStrSizes={computedValues().maxStrSizes}
             />
         </div>
     );
@@ -172,19 +166,16 @@ interface ControlProps {
     searchQuery: string;
     setSearchQuery: (val: string) => void;
 
-    branch: string;
-    setBranch: Setter<string>;
-    semester: string;
-    setSemester: Setter<string>;
+    filters: Filters;
+    setFilters: Setter<Filters>;
 
-    semesterOptions: string[];
-    branchOptions: string[];
+    filterOptions: FilterOptions;
     isFiltering?: boolean;
 }
 
 function Controls(props: ControlProps) {
     return (
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 py-4 px-6">
+        <div class="grid grid-cols-1 md:grid-cols-[3fr_3fr_2fr_2fr] gap-4 py-4 px-6">
             <div class="grid">
                 <label for="searchBy" class="w-fit">
                     Search
@@ -227,19 +218,46 @@ function Controls(props: ControlProps) {
             </div>
 
             <div>
+                <label for="college-filter">College</label>
+                <Select
+                    id="college-filter"
+                    value={props.filters.college}
+                    onChange={(val) => {
+                        props.setFilters((prev) => ({
+                            ...prev,
+                            college: val,
+                        }));
+                    }}
+                    options={[
+                        {
+                            value: "",
+                            label: "All Colleges",
+                        },
+                        ...props.filterOptions.college.map((college) => ({
+                            value: college,
+                            label: college,
+                        })),
+                    ]}
+                />
+            </div>
+
+            <div>
                 <label for="branch-filter">Branch</label>
                 <Select
                     id="branch-filter"
-                    value={props.branch}
+                    value={props.filters.branch}
                     onChange={(val) => {
-                        props.setBranch(val);
+                        props.setFilters((prev) => ({
+                            ...prev,
+                            branch: val,
+                        }));
                     }}
                     options={[
                         {
                             value: "",
                             label: "All Branches",
                         },
-                        ...props.branchOptions.map((branch) => ({
+                        ...props.filterOptions.branch.map((branch) => ({
                             value: branch,
                             label: branch,
                         })),
@@ -251,16 +269,19 @@ function Controls(props: ControlProps) {
                 <label for="semester-filter">Semester</label>
                 <Select
                     id="semester-filter"
-                    value={props.semester}
+                    value={props.filters.semester}
                     onChange={(val) => {
-                        props.setSemester(val);
+                        props.setFilters((prev) => ({
+                            ...prev,
+                            semester: val,
+                        }));
                     }}
                     options={[
                         {
                             value: "",
                             label: "All Semesters",
                         },
-                        ...props.semesterOptions.map((sem) => ({
+                        ...props.filterOptions.semester.map((sem) => ({
                             value: sem,
                             label: SemesterLabel(sem),
                         })),
@@ -269,6 +290,25 @@ function Controls(props: ControlProps) {
             </div>
         </div>
     );
+}
+
+// Debounce hook for search input
+function createDebouncedSignal<T>(initialValue: T, delay = 150) {
+    const [value, setValue] = createSignal(initialValue);
+    const [debouncedValue, setDebouncedValue] = createSignal(initialValue);
+    let timeoutId: ReturnType<typeof setTimeout> | undefined;
+
+    const setValueDebounced = (newValue: T) => {
+        setValue(() => newValue);
+        if (timeoutId) clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => setDebouncedValue(() => newValue), delay);
+    };
+
+    onCleanup(() => {
+        if (timeoutId) clearTimeout(timeoutId);
+    });
+
+    return [value, debouncedValue, setValueDebounced] as const;
 }
 
 function SemesterLabel(sem: string) {

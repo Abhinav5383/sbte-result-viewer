@@ -6,31 +6,34 @@ import { extractTextFromPdfBuffer } from "~/lib/parser/extract-text";
 import { parseTxtToJson } from "~/lib/parser/parse-txt";
 import { formatRollList } from "~/lib/utils";
 
-const BATCH_SIZE = 50;
-export async function parseAllStudentsData(branch: BranchConfig) {
+const BATCH_SIZE = 100;
+export async function parseAllStudentsData(branch: BranchConfig): Promise<ParsedResult[]> {
+    const requestedItems: ParsedResult[] = [];
+    const requestedRolls = formatRollList(branch.rollList, branch);
+
     const invalidRolls = await getInvalidRolls();
-
     const existingResults = await getSavedResults();
-    const existingResultRolls = Object.keys(existingResults);
+    const existingResultRolls = existingResults.map((res) => res.student.roll);
 
+    for (const item of existingResults) {
+        if (requestedRolls.includes(item.student.roll)) {
+            requestedItems.push(item);
+        }
+    }
     const filteredRolls = formatRollList(branch.rollList, branch).filter((roll) => {
         return !invalidRolls.includes(roll) && !existingResultRolls.includes(roll);
     });
 
     // if no new rolls to fetch, return from existing results
-    if (filteredRolls.length < 1) {
-        return formatRollList(branch.rollList, branch).map((roll) => {
-            return existingResults[roll];
-        });
-    }
+    if (filteredRolls.length < 1) return requestedItems;
 
     console.log(
         `Fetching results for ${filteredRolls.length} students in ${branch.branchName} branch...`,
     );
 
     const newInvalidRolls: string[] = [];
+    const parsedData: ParsedResult[] = [];
 
-    const parsedData: Record<string, ParsedResult> = {};
     for (let i = 0; i < filteredRolls.length; i += BATCH_SIZE) {
         const batch = filteredRolls.slice(i, i + BATCH_SIZE);
         const fetchPromises = batch.map(async (roll) => {
@@ -47,14 +50,13 @@ export async function parseAllStudentsData(branch: BranchConfig) {
                 return;
             }
 
-            parsedData[roll] = parsedResult;
+            parsedData.push(parsedResult);
+            requestedItems.push(parsedResult);
         });
 
         await Promise.all(fetchPromises);
     }
-    console.log(
-        `Fetched ${Object.keys(parsedData).length} results for branch: ${branch.branchName}\n`,
-    );
+    console.log(`Fetched ${parsedData.length} results for branch: ${branch.branchName}\n`);
 
     const invalidRolls_appendList: string[] = [];
     for (const roll of newInvalidRolls) {
@@ -62,16 +64,12 @@ export async function parseAllStudentsData(branch: BranchConfig) {
             invalidRolls_appendList.push(roll);
         }
     }
-
     await saveInvalidRolls(invalidRolls_appendList);
-    await saveResults({
-        ...existingResults,
-        ...parsedData,
-    });
 
-    return formatRollList(branch.rollList, branch).map((roll) => {
-        return parsedData[roll] || existingResults[roll];
-    });
+    const combinedResults = [...existingResults, ...parsedData];
+    await saveResults(combinedResults);
+
+    return requestedItems;
 }
 
 async function fetchResultPdf(roll: string) {

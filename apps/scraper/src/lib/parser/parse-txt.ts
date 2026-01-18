@@ -1,4 +1,11 @@
-import { BRANCH_NAME, PAPER_TYPE, type ParsedResult, type SubjectResult } from "@app/shared/types";
+import {
+    BRANCH_NAME,
+    COLLEGE_NAME,
+    PAPER_TYPE,
+    type ParsedResult,
+    type SubjectResult,
+} from "@app/shared/types";
+import { getCollegeFromRoll } from "@app/shared/utils";
 
 export function parseTxtToJson(txt: string): ParsedResult {
     const lines = txt.split("\n").map((line) => line.trim());
@@ -8,6 +15,7 @@ export function parseTxtToJson(txt: string): ParsedResult {
             name: "",
             roll: "",
             branch: BRANCH_NAME.UNKNOWN,
+            college: COLLEGE_NAME.UNKNOWN,
         },
         grandTotal: {
             maximum: 0,
@@ -104,6 +112,7 @@ export function parseTxtToJson(txt: string): ParsedResult {
         result.grandTotal.passing += sub.total.passing;
     }
 
+    result.student.college = getCollegeFromRoll(result.student.roll);
     return result;
 }
 

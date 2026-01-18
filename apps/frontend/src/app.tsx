@@ -4,10 +4,10 @@ import Navbar from "./components/navbar";
 import { ResultListPage } from "./pages/results";
 
 // Declare the global embedded data (injected at build time)
-declare const __EMBEDDED_RESULTS__: Record<string, ParsedResult> | undefined;
+declare const __EMBEDDED_RESULTS__: ParsedResult[] | undefined;
 
 export default function App() {
-    const [results, { refetch }] = createResource(async () => {
+    const [results, { refetch }] = createResource(async (): Promise<ParsedResult[]> => {
         if (typeof __EMBEDDED_RESULTS__ !== "undefined") {
             return __EMBEDDED_RESULTS__;
         }
@@ -17,7 +17,8 @@ export default function App() {
         if (!res.ok) {
             throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         }
-        return (await res.json()) as Record<string, ParsedResult>;
+        const records = (await res.json()) as Record<string, ParsedResult>;
+        return Object.values(records);
     });
 
     return (
