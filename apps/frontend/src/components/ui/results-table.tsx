@@ -27,6 +27,11 @@ interface ResultsListTableProps {
 
     displayedResults: ParsedResult[];
     totalItems: number;
+
+    maxStrSizes: {
+        name: number;
+        branch: number;
+    };
 }
 
 export function ResultsListTable(props: ResultsListTableProps) {
@@ -55,7 +60,16 @@ export function ResultsListTable(props: ResultsListTableProps) {
                     {props.displayedResults.length !== 1 ? "results" : "result"}
                 </div>
 
-                <div class="grid gap-x-8 grid-cols-[max-content_minmax(max-content,1fr)_minmax(max-content,1fr)_minmax(max-content,1fr)_minmax(max-content,1fr)_minmax(max-content,1fr)]">
+                <div
+                    class="grid gap-x-8 table-grid"
+                    style={{
+                        // to prevent layout shifts as virtual rows are rendered
+                        // col width uses max-content so this is needed to keep the columns stable
+                        "--max-name-len": `${props.maxStrSizes.name}ch`,
+                        // adding extra for the semester suffix + spacing
+                        "--max-branch-len": `${props.maxStrSizes.branch + 10}ch`,
+                    }}
+                >
                     <div class="grid col-span-full grid-cols-subgrid gap-x-0 *:px-4 *:py-3 border-b border-border bg-zinc-700 text-zinc-200">
                         <div>
                             <strong>Sl no</strong>

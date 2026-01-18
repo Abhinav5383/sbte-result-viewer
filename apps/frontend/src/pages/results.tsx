@@ -55,6 +55,27 @@ export function ResultListPage(props: ResultListPageProps) {
         return Array.from(options).sort();
     });
 
+    const maxStrSizes = createMemo(() => {
+        let name = 0;
+        let branch = 0;
+
+        for (const key in props.studentResultList) {
+            const nameLength = props.studentResultList[key].student.name.length;
+            if (nameLength > name) {
+                name = nameLength;
+            }
+            const branchLength = props.studentResultList[key].student.branch.length;
+            if (branchLength > branch) {
+                branch = branchLength;
+            }
+        }
+
+        return {
+            name,
+            branch,
+        };
+    });
+
     const totalItems = createMemo(() => Object.keys(props.studentResultList).length);
 
     const filteredResults = createMemo(() => {
@@ -139,6 +160,7 @@ export function ResultListPage(props: ResultListPageProps) {
                 setSortOrder={setSortOrder}
                 displayedResults={sortedResults()}
                 totalItems={totalItems()}
+                maxStrSizes={maxStrSizes()}
             />
         </div>
     );

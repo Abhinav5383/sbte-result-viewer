@@ -42,11 +42,13 @@ export default function App() {
                         </button>
                     </div>
                 </Show>
+
                 <Show when={results.loading}>
                     <div class="flex items-center justify-center p-8">
                         <span class="text-lg text-dim-fg font-semibold">Loading results...</span>
                     </div>
                 </Show>
+
                 <Show keyed when={!results.loading && !results.error && results()}>
                     {(list) => <ResultListPage studentResultList={list} />}
                 </Show>
