@@ -42,12 +42,11 @@ export function DetailsDialog(props: DetailsDialogProps) {
         setSaving(true);
         try {
             // wait to apply the saving state
-            // not doing this block the whole shit
             await new Promise((resolve) => setTimeout(resolve, 10));
 
             const dataUrl = await toPng(content, {
                 backgroundColor: "#ffffff",
-                pixelRatio: 1.5,
+                pixelRatio: 3,
             });
             setPreviewImage(dataUrl);
             setPreviewOpen(true);
@@ -281,8 +280,14 @@ function ImagePreviewDialog(props: ImagePreviewDialogProps) {
                         </button>
                     </div>
 
-                    <div class="flex-1 min-h-0 overflow-auto rounded-lg border border-zinc-200">
-                        <img src={props.imageUrl ?? ""} alt="Result preview" class="w-full" />
+                    <div class="flex-1 min-h-0 overflow-auto flex items-center justify-center p-6 bg-zinc-100 rounded-lg">
+                        <div class="bg-white p-3 pb-12 shadow-[0_4px_20px_rgba(0,0,0,0.15),0_8px_40px_rgba(0,0,0,0.1)] rounded-sm rotate-3">
+                            <img
+                                src={props.imageUrl ?? ""}
+                                alt="Result preview"
+                                class="max-w-full max-h-[60vh] rounded-sm shadow-inner"
+                            />
+                        </div>
                     </div>
 
                     <div class="flex gap-3 justify-end">
