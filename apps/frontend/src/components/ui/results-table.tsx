@@ -3,11 +3,11 @@ import ArrowDownWideNarrow from "lucide-solid/icons/arrow-down-wide-narrow";
 import ArrowUpWideNarrow from "lucide-solid/icons/arrow-up-wide-narrow";
 import ChevronUpIcon from "lucide-solid/icons/chevron-up";
 import {
-    type ComponentProps,
     For,
     type Setter,
     Show,
     batch,
+    createEffect,
     createMemo,
     createSignal,
     onCleanup,
@@ -216,101 +216,84 @@ interface ResultTableContentsProps {
 
 function ResultTableContents(props: ResultTableContentsProps) {
     const DEFAULT_ROW_HEIGHT = 52;
-    const OVERSCAN = 15;
+    const OVERSCAN = 5;
 
-    let measureRef: HTMLDivElement | undefined;
-    let containerRef: HTMLDivElement | undefined;
-    const [rowHeight, setRowHeight] = createSignal(DEFAULT_ROW_HEIGHT);
-    const [viewportHeight, setViewportHeight] = createSignal(window.innerHeight);
-    const [scrollOffset, setScrollOffset] = createSignal(0);
+    const [rowHeight, setRowHeight] = createSignal<number>(DEFAULT_ROW_HEIGHT);
+    const [containerRef, setContainerRef] = createSignal<HTMLDivElement | undefined>();
+    const [visibleIndices, setVisibleIndices] = createSignal({ start: 0, end: 0 });
 
-    // all rows have the same height
-    // and because each column has a min-width of 'max-content', text can't (or rather won't) wrap in our case
-    // really long names might still cause wrapping, but meh
-    function measureRowHeight() {
-        if (measureRef) {
-            const measured = measureRef.offsetHeight;
-            if (measured > 0) setRowHeight(measured);
+    function handleResize(parent: HTMLDivElement) {
+        const row = parent.querySelector<HTMLDivElement>(".result-row");
+        if (!row) return;
+
+        const height = row.getBoundingClientRect().height;
+        if (height && height !== rowHeight()) {
+            setRowHeight(height);
+            handleScroll(undefined, height);
         }
     }
 
-    function handleScroll() {
-        if (!containerRef) return;
-        const rect = containerRef.getBoundingClientRect();
-        setScrollOffset(Math.max(0, -rect.top));
+    function handleScroll(_e?: Event, rHeight = rowHeight()) {
+        const scrollContainer = containerRef();
+
+        const containerTop = scrollContainer?.getBoundingClientRect().top ?? 0;
+        const containerYScroll = Math.max(0, -containerTop);
+
+        const startIndex = Math.max(0, Math.floor(containerYScroll / rHeight) - OVERSCAN);
+        const endIndex = Math.min(
+            props.results.length - 1,
+            Math.ceil((containerYScroll + window.innerHeight) / rHeight) + OVERSCAN,
+        );
+
+        setVisibleIndices({ start: startIndex, end: endIndex });
     }
 
-    let resizeDebounceTimeout: number | undefined;
-    function handleResize() {
-        if (resizeDebounceTimeout) clearTimeout(resizeDebounceTimeout);
-
-        resizeDebounceTimeout = window.setTimeout(() => {
-            setViewportHeight(window.innerHeight);
-            // measure row height again in case layout changed
-            requestAnimationFrame(measureRowHeight);
-            handleScroll();
-        }, 100);
-    }
-
-    // track window scroll position relative to container
     onMount(() => {
-        window.addEventListener("scroll", handleScroll, { passive: true });
-        window.addEventListener("resize", handleResize, { passive: true });
+        document.addEventListener("scroll", handleScroll, { passive: true });
 
-        // init
-        requestAnimationFrame(() => {
-            measureRowHeight();
-            handleScroll();
+        const container = containerRef();
+        let observer: ResizeObserver | null = null;
+        if (container) {
+            observer = new ResizeObserver(() => handleResize(container));
+            observer.observe(container);
+            handleResize(container);
+        }
+
+        onCleanup(() => {
+            document.removeEventListener("scroll", handleScroll);
+            if (observer) observer.disconnect();
         });
     });
 
-    onCleanup(() => {
-        window.removeEventListener("scroll", handleScroll);
-        window.removeEventListener("resize", handleResize);
+    createEffect(() => {
+        const paddingTop = visibleIndices().start * rowHeight();
+        const paddingBottom = (props.results.length - (visibleIndices().end + 1)) * rowHeight();
+
+        const el = containerRef();
+        if (el) {
+            el.style.paddingTop = `${paddingTop}px`;
+            el.style.paddingBottom = `${paddingBottom}px`;
+        }
     });
 
-    const visibleRange = createMemo(() => {
-        const rh = rowHeight();
-        const offset = scrollOffset();
-        const vh = viewportHeight();
-        const total = props.results.length;
-
-        const startIndex = Math.max(0, Math.floor(offset / rh) - OVERSCAN);
-        const visibleCount = Math.ceil(vh / rh) + OVERSCAN * 2;
-        const endIndex = Math.min(total, startIndex + visibleCount);
-
-        return { startIndex, endIndex };
-    });
-
+    // computed values
     const visibleItems = createMemo(() => {
-        const { startIndex, endIndex } = visibleRange();
-        return props.results.slice(startIndex, endIndex);
+        const items = [];
+        for (let i = visibleIndices().start; i <= visibleIndices().end; i++) {
+            items.push(props.results[i]);
+        }
+        return items;
     });
-
-    const topPadding = () => visibleRange().startIndex * rowHeight();
-    const bottomPadding = () => (props.results.length - visibleRange().endIndex) * rowHeight();
 
     return (
         <>
-            <div
-                ref={(el) => {
-                    containerRef = el;
-                }}
-                class="grid col-span-full grid-cols-subgrid"
-                style={{
-                    "padding-top": `${topPadding()}px`,
-                    "padding-bottom": `${bottomPadding()}px`,
-                }}
-            >
+            <div ref={setContainerRef} class="grid col-span-full grid-cols-subgrid contain-size">
                 <For each={visibleItems()}>
                     {(item, index) => (
                         <ResultRow
                             item={item}
-                            index={visibleRange().startIndex + index()}
+                            index={visibleIndices().start + index()}
                             onSelect={() => props.onSelect(item.student.roll)}
-                            ref={(el) => {
-                                if (index() === 0) measureRef = el;
-                            }}
                             showCollege={props.showCollege}
                         />
                     )}
@@ -320,13 +303,17 @@ function ResultTableContents(props: ResultTableContentsProps) {
             <div
                 class="fixed bottom-4 end-4"
                 style={{
-                    visibility: showGoToTopBtn(scrollOffset(), containerRef) ? "visible" : "hidden",
+                    visibility:
+                        visibleIndices().start > 15 &&
+                        visibleIndices().end < props.results.length - 15
+                            ? "visible"
+                            : "hidden",
                 }}
             >
                 <button
                     type="button"
                     class="flex items-center justify-center bg-accent-bg text-white h-12 aspect-square rounded-full"
-                    onclick={goToTop}
+                    onclick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
                 >
                     <ChevronUpIcon class="size-6" />
                 </button>
@@ -339,7 +326,6 @@ interface ResultRowProps {
     item: ParsedResult;
     index: number;
     onSelect: () => void;
-    ref?: ComponentProps<"div">["ref"];
     showCollege: boolean;
 }
 
@@ -360,7 +346,7 @@ function ResultRow(props: ResultRowProps) {
     });
 
     return (
-        <div class="grid col-span-full grid-cols-subgrid" ref={props.ref}>
+        <div class="result-row grid col-span-full grid-cols-subgrid">
             <MobileResultRow {...commonProps()} />
             <DesktopResultRow {...commonProps()} />
         </div>
@@ -516,16 +502,4 @@ function handleRowKbEvent(
         e.preventDefault();
         callback();
     }
-}
-
-function showGoToTopBtn(scrollOffset: number, scrollContainer?: HTMLElement) {
-    if (scrollOffset < 300) return false;
-    if (scrollContainer && scrollContainer.scrollHeight - scrollOffset < window.innerHeight * 2)
-        return false;
-
-    return true;
-}
-
-function goToTop() {
-    window.scrollTo({ top: 0, behavior: "smooth" });
 }
