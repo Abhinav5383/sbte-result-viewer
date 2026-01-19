@@ -1,5 +1,5 @@
 .table-grid {
-    grid-template-columns: max-content minmax(max-content, 1fr) minmax(var(--max-name-len), 1fr) minmax(var(--max-branch-len), 1fr) minmax(max-content, 0.7fr) minmax(max-content, 0.7fr) minmax(var(--max-college-len), 1fr);
+    grid-template-columns: minmax(8ch, max-content) minmax(var(--max-name-len), 1fr) minmax(14ch, 0.5fr) minmax(max-content, 0.7fr) minmax(max-content, 0.7fr) minmax(var(--max-branch-len), 1fr) minmax(var(--max-college-len), 2fr);
 }
 
 .branch-badge {

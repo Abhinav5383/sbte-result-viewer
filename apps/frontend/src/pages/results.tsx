@@ -1,4 +1,4 @@
-import type { ParsedResult } from "@app/shared/types";
+import { COLLEGE_NAME, type ParsedResult } from "@app/shared/types";
 import { type Setter, Show, createMemo, createSignal, onCleanup } from "solid-js";
 import { ResultsListTable } from "~/components/ui/results-table";
 import { Select } from "~/components/ui/select";
@@ -30,7 +30,7 @@ export function ResultListPage(props: ResultListPageProps) {
     const [searchQuery, debouncedSearchQuery, setSearchQuery] = createDebouncedSignal("", 200);
 
     const [filters, setFilters] = createSignal({
-        college: "",
+        college: COLLEGE_NAME.NGP_PATNA_13 as string,
         branch: "",
         semester: "",
     });
@@ -146,10 +146,14 @@ export function ResultListPage(props: ResultListPageProps) {
                     if (ar.student.name < br.student.name) return asc ? -1 : 1;
                     if (ar.student.name > br.student.name) return asc ? 1 : -1;
                     return 0;
-                case SortBy.Marks:
+                case SortBy.Marks: {
+                    const obtainedPercend_A = ar.grandTotal.obtained / ar.grandTotal.maximum;
+                    const obtainedPercend_B = br.grandTotal.obtained / br.grandTotal.maximum;
+
                     return asc
-                        ? ar.grandTotal.obtained - br.grandTotal.obtained
-                        : br.grandTotal.obtained - ar.grandTotal.obtained;
+                        ? obtainedPercend_A - obtainedPercend_B
+                        : obtainedPercend_B - obtainedPercend_A;
+                }
                 case SortBy.sgpa:
                     return asc ? ar.sgpa - br.sgpa : br.sgpa - ar.sgpa;
                 default:

@@ -62,7 +62,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                 </div>
 
                 <div
-                    class="grid gap-x-8 table-grid"
+                    class="grid gap-x-8 table-grid relative"
                     style={{
                         // to prevent layout shifts as virtual rows are rendered
                         // col width uses max-content so this is needed to keep the columns stable
@@ -72,19 +72,11 @@ export function ResultsListTable(props: ResultsListTableProps) {
                         "--max-college-len": `${props.maxStrSizes.college}ch`,
                     }}
                 >
-                    <div class="grid col-span-full grid-cols-subgrid gap-x-0 *:px-4 *:py-3 border-b border-border bg-zinc-700 text-zinc-200">
+                    <div class="grid z-10 sticky top-0 col-span-full grid-cols-subgrid gap-x-0 *:px-4 *:py-3 border-b border-border bg-zinc-700 text-zinc-200">
                         <div>
-                            <strong>Sl no</strong>
+                            <strong>#</strong>
                         </div>
 
-                        <SortableHeaderItem
-                            title="Roll No"
-                            value={SortBy.Roll}
-                            sortBy={props.sortBy}
-                            setSortBy={props.setSortBy}
-                            sortOrder={props.sortOrder}
-                            setSortOrder={props.setSortOrder}
-                        />
                         <SortableHeaderItem
                             title="Name"
                             value={SortBy.Name}
@@ -94,9 +86,14 @@ export function ResultsListTable(props: ResultsListTableProps) {
                             setSortOrder={props.setSortOrder}
                         />
 
-                        <div>
-                            <strong>Branch</strong>
-                        </div>
+                        <SortableHeaderItem
+                            title="Roll No"
+                            value={SortBy.Roll}
+                            sortBy={props.sortBy}
+                            setSortBy={props.setSortBy}
+                            sortOrder={props.sortOrder}
+                            setSortOrder={props.setSortOrder}
+                        />
 
                         <SortableHeaderItem
                             title="Marks"
@@ -106,6 +103,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                             sortOrder={props.sortOrder}
                             setSortOrder={props.setSortOrder}
                         />
+
                         <SortableHeaderItem
                             title="SGPA"
                             value={SortBy.sgpa}
@@ -114,6 +112,10 @@ export function ResultsListTable(props: ResultsListTableProps) {
                             sortOrder={props.sortOrder}
                             setSortOrder={props.setSortOrder}
                         />
+
+                        <div>
+                            <strong>Branch</strong>
+                        </div>
 
                         <div>
                             <strong>College</strong>
@@ -320,16 +322,37 @@ function ResultRow(props: ResultRowProps) {
     const sgpaClassName = sgpaClass(props.item.sgpa);
     const formattedSgpa = props.item.sgpa.toFixed(2);
 
+    const percentObtained =
+        Math.round((props.item.grandTotal.obtained / props.item.grandTotal.maximum) * 100_00) / 100;
+
     return (
         // biome-ignore lint/a11y/useKeyWithClickEvents: Row click handler
         <div
-            class="grid items-center col-span-full grid-cols-subgrid py-3 border-b border-border hover:bg-zinc-100 cursor-pointer px-6"
+            class="grid items-center col-span-full grid-cols-subgrid py-3 border-b border-border hover:bg-zinc-100 cursor-pointer px-6 overflow-clip"
             onClick={props.onSelect}
             ref={props.ref}
         >
-            <span class="text-dim-fg">{props.index + 1}</span>
-            <span class="text-dim-fg">{props.item.student.roll}</span>
+            <span class="text-dim-fg text-sm">{props.index + 1}</span>
             <span>{props.item.student.name}</span>
+            <span class="text-dim-fg">
+                <span class="opacity-90">{props.item.student.roll.slice(0, -3)}</span>
+                <span class="italic">{props.item.student.roll.slice(-3)}</span>
+            </span>
+
+            <div class="grid grid-cols-2 gap-2 items-center pe-8">
+                <div class="text-dim-fg text-xs">
+                    <span class="text-base font-medium">{props.item.grandTotal.obtained}</span>{" "}
+                    <span class="text-xs opacity-5s0">/</span>{" "}
+                    <span class="text-xs opacity-70">{props.item.grandTotal.maximum}</span>
+                </div>
+
+                <span class={cn(marksClassName, " bg-(--clr)/10 px-1.5 rounded-lg w-fit")}>
+                    <span class="text-sm">{percentObtained}</span>
+                    <span class="text-xs opacity-80 saturate-50">{" %"}</span>
+                </span>
+            </div>
+            <span class={cn("saturate-70", sgpaClassName)}>{formattedSgpa}</span>
+
             <div>
                 <span
                     class={`branch-badge ${branchClass} inline-block ps-2 pe-0.5 rounded-lg text-sm text-nowrap`}
@@ -341,13 +364,6 @@ function ResultRow(props: ResultRowProps) {
                     </em>
                 </span>
             </div>
-            <div>
-                <span class={cn("font-medium text-lg", marksClassName)}>
-                    {props.item.grandTotal.obtained}
-                </span>{" "}
-                <span class="text-sm text-dim-fg">/{props.item.grandTotal.maximum}</span>
-            </div>
-            <span class={cn("font-medium", sgpaClassName)}>{formattedSgpa}</span>
             <span class="text-dim-fg text-sm">{props.item.student.college}</span>
         </div>
     );

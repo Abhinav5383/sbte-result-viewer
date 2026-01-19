@@ -185,22 +185,27 @@ body {
     }
 
     .class-excellent {
-        color: var(--color-accent-fg)
+        --clr: var(--color-accent-fg);
+        color: var(--clr);
     }
 
     .class-good {
-        color: var(--color-lime-600)
+        --clr: var(--color-lime-600);
+        color: var(--clr);
     }
 
     .class-average {
-        color: var(--color-amber-600)
+        --clr: var(--color-amber-600);
+        color: var(--clr);
     }
 
     .class-pass {
-        color: var(--color-orange-600)
+        --clr: var(--color-orange-600);
+        color: var(--clr);
     }
 
     .class-fail {
-        color: var(--color-red-600)
+        --clr: var(--color-red-600);
+        color: var(--clr);
     }
 }
