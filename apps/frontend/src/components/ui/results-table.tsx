@@ -13,7 +13,7 @@ import {
     onMount,
 } from "solid-js";
 import { marksClass, sgpaClass } from "~/lib/grade-utils";
-import { SortBy, SortOrder } from "~/lib/types";
+import { type Filters, SortBy, SortOrder } from "~/lib/types";
 import { OrdinalSuffix, cn } from "../utils";
 import { DetailsDialog } from "./details-dialog";
 import "./results-table.css";
@@ -33,6 +33,8 @@ interface ResultsListTableProps {
         branch: number;
         college: number;
     };
+
+    filters: Filters;
 }
 
 export function ResultsListTable(props: ResultsListTableProps) {
@@ -44,6 +46,8 @@ export function ResultsListTable(props: ResultsListTableProps) {
         if (!roll) return undefined;
         return props.displayedResults.find((r) => r.student.roll === roll);
     }
+
+    const showCollegeCol = () => !props.filters.college;
 
     return (
         <div>
@@ -62,7 +66,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                 </div>
 
                 <div
-                    class="grid gap-x-8 table-grid relative"
+                    class="grid gap-x-8 relative"
                     style={{
                         // to prevent layout shifts as virtual rows are rendered
                         // col width uses max-content so this is needed to keep the columns stable
@@ -70,6 +74,9 @@ export function ResultsListTable(props: ResultsListTableProps) {
                         // adding extra for the semester suffix + spacing
                         "--max-branch-len": `${props.maxStrSizes.branch + 10}ch`,
                         "--max-college-len": `${props.maxStrSizes.college}ch`,
+                        "grid-template-columns": `minmax(8ch, max-content) minmax(var(--max-name-len), 1fr) minmax(14ch, 0.5fr) minmax(max-content, 0.7fr) minmax(max-content, 0.7fr) minmax(var(--max-branch-len), 1fr) ${
+                            showCollegeCol() ? "minmax(var(--max-college-len), 2fr)" : ""
+                        }`,
                     }}
                 >
                     <div class="grid z-10 sticky top-0 col-span-full grid-cols-subgrid gap-x-0 *:px-4 *:py-3 border-b border-border bg-zinc-700 text-zinc-200">
@@ -117,9 +124,11 @@ export function ResultsListTable(props: ResultsListTableProps) {
                             <strong>Branch</strong>
                         </div>
 
-                        <div>
-                            <strong>College</strong>
-                        </div>
+                        <Show when={showCollegeCol()}>
+                            <div>
+                                <strong>College</strong>
+                            </div>
+                        </Show>
                     </div>
 
                     <ResultTableContents
@@ -128,6 +137,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                             setSelectedRoll(roll);
                             setDialogOpen(true);
                         }}
+                        showCollege={showCollegeCol()}
                     />
                 </div>
             </Show>
@@ -204,6 +214,7 @@ function SortableHeaderItem(props: SortableHeaderItemProps) {
 interface ResultTableContentsProps {
     results: ParsedResult[];
     onSelect: (roll: string) => void;
+    showCollege: boolean;
 }
 
 function ResultTableContents(props: ResultTableContentsProps) {
@@ -297,6 +308,7 @@ function ResultTableContents(props: ResultTableContentsProps) {
                         ref={(el) => {
                             if (index() === 0) measureRef = el;
                         }}
+                        showCollege={props.showCollege}
                     />
                 )}
             </For>
@@ -309,6 +321,7 @@ interface ResultRowProps {
     index: number;
     onSelect: () => void;
     ref?: ComponentProps<"div">["ref"];
+    showCollege: boolean;
 }
 
 function ResultRow(props: ResultRowProps) {
@@ -364,7 +377,9 @@ function ResultRow(props: ResultRowProps) {
                     </em>
                 </span>
             </div>
-            <span class="text-dim-fg text-sm">{props.item.student.college}</span>
+            <Show when={props.showCollege}>
+                <span class="text-dim-fg text-sm">{props.item.student.college}</span>
+            </Show>
         </div>
     );
 }

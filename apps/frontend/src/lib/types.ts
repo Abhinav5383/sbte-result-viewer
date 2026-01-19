@@ -14,3 +14,9 @@ export enum SortOrder {
     Ascending = "Ascending",
     Descending = "Descending",
 }
+
+export interface Filters {
+    college: string;
+    branch: string;
+    semester: string;
+}

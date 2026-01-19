@@ -3,16 +3,10 @@ import { type Setter, Show, createMemo, createSignal, onCleanup } from "solid-js
 import { ResultsListTable } from "~/components/ui/results-table";
 import { Select } from "~/components/ui/select";
 import { OrdinalSuffix } from "~/components/utils";
-import { SearchBy, SortBy, SortOrder } from "~/lib/types";
+import { type Filters, SearchBy, SortBy, SortOrder } from "~/lib/types";
 
 interface ResultListPageProps {
     studentResultList: ParsedResult[];
-}
-
-interface Filters {
-    college: string;
-    branch: string;
-    semester: string;
 }
 
 type FilterOptions = {
@@ -185,6 +179,7 @@ export function ResultListPage(props: ResultListPageProps) {
                 displayedResults={sortedResults()}
                 totalItems={props.studentResultList.length}
                 maxStrSizes={indexedData().maxStrSizes}
+                filters={filters()}
             />
         </div>
     );

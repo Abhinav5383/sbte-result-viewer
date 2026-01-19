@@ -1,7 +1,3 @@
-.table-grid {
-    grid-template-columns: minmax(8ch, max-content) minmax(var(--max-name-len), 1fr) minmax(14ch, 0.5fr) minmax(max-content, 0.7fr) minmax(max-content, 0.7fr) minmax(var(--max-branch-len), 1fr) minmax(var(--max-college-len), 2fr);
-}
-
 .branch-badge {
     background-color: var(--color-zinc-200);
     color: var(--color-bright-fg);
