@@ -91,7 +91,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                     <div class="relative">
                         <div ref={setContentRef} class="@container">
                             <div class="grid gap-y-3 p-6 bg-accent-bg text-zinc-50">
-                                <div class="grid gap-1">
+                                <div class="flex flex-wrap-reverse gap-x-3">
                                     <div class="flex flex-wrap items-center gap-3">
                                         <h1 class="text-3xl font-extrabold">{data.student.name}</h1>
                                         <span
@@ -104,10 +104,32 @@ export function DetailsDialog(props: DetailsDialogProps) {
                                             </em>
                                         </span>
                                     </div>
-                                    <span class="text-accent-bg-text font-medium">
-                                        {COLLEGE_FULL_NAME[data.student.college]}
-                                    </span>
+
+                                    {/* dummy buttons to reserve space for the absolute positioned actual buttons */}
+                                    <div class="invisible flex items-center gap-2">
+                                        <button
+                                            type="button"
+                                            class="flex items-center justify-center gap-2 bg-zinc-50 text-normal-fg rounded-full ring-zinc-600 hover:scale-105 transition-transform duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                            disabled
+                                        >
+                                            <ImageIcon />
+                                            Save Image
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            class="bg-zinc-50 text-normal-fg rounded-full ring-zinc-600 hover:scale-105 transition-transform duration-500"
+                                            disabled
+                                        >
+                                            <XIcon />
+                                        </button>
+                                    </div>
                                 </div>
+
+                                <span class="text-accent-bg-text font-medium">
+                                    {COLLEGE_FULL_NAME[data.student.college]}
+                                </span>
+
                                 <div class="flex items-center gap-3">
                                     <span class="font-semibold py-1">{data.student.roll}</span>
                                     <a
@@ -348,12 +370,12 @@ function SubjectCategory(props: SubjectCategoryProps) {
 
 function SubjectMarksDetails(props: { sub: SubjectResult }) {
     return (
-        <div class="grid gap-2 bg-zinc-100 rounded-lg p-3 border border-zinc-200">
+        <div class="grid gap-3 bg-zinc-100 rounded-lg px-4 py-3 border border-zinc-200">
             <div class="h-fit flex gap-3 items-center">
-                <span class="text-lg font-medium">{props.sub.name}</span>
+                <span class="text-lg leading-tight font-medium">{props.sub.name}</span>
                 <span
                     class={cn(
-                        "bg-current/10 px-2 py-0.5 rounded-md text-xs font-bold",
+                        "bg-current/10 px-2 py-0.5 self-start ms-auto mt-[0.15em] rounded-md text-xs font-bold",
                         alphabeticalGradeClass(props.sub.grade),
                     )}
                 >
@@ -368,7 +390,7 @@ function SubjectMarksDetails(props: { sub: SubjectResult }) {
 
 function SubjectMarksRow(props: { sub: SubjectResult }) {
     return (
-        <div class="grid gap-3 grid-cols-[repeat(3,max-content)] font-medium content-end text-xs text-dim-fg uppercase">
+        <div class="grid gap-1.5 grid-cols-[repeat(4,max-content)] font-medium text-xs text-dim-fg uppercase [&>div>*:not(:first-child)]:justify-self-end">
             <Show
                 when={props.sub.external.max}
                 fallback={
@@ -382,26 +404,26 @@ function SubjectMarksRow(props: { sub: SubjectResult }) {
                         >
                             {props.sub.internal.obtained}
                         </span>
-                        <span>
-                            <span class="text-dim-fg/50">/</span> {props.sub.internal.max}
-                        </span>
+
+                        <span class="text-dim-fg/50">/</span>
+                        <span>{props.sub.internal.max}</span>
                     </div>
                 }
             >
                 <div class="grid leading-none items-end col-span-full grid-cols-subgrid">
                     <span>External:</span>
                     <span class="font-semibold text-normal-fg">{props.sub.external.obtained}</span>
-                    <span>
-                        <span class="text-dim-fg/50">/</span> {props.sub.external.max}
-                    </span>
+
+                    <span class="text-dim-fg/50">/</span>
+                    <span>{props.sub.external.max}</span>
                 </div>
 
                 <div class="grid leading-none items-end col-span-full grid-cols-subgrid">
                     <span>Internal:</span>
                     <span class="font-semibold text-normal-fg">{props.sub.internal.obtained}</span>
-                    <span>
-                        <span class="text-dim-fg/50">/</span> {props.sub.internal.max}
-                    </span>
+
+                    <span class="text-dim-fg/50">/</span>
+                    <span>{props.sub.internal.max}</span>
                 </div>
 
                 <div class="grid leading-none items-end col-span-full grid-cols-subgrid">
@@ -414,9 +436,9 @@ function SubjectMarksRow(props: { sub: SubjectResult }) {
                     >
                         {props.sub.total.obtained}
                     </span>
-                    <span>
-                        <span class="text-dim-fg/50">/</span> {props.sub.total.max}
-                    </span>
+
+                    <span class="text-dim-fg/50">/</span>
+                    <span>{props.sub.total.max}</span>
                 </div>
             </Show>
         </div>

@@ -342,7 +342,7 @@ function ResultRow(props: ResultRowProps) {
     });
 
     return (
-        <div class="contents" ref={props.ref}>
+        <div class="grid col-span-full grid-cols-subgrid" ref={props.ref}>
             <MobileResultRow {...commonProps()} />
             <DesktopResultRow {...commonProps()} />
         </div>
@@ -360,59 +360,55 @@ interface RowVariantProps extends ResultRowProps {
 function MobileResultRow(props: RowVariantProps) {
     return (
         <div
-            class="result-row lg:hidden flex flex-col gap-3 p-4"
+            class="lg:hidden grid grid-cols-[max-content_1fr] gap-3 px-3 py-5 border-b border-border hover:bg-zinc-100"
             onClick={props.onSelect}
             onKeyDown={(e) => handleRowKbEvent(e, props.onSelect)}
         >
-            <div class="flex justify-between items-start gap-3">
-                <div class="flex flex-col gap-1.5 flex-1 min-w-0">
+            <div>
+                <span class="text-sm text-dim-fg/50">#{props.index + 1}</span>
+            </div>
+
+            <div class="grid gap-2">
+                <div class="flex items-center gap-x-2">
                     <span class="font-semibold text-lg leading-tight truncate">
                         {props.item.student.name}
                     </span>
-
-                    <div class="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-dim-fg">
-                        <span class="font-mono text-xs">{props.item.student.roll}</span>
-                        <span class="text-xs opacity-50">•</span>
-                        <BranchBadge branch={props.item.student.branch} semester={props.semester} />
-                    </div>
-
-                    <div class="text-xs text-dim-fg truncate opacity-80">
-                        {props.item.student.college}
-                    </div>
+                    <BranchBadge
+                        branch={props.item.student.branch}
+                        semester={props.semester}
+                        class="text-xs"
+                    />
                 </div>
 
-                <span class="shrink-0 text-[10px] font-mono text-zinc-400 font-medium pt-1">
-                    #{props.index + 1}
-                </span>
-            </div>
-
-            <div class="grid grid-cols-2 gap-3 mt-1">
-                <div class="flex flex-col gap-1 p-2.5 rounded-lg bg-zinc-50/80 border border-zinc-100">
-                    <div class="flex justify-between items-center text-[10px] uppercase tracking-wider text-dim-fg font-semibold">
-                        <span>Marks</span>
-                        <span class="text-zinc-400 font-normal normal-case tracking-normal">
-                            {props.percentObtained}%
-                        </span>
-                    </div>
-                    <div class="flex items-baseline gap-1.5">
-                        <span
-                            class={cn(props.marksClassName, "font-semibold text-lg leading-none")}
-                        >
-                            {props.item.grandTotal.obtained}
-                        </span>
-                        <span class="text-xs text-dim-fg/70">
-                            / {props.item.grandTotal.maximum}
-                        </span>
-                    </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-sm text-dim-fg">{props.item.student.roll}</span>
+                    <span class="text-xs opacity-50">•</span>
+                    <span class="text-sm text-dim-fg">{props.item.student.college}</span>
                 </div>
 
-                <div class="flex flex-col gap-1 p-2.5 rounded-lg bg-zinc-50/80 border border-zinc-100">
-                    <span class="text-[10px] uppercase tracking-wider text-dim-fg font-semibold">
-                        SGPA
-                    </span>
-                    <span class={cn(props.sgpaClassName, "font-semibold text-lg leading-none")}>
-                        {props.formattedSgpa}
-                    </span>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex items-center justify-center flex-col bg-zinc-50 p-3 rounded-lg border border-zinc-200">
+                        <span class="text-dim-fg font-medium uppercase text-xs opacity-70">
+                            Marks Obtained
+                        </span>
+
+                        <div class="text-dim-fg text-xs">
+                            <span class={cn(props.marksClassName, "text-lg font-medium")}>
+                                {props.item.grandTotal.obtained}
+                            </span>{" "}
+                            <span class="opacity-50">/</span>{" "}
+                            <span class="opacity-70">{props.item.grandTotal.maximum}</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-center flex-col bg-zinc-50 p-3 rounded-lg border border-zinc-200">
+                        <span class="text-dim-fg font-medium uppercase text-xs opacity-70">
+                            SGPA
+                        </span>
+                        <span class={cn(props.sgpaClassName, "font-semibold text-lg")}>
+                            {props.item.sgpa}
+                        </span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -423,7 +419,7 @@ function DesktopResultRow(props: RowVariantProps) {
     return (
         <div
             class={cn(
-                "result-row hidden lg:grid",
+                "hidden lg:grid",
                 "items-center col-span-full grid-cols-subgrid py-3 border-b border-border hover:bg-zinc-100 cursor-pointer px-6",
                 "focus-ring",
             )}
@@ -445,10 +441,10 @@ function DesktopResultRow(props: RowVariantProps) {
                     <span class="text-xs opacity-70">{props.item.grandTotal.maximum}</span>
                 </div>
 
-                <span class={cn(props.marksClassName, " bg-(--clr)/10 px-1.5 rounded-lg w-fit")}>
-                    <span class="text-[0.83rem]">{props.percentObtained}</span>
-                    <span class="text-xs opacity-80 saturate-50">{" %"}</span>
-                </span>
+                <PercentageBadge
+                    percentObtained={props.percentObtained}
+                    class={props.marksClassName}
+                />
             </div>
 
             <span class={cn("saturate-70", props.sgpaClassName)}>{props.formattedSgpa}</span>
@@ -464,16 +460,29 @@ function DesktopResultRow(props: RowVariantProps) {
     );
 }
 
-function BranchBadge(props: { branch: string; semester: string }) {
+function BranchBadge(props: { branch: string; semester: string; class?: string }) {
     return (
         <span
-            class={`branch-badge ${props.branch.toLowerCase()} inline-block ps-2 pe-0.5 rounded-lg text-sm text-nowrap`}
+            class={cn(
+                "branch-badge inline-block ps-2 pe-0.5 rounded-lg text-sm text-nowrap",
+                props.branch.toLowerCase(),
+                props.class,
+            )}
         >
             {props.branch}
             <em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 rounded-md">
                 {props.semester}
                 {OrdinalSuffix(props.semester)} sem
             </em>
+        </span>
+    );
+}
+
+function PercentageBadge(props: { percentObtained: number; class?: string }) {
+    return (
+        <span class={cn("bg-(--clr)/10 px-1.5 rounded-lg w-fit text-[0.83rem]", props.class)}>
+            <span>{props.percentObtained}</span>
+            <span class="text-xs opacity-80 saturate-50">{" %"}</span>
         </span>
     );
 }
