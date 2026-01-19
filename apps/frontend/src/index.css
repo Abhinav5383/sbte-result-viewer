@@ -20,6 +20,8 @@
     --font-body: 'Space Grotesk', sans-serif;
 
     --color-border: lch(84% 8 190);
+
+    --breakpoint-xs: 26rem;
 }
 
 html,
@@ -48,7 +50,8 @@ body {
     button,
     select,
     input,
-    textarea {
+    textarea,
+    .focus-ring {
         outline: none;
 
         &:focus-visible {
@@ -60,7 +63,7 @@ body {
         }
 
         &.no-focus-ring {
-            border-width: 0;
+            @apply ring-transparent;
         }
     }
 
@@ -105,7 +108,7 @@ body {
         align-items: center;
         border: var(--color-border);
         cursor: pointer;
-        min-width: 18ch;
+        min-width: 16ch;
         width: 100%;
 
         @supports (appearance: base-select) {

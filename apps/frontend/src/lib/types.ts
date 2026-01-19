@@ -4,10 +4,10 @@ export enum SearchBy {
 }
 
 export enum SortBy {
-    Roll = "Roll",
-    Name = "Name",
     Marks = "Marks",
     sgpa = "SGPA",
+    Name = "Name",
+    Roll = "Roll No",
 }
 
 export enum SortOrder {

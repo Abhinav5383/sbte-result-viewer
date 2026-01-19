@@ -38,9 +38,9 @@ export function ResultListPage(props: ResultListPageProps) {
         const branches = new Set<string>();
         const colleges = new Set<string>();
 
-        let maxNameLen = 0;
+        // let maxNameLen = 0;
+        // let maxCollegeLen = 0;
         let maxBranchLen = 0;
-        let maxCollegeLen = 0;
 
         const indexed: IndexedResult[] = new Array(props.studentResultList.length);
 
@@ -52,11 +52,15 @@ export function ResultListPage(props: ResultListPageProps) {
             branches.add(item.student.branch);
             colleges.add(item.student.college);
 
-            if (item.student.name.length > maxNameLen) maxNameLen = item.student.name.length;
-            if (item.student.branch.length > maxBranchLen)
+            // if (item.student.name.length > maxNameLen) {
+            //     maxNameLen = item.student.name.length;
+            // }
+            // if (item.student.college.length > maxCollegeLen) {
+            //     maxCollegeLen = item.student.college.length;
+            // }
+            if (item.student.branch.length > maxBranchLen) {
                 maxBranchLen = item.student.branch.length;
-            if (item.student.college.length > maxCollegeLen)
-                maxCollegeLen = item.student.college.length;
+            }
 
             indexed[i] = {
                 result: item,
@@ -73,9 +77,9 @@ export function ResultListPage(props: ResultListPageProps) {
                 college: Array.from(colleges).sort(),
             } satisfies FilterOptions,
             maxStrSizes: {
-                name: maxNameLen,
+                // name: maxNameLen,
+                // college: maxCollegeLen,
                 branch: maxBranchLen,
-                college: maxCollegeLen,
             },
         };
     });
@@ -169,6 +173,10 @@ export function ResultListPage(props: ResultListPageProps) {
                 setFilters={setFilters}
                 filterOptions={indexedData().filters}
                 isFiltering={searchQuery() !== debouncedSearchQuery()}
+                sortBy={sortBy()}
+                setSortBy={setSortBy}
+                sortOrder={sortOrder()}
+                setSortOrder={setSortOrder}
             />
 
             <ResultsListTable
@@ -196,16 +204,21 @@ interface ControlProps {
 
     filterOptions: FilterOptions;
     isFiltering?: boolean;
+
+    sortBy: SortBy;
+    setSortBy: Setter<SortBy>;
+    sortOrder: SortOrder;
+    setSortOrder: Setter<SortOrder>;
 }
 
 function Controls(props: ControlProps) {
     return (
-        <div class="grid grid-cols-1 md:grid-cols-[3fr_3fr_2fr_2fr] gap-4 py-4 px-6">
+        <div class="grid grid-cols-1 lg:grid-cols-[3fr_3fr_2fr_2fr] gap-4 py-4 px-6">
             <div class="grid">
                 <label for="searchBy" class="w-fit">
                     Search
                 </label>
-                <div class="grid grid-cols-[12ch_1fr] gap-0">
+                <div class="grid gap-y-3 grid-cols-1 xs:grid-cols-[12ch_1fr] gap-0">
                     <Select
                         value={props.searchBy}
                         onChange={(val) => {
@@ -221,7 +234,7 @@ function Controls(props: ControlProps) {
                                 label: "Name",
                             },
                         ]}
-                        class="rounded-e-none border-2 border-e min-w-[10ch] border-border focus:border-accent-bg"
+                        class="xs:rounded-e-none xs:border-e-0 border-2 min-w-[10ch] border-border focus:border-accent-bg"
                     />
 
                     <div class="relative">
@@ -229,7 +242,7 @@ function Controls(props: ControlProps) {
                             id="searchBy"
                             type="text"
                             placeholder={`Enter ${props.searchBy} to search`}
-                            class="no-focus-ring rounded-s-none border-s border-2 border-border focus:border-accent-bg w-full"
+                            class="no-focus-ring xs:rounded-s-none border-2 border-border focus:border-accent-bg w-full"
                             value={props.searchQuery}
                             onInput={(e) => props.setSearchQuery(e.currentTarget.value)}
                         />
@@ -313,11 +326,39 @@ function Controls(props: ControlProps) {
                     ]}
                 />
             </div>
+
+            <div class="lg:hidden">
+                <div>
+                    <label for="mb-sort">Sort By</label>
+                    <div class="grid gap-y-3 grid-cols-1 xs:grid-cols-[3fr_max-content]">
+                        <Select
+                            id="mb-sort"
+                            value={props.sortBy}
+                            onChange={(v) => props.setSortBy(v as SortBy)}
+                            options={Object.values(SortBy).map((sortBy) => ({
+                                value: sortBy,
+                                label: sortBy,
+                            }))}
+                            class="xs:rounded-e-none"
+                        />
+
+                        <Select
+                            id="mb-order"
+                            value={props.sortOrder}
+                            onChange={(v) => props.setSortOrder(v as SortOrder)}
+                            options={[
+                                { value: SortOrder.Descending, label: SortOrder.Descending },
+                                { value: SortOrder.Ascending, label: SortOrder.Ascending },
+                            ]}
+                            class="xs:rounded-s-none xs:border-s-0"
+                        />
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
 
-// Debounce hook for search input
 function createDebouncedSignal<T>(initialValue: T, delay = 150) {
     const [value, setValue] = createSignal(initialValue);
     const [debouncedValue, setDebouncedValue] = createSignal(initialValue);
