@@ -219,7 +219,7 @@ interface ResultTableContentsProps {
 
 function ResultTableContents(props: ResultTableContentsProps) {
     const DEFAULT_ROW_HEIGHT = 52;
-    const OVERSCAN = 10;
+    const OVERSCAN = 15;
 
     let measureRef: HTMLDivElement | undefined;
     let containerRef: HTMLDivElement | undefined;
@@ -243,11 +243,16 @@ function ResultTableContents(props: ResultTableContentsProps) {
         setScrollOffset(Math.max(0, -rect.top));
     }
 
+    let resizeDebounceTimeout: number | undefined;
     function handleResize() {
-        setViewportHeight(window.innerHeight);
-        // measure row height again in case layout changed
-        requestAnimationFrame(measureRowHeight);
-        handleScroll();
+        if (resizeDebounceTimeout) clearTimeout(resizeDebounceTimeout);
+
+        resizeDebounceTimeout = window.setTimeout(() => {
+            setViewportHeight(window.innerHeight);
+            // measure row height again in case layout changed
+            requestAnimationFrame(measureRowHeight);
+            handleScroll();
+        }, 100);
     }
 
     // track window scroll position relative to container
