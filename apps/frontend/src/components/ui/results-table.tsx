@@ -216,7 +216,6 @@ interface ResultTableContentsProps {
 
 function ResultTableContents(props: ResultTableContentsProps) {
     const DEFAULT_ROW_HEIGHT = 52;
-    const OVERSCAN = 5;
 
     const [rowHeight, setRowHeight] = createSignal<number>(DEFAULT_ROW_HEIGHT);
     const [containerRef, setContainerRef] = createSignal<HTMLDivElement | undefined>();
@@ -239,13 +238,14 @@ function ResultTableContents(props: ResultTableContentsProps) {
         const containerTop = scrollContainer?.getBoundingClientRect().top ?? 0;
         const containerYScroll = Math.max(0, -containerTop);
 
-        const startIndex = Math.max(0, Math.floor(containerYScroll / rHeight) - OVERSCAN);
-        const endIndex = Math.min(
-            props.results.length - 1,
-            Math.ceil((containerYScroll + window.innerHeight) / rHeight) + OVERSCAN,
-        );
+        const startIndex = Math.floor(containerYScroll / rHeight);
+        const endIndex = Math.ceil((containerYScroll + window.innerHeight) / rHeight);
 
-        setVisibleIndices({ start: startIndex, end: endIndex });
+        const overscan = endIndex - startIndex; // overscan by one viewport height
+        const adjustedStartIndex = Math.max(0, startIndex - overscan);
+        const adjustedEndIndex = Math.min(props.results.length - 1, endIndex + overscan);
+
+        setVisibleIndices({ start: adjustedStartIndex, end: adjustedEndIndex });
     }
 
     onMount(() => {

@@ -34,7 +34,6 @@ export default function App() {
         }
 
         const res = await fetch("http://localhost:5500/students-data");
-
         if (!res.ok) {
             throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         }
