@@ -364,9 +364,11 @@ interface RowVariantProps extends ResultRowProps {
 function MobileResultRow(props: RowVariantProps) {
     return (
         <div
-            class="lg:hidden grid grid-cols-[max-content_1fr] gap-3 px-3 py-5 border-b border-border hover:bg-zinc-100"
+            class="lg:hidden grid grid-cols-[max-content_1fr] gap-3 px-3 py-5 border-b border-border hover:bg-zinc-100 active:bg-zinc-100 cursor-pointer focus-ring"
             onClick={props.onSelect}
             onKeyDown={(e) => handleRowKbEvent(e, props.onSelect)}
+            role="button"
+            tabindex={0}
         >
             <div>
                 <span class="text-sm text-dim-fg/50">#{props.index + 1}</span>
@@ -430,6 +432,7 @@ function DesktopResultRow(props: RowVariantProps) {
             onClick={props.onSelect}
             onKeyDown={(e) => handleRowKbEvent(e, props.onSelect)}
             tabindex={0}
+            role="button"
         >
             <span class="text-dim-fg text-sm">{props.index + 1}</span>
             <span class="truncate">{props.item.student.name}</span>
