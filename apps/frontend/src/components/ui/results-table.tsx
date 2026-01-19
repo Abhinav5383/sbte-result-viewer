@@ -347,7 +347,7 @@ function ResultRow(props: ResultRowProps) {
                 </div>
 
                 <span class={cn(marksClassName, " bg-(--clr)/10 px-1.5 rounded-lg w-fit")}>
-                    <span class="text-sm">{percentObtained}</span>
+                    <span class="text-[0.83rem]">{percentObtained}</span>
                     <span class="text-xs opacity-80 saturate-50">{" %"}</span>
                 </span>
             </div>
