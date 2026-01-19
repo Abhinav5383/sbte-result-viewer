@@ -71,10 +71,18 @@ export function DetailsDialog(props: DetailsDialogProps) {
     return (
         <dialog
             ref={setDialogRef}
-            closedby="any"
             onClose={(e) => {
                 e.preventDefault();
                 props.onClose();
+            }}
+            onKeyDown={(e) => {
+                if (e.key === "Escape") props.onClose();
+            }}
+            onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                    e.stopPropagation();
+                    props.onClose();
+                }
             }}
             class="rounded-xl overflow-x-clip"
         >
@@ -265,6 +273,7 @@ function ImagePreviewDialog(props: ImagePreviewDialogProps) {
                 e.preventDefault();
                 props.onClose();
             }}
+            onKeyDown={(e) => e.stopPropagation()}
             class="rounded-xl overflow-clip"
         >
             <Show when={props.imageUrl}>
