@@ -1,6 +1,7 @@
 import { type ParsedResult } from "@app/shared/types";
 import ArrowDownWideNarrow from "lucide-solid/icons/arrow-down-wide-narrow";
 import ArrowUpWideNarrow from "lucide-solid/icons/arrow-up-wide-narrow";
+import ChevronUpIcon from "lucide-solid/icons/chevron-up";
 import {
     type ComponentProps,
     For,
@@ -220,8 +221,8 @@ function ResultTableContents(props: ResultTableContentsProps) {
     let measureRef: HTMLDivElement | undefined;
     let containerRef: HTMLDivElement | undefined;
     const [rowHeight, setRowHeight] = createSignal(DEFAULT_ROW_HEIGHT);
-    const [scrollOffset, setScrollOffset] = createSignal(0);
     const [viewportHeight, setViewportHeight] = createSignal(window.innerHeight);
+    const [scrollOffset, setScrollOffset] = createSignal(0);
 
     // all rows have the same height
     // and because each column has a min-width of 'max-content', text can't (or rather won't) wrap in our case
@@ -290,30 +291,47 @@ function ResultTableContents(props: ResultTableContentsProps) {
     const bottomPadding = () => (props.results.length - visibleRange().endIndex) * rowHeight();
 
     return (
-        <div
-            ref={(el) => {
-                containerRef = el;
-            }}
-            class="grid col-span-full grid-cols-subgrid"
-            style={{
-                "padding-top": `${topPadding()}px`,
-                "padding-bottom": `${bottomPadding()}px`,
-            }}
-        >
-            <For each={visibleItems()}>
-                {(item, index) => (
-                    <ResultRow
-                        item={item}
-                        index={visibleRange().startIndex + index()}
-                        onSelect={() => props.onSelect(item.student.roll)}
-                        ref={(el) => {
-                            if (index() === 0) measureRef = el;
-                        }}
-                        showCollege={props.showCollege}
-                    />
-                )}
-            </For>
-        </div>
+        <>
+            <div
+                ref={(el) => {
+                    containerRef = el;
+                }}
+                class="grid col-span-full grid-cols-subgrid"
+                style={{
+                    "padding-top": `${topPadding()}px`,
+                    "padding-bottom": `${bottomPadding()}px`,
+                }}
+            >
+                <For each={visibleItems()}>
+                    {(item, index) => (
+                        <ResultRow
+                            item={item}
+                            index={visibleRange().startIndex + index()}
+                            onSelect={() => props.onSelect(item.student.roll)}
+                            ref={(el) => {
+                                if (index() === 0) measureRef = el;
+                            }}
+                            showCollege={props.showCollege}
+                        />
+                    )}
+                </For>
+            </div>
+
+            <div
+                class="fixed bottom-4 end-4"
+                style={{
+                    visibility: showGoToTopBtn(scrollOffset(), containerRef) ? "visible" : "hidden",
+                }}
+            >
+                <button
+                    type="button"
+                    class="flex items-center justify-center bg-accent-bg text-white h-12 aspect-square rounded-full"
+                    onclick={goToTop}
+                >
+                    <ChevronUpIcon class="size-6" />
+                </button>
+            </div>
+        </>
     );
 }
 
@@ -498,4 +516,16 @@ function handleRowKbEvent(
         e.preventDefault();
         callback();
     }
+}
+
+function showGoToTopBtn(scrollOffset: number, scrollContainer?: HTMLElement) {
+    if (scrollOffset < 300) return false;
+    if (scrollContainer && scrollContainer.scrollHeight - scrollOffset < window.innerHeight * 2)
+        return false;
+
+    return true;
+}
+
+function goToTop() {
+    window.scrollTo({ top: 0, behavior: "smooth" });
 }
