@@ -20,14 +20,11 @@ import { DetailsDialog } from "./details-dialog";
 import "./results-table.css";
 
 interface ResultsListTableProps {
-    sortBy: SortBy;
-    setSortBy: Setter<SortBy>;
-
-    sortOrder: SortOrder;
-    setSortOrder: Setter<SortOrder>;
-
-    displayedResults: ParsedResult[];
     totalItems: number;
+    sortedResults: SortedResults;
+
+    setSortBy: Setter<SortBy>;
+    setSortOrder: Setter<SortOrder>;
 
     maxStrSizes: {
         // name: number;
@@ -38,6 +35,12 @@ interface ResultsListTableProps {
     filters: Filters;
 }
 
+interface SortedResults {
+    results: ParsedResult[];
+    sortedBy: SortBy;
+    sortOrder: SortOrder;
+}
+
 export function ResultsListTable(props: ResultsListTableProps) {
     const [dialogOpen, setDialogOpen] = createSignal(false);
     const [selectedRoll, setSelectedRoll] = createSignal<string | null>(null);
@@ -45,7 +48,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
     function dialogData() {
         const roll = selectedRoll();
         if (!roll) return undefined;
-        return props.displayedResults.find((r) => r.student.roll === roll);
+        return props.sortedResults.results.find((r) => r.student.roll === roll);
     }
 
     const showCollegeCol = () => !props.filters.college;
@@ -53,7 +56,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
     return (
         <div>
             <Show
-                when={props.displayedResults.length > 0}
+                when={props.sortedResults.results.length > 0}
                 fallback={
                     <div class="flex flex-col items-center justify-center gap-2 py-16 text-dim-fg">
                         <span class="text-xl font-semibold">No results found</span>
@@ -62,8 +65,8 @@ export function ResultsListTable(props: ResultsListTableProps) {
                 }
             >
                 <div class="text-sm text-dim-fg px-6 py-2 border-b border-border bg-zinc-50">
-                    Showing {props.displayedResults.length} of {props.totalItems}{" "}
-                    {props.displayedResults.length !== 1 ? "results" : "result"}
+                    Showing {props.sortedResults.results.length} of {props.totalItems}{" "}
+                    {props.sortedResults.results.length !== 1 ? "results" : "result"}
                 </div>
 
                 <div
@@ -84,36 +87,36 @@ export function ResultsListTable(props: ResultsListTableProps) {
                         <SortableHeaderItem
                             title="Name"
                             value={SortBy.Name}
-                            sortBy={props.sortBy}
+                            sortBy={props.sortedResults.sortedBy}
                             setSortBy={props.setSortBy}
-                            sortOrder={props.sortOrder}
+                            sortOrder={props.sortedResults.sortOrder}
                             setSortOrder={props.setSortOrder}
                         />
 
                         <SortableHeaderItem
                             title="Roll No"
                             value={SortBy.Roll}
-                            sortBy={props.sortBy}
+                            sortBy={props.sortedResults.sortedBy}
                             setSortBy={props.setSortBy}
-                            sortOrder={props.sortOrder}
+                            sortOrder={props.sortedResults.sortOrder}
                             setSortOrder={props.setSortOrder}
                         />
 
                         <SortableHeaderItem
                             title="Marks"
                             value={SortBy.Marks}
-                            sortBy={props.sortBy}
+                            sortBy={props.sortedResults.sortedBy}
                             setSortBy={props.setSortBy}
-                            sortOrder={props.sortOrder}
+                            sortOrder={props.sortedResults.sortOrder}
                             setSortOrder={props.setSortOrder}
                         />
 
                         <SortableHeaderItem
                             title="SGPA"
                             value={SortBy.sgpa}
-                            sortBy={props.sortBy}
+                            sortBy={props.sortedResults.sortedBy}
                             setSortBy={props.setSortBy}
-                            sortOrder={props.sortOrder}
+                            sortOrder={props.sortedResults.sortOrder}
                             setSortOrder={props.setSortOrder}
                         />
 
@@ -129,7 +132,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                     </div>
 
                     <ResultTableContents
-                        results={props.displayedResults}
+                        sortedResults={props.sortedResults}
                         onSelect={(roll) => {
                             setSelectedRoll(roll);
                             setDialogOpen(true);
@@ -209,7 +212,7 @@ function SortableHeaderItem(props: SortableHeaderItemProps) {
 }
 
 interface ResultTableContentsProps {
-    results: ParsedResult[];
+    sortedResults: SortedResults;
     onSelect: (roll: string) => void;
     showCollege: boolean;
 }
@@ -243,7 +246,10 @@ function ResultTableContents(props: ResultTableContentsProps) {
 
         const overscan = endIndex - startIndex; // overscan by one viewport height
         const adjustedStartIndex = Math.max(0, startIndex - overscan);
-        const adjustedEndIndex = Math.min(props.results.length - 1, endIndex + overscan);
+        const adjustedEndIndex = Math.min(
+            props.sortedResults.results.length - 1,
+            endIndex + overscan,
+        );
 
         setVisibleIndices({ start: adjustedStartIndex, end: adjustedEndIndex });
     }
@@ -267,7 +273,8 @@ function ResultTableContents(props: ResultTableContentsProps) {
 
     createEffect(() => {
         const paddingTop = visibleIndices().start * rowHeight();
-        const paddingBottom = (props.results.length - (visibleIndices().end + 1)) * rowHeight();
+        const paddingBottom =
+            (props.sortedResults.results.length - (visibleIndices().end + 1)) * rowHeight();
 
         const el = containerRef();
         if (el) {
@@ -276,11 +283,14 @@ function ResultTableContents(props: ResultTableContentsProps) {
         }
     });
 
+    createEffect(() => handleScroll(), props.sortedResults.results);
+
     // computed values
     const visibleItems = createMemo(() => {
         const items = [];
         for (let i = visibleIndices().start; i <= visibleIndices().end; i++) {
-            items.push(props.results[i]);
+            const item = props.sortedResults.results[i];
+            if (item) items.push(item);
         }
         return items;
     });
@@ -305,7 +315,7 @@ function ResultTableContents(props: ResultTableContentsProps) {
                 style={{
                     visibility:
                         visibleIndices().start > 15 &&
-                        visibleIndices().end < props.results.length - 15
+                        visibleIndices().end < props.sortedResults.results.length - 15
                             ? "visible"
                             : "hidden",
                 }}

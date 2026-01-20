@@ -13,12 +13,6 @@ type FilterOptions = {
     [K in keyof Filters]: Filters[K][];
 };
 
-interface IndexedResult {
-    result: ParsedResult;
-    nameLower: string;
-    semester: string;
-}
-
 export function ResultListPage(props: ResultListPageProps) {
     const [searchBy, setSearchBy] = createSignal(SearchBy.Name);
     const [searchQuery, debouncedSearchQuery, setSearchQuery] = createDebouncedSignal("", 200);
@@ -42,8 +36,6 @@ export function ResultListPage(props: ResultListPageProps) {
         // let maxCollegeLen = 0;
         let maxBranchLen = 0;
 
-        const indexed: IndexedResult[] = new Array(props.studentResultList.length);
-
         for (let i = 0; i < props.studentResultList.length; i++) {
             const item = props.studentResultList[i];
             const semester = item.student.roll.charAt(0);
@@ -61,16 +53,9 @@ export function ResultListPage(props: ResultListPageProps) {
             if (item.student.branch.length > maxBranchLen) {
                 maxBranchLen = item.student.branch.length;
             }
-
-            indexed[i] = {
-                result: item,
-                nameLower: item.student.name.toLowerCase(),
-                semester,
-            };
         }
 
         return {
-            indexed,
             filters: {
                 semester: Array.from(semesters).sort(),
                 branch: Array.from(branches).sort(),
@@ -85,7 +70,7 @@ export function ResultListPage(props: ResultListPageProps) {
     });
 
     const filteredResults = createMemo(() => {
-        const { indexed } = indexedData();
+        const fullList = props.studentResultList;
         const filterValues = filters();
         const searchQ = debouncedSearchQuery().trim();
         const searchMode = searchBy();
@@ -98,28 +83,26 @@ export function ResultListPage(props: ResultListPageProps) {
 
         // fast path: no filters
         if (!hasCollegeFilter && !hasBranchFilter && !hasSemesterFilter && !hasSearch) {
-            return indexed.slice();
+            return fullList.slice();
         }
 
-        const filtered: IndexedResult[] = [];
+        const filtered: ParsedResult[] = [];
 
-        for (let i = 0; i < indexed.length; i++) {
-            const entry = indexed[i];
-            const item = entry.result;
-
+        for (const item of fullList) {
             if (hasCollegeFilter && item.student.college !== filterValues.college) continue;
             if (hasBranchFilter && item.student.branch !== filterValues.branch) continue;
-            if (hasSemesterFilter && entry.semester !== filterValues.semester) continue;
+            if (hasSemesterFilter && item.student.roll.charAt(0) !== filterValues.semester)
+                continue;
 
             if (hasSearch) {
                 if (searchMode === SearchBy.Roll) {
                     if (!item.student.roll.includes(searchQ)) continue;
                 } else {
-                    if (!entry.nameLower.includes(searchLower)) continue;
+                    if (!item.student.name.toLowerCase().includes(searchLower)) continue;
                 }
             }
 
-            filtered.push(entry);
+            filtered.push(item);
         }
 
         return filtered;
@@ -132,34 +115,38 @@ export function ResultListPage(props: ResultListPageProps) {
         const asc = order === SortOrder.Ascending;
 
         sorted.sort((a, b) => {
-            const ar = a.result;
-            const br = b.result;
-
             switch (sort) {
                 case SortBy.Roll:
-                    if (ar.student.roll < br.student.roll) return asc ? -1 : 1;
-                    if (ar.student.roll > br.student.roll) return asc ? 1 : -1;
+                    if (a.student.roll < b.student.roll) return asc ? -1 : 1;
+                    if (a.student.roll > b.student.roll) return asc ? 1 : -1;
                     return 0;
                 case SortBy.Name:
-                    if (ar.student.name < br.student.name) return asc ? -1 : 1;
-                    if (ar.student.name > br.student.name) return asc ? 1 : -1;
+                    if (a.student.name < b.student.name) return asc ? -1 : 1;
+                    if (a.student.name > b.student.name) return asc ? 1 : -1;
                     return 0;
                 case SortBy.Marks: {
-                    const obtainedPercend_A = ar.grandTotal.obtained / ar.grandTotal.maximum;
-                    const obtainedPercend_B = br.grandTotal.obtained / br.grandTotal.maximum;
+                    const obtainedPercend_A = a.grandTotal.obtained / a.grandTotal.maximum;
+                    const obtainedPercend_B = b.grandTotal.obtained / b.grandTotal.maximum;
 
                     return asc
                         ? obtainedPercend_A - obtainedPercend_B
                         : obtainedPercend_B - obtainedPercend_A;
                 }
                 case SortBy.sgpa:
-                    return asc ? ar.sgpa - br.sgpa : br.sgpa - ar.sgpa;
+                    return asc ? a.sgpa - b.sgpa : b.sgpa - a.sgpa;
                 default:
                     return 0;
             }
         });
 
-        return sorted.map((s) => s.result);
+        // the array is sorted in place, no one wants to clone an array of 50k+ items every time
+        // but solid wants the value to "change, so we keep the array is same,
+        // but return a brand new object; magic (insert_sparkly_emoji_here)
+        return {
+            results: sorted,
+            sortedBy: sort,
+            sortOrder: order,
+        };
     });
 
     return (
@@ -180,11 +167,9 @@ export function ResultListPage(props: ResultListPageProps) {
             />
 
             <ResultsListTable
-                sortBy={sortBy()}
                 setSortBy={setSortBy}
-                sortOrder={sortOrder()}
                 setSortOrder={setSortOrder}
-                displayedResults={sortedResults()}
+                sortedResults={sortedResults()}
                 totalItems={props.studentResultList.length}
                 maxStrSizes={indexedData().maxStrSizes}
                 filters={filters()}
