@@ -297,7 +297,7 @@ function ResultTableContents(props: ResultTableContentsProps) {
 
     return (
         <>
-            <div ref={setContainerRef} class="grid col-span-full grid-cols-subgrid contain-size">
+            <div ref={setContainerRef} class="grid col-span-full grid-cols-subgrid">
                 <For each={visibleItems()}>
                     {(item, index) => (
                         <ResultRow
