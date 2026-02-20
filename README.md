@@ -2,7 +2,7 @@
 
 Try it out: https://sbte-results.devabhinav.online
 
-This is a simple too that can
+This is a set of tools that can
 - Download the sbte result pdfs automatically in bulk
 - Extract marks data from the pdfs and store them in a json file
 - Create a web page to show the resutls in a nice UI
