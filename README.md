@@ -1,21 +1,10 @@
-# sbte-result-viewer
+# SBTE Results viewer
 
-To install dependencies:
+Try it out: https://sbte-results.devabhinav.online
 
-```bash
-bun install
-```
+This is a simple too that can
+- Download the sbte result pdfs automatically in bulk
+- Extract marks data from the pdfs and store them in a json file
+- Create a web page to show the resutls in a nice UI
 
-To run:
-
-Server:
-```
-cd apps/scraper
-bun run src/server.ts
-```
-
-Frontend:
-```
-cd apps/frontend
-bun run dev
-```
+The built html file is standalone, it doesn't need to load data from anywhere else. The results json file is gzipped and embedded in the html file itself.
