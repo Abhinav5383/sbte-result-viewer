@@ -388,57 +388,64 @@ function SubjectMarksDetails(props: { sub: SubjectResult }) {
     );
 }
 
-function SubjectMarksRow(props: { sub: SubjectResult }) {
+function MarksDivider() {
     return (
-        <div class="grid gap-1.5 grid-cols-[repeat(4,max-content)] font-medium text-xs text-dim-fg uppercase [&>div>*:not(:first-child)]:justify-self-end">
+        <span class="leading-none text-[0.9em] text-dim-fg/50">/</span>
+    )
+}
+
+function SubjectMarksRow(props: { sub: SubjectResult }) {
+
+    return (
+        <div class="grid gap-x-1 gap-y-3 grid-cols-[repeat(4,max-content)] font-medium text-xs text-dim-fg [&>div>*:not(:first-child)]:justify-self-end">
             <Show
                 when={props.sub.external.max}
                 fallback={
-                    <div class="grid leading-none items-end col-span-full grid-cols-subgrid">
-                        <span>Internal:</span>
+                    <div class="grid items-end col-span-full grid-cols-subgrid">
+                        <span class="trim-both">Internal:</span>
                         <span
                             class={cn(
-                                "font-semibold text-lg leading-none -mb-[0.16em]",
+                                "trim-both font-semibold text-lg",
                                 marksClass(props.sub.total.obtained, props.sub.total.max),
                             )}
                         >
                             {props.sub.internal.obtained}
                         </span>
 
-                        <span class="text-dim-fg/50">/</span>
-                        <span>{props.sub.internal.max}</span>
+                        <MarksDivider />
+                        <span class="trim-both">{props.sub.internal.max}</span>
                     </div>
                 }
             >
-                <div class="grid leading-none items-end col-span-full grid-cols-subgrid">
-                    <span>External:</span>
-                    <span class="font-semibold text-normal-fg">{props.sub.external.obtained}</span>
+                <div class="grid items-end col-span-full grid-cols-subgrid">
+                    <span class="trim-both">External:</span>
+                    <span class="trim-both font-semibold text-normal-fg">{props.sub.external.obtained}</span>
 
-                    <span class="text-dim-fg/50">/</span>
-                    <span>{props.sub.external.max}</span>
+                    <MarksDivider />
+                    <span class="trim-both">{props.sub.external.max}</span>
                 </div>
 
-                <div class="grid leading-none items-end col-span-full grid-cols-subgrid">
-                    <span>Internal:</span>
-                    <span class="font-semibold text-normal-fg">{props.sub.internal.obtained}</span>
+                <div class="grid items-end col-span-full grid-cols-subgrid">
+                    <span class="trim-both">Internal:</span>
+                    <span class="trim-both font-semibold text-normal-fg">{props.sub.internal.obtained}</span>
 
-                    <span class="text-dim-fg/50">/</span>
-                    <span>{props.sub.internal.max}</span>
+                    <MarksDivider />
+                    <span class="trim-both">{props.sub.internal.max}</span>
                 </div>
 
-                <div class="grid leading-none items-end col-span-full grid-cols-subgrid">
-                    <span>Total:</span>
+                <div class="grid items-end col-span-full grid-cols-subgrid">
+                    <span class="trim-both">Total:</span>
                     <span
                         class={cn(
-                            "font-semibold text-lg leading-none -mb-[0.16em]",
+                            "trim-both font-semibold text-lg",
                             marksClass(props.sub.total.obtained, props.sub.total.max),
                         )}
                     >
                         {props.sub.total.obtained}
                     </span>
 
-                    <span class="text-dim-fg/50">/</span>
-                    <span>{props.sub.total.max}</span>
+                    <MarksDivider />
+                    <span class="trim-both">{props.sub.total.max}</span>
                 </div>
             </Show>
         </div>

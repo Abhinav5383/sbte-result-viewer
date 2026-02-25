@@ -212,4 +212,9 @@ body {
         --clr: var(--color-red-600);
         color: var(--clr);
     }
+
+    .trim-both {
+        text-box: trim-both cap alphabetic;
+        line-height: 1;
+    }
 }
