@@ -21,13 +21,13 @@ async function decodeEmbeddedResults(base64: string): Promise<ParsedResult[]> {
 
     // Decompress using DecompressionStream (browser native)
     const ds = new DecompressionStream("gzip");
+    const decompressed = new Response(ds.readable).text();
+    
     const writer = ds.writable.getWriter();
     await writer.write(bytes);
     await writer.close();
 
-    const decompressed = await new Response(ds.readable).text();
-    const encoded = JSON.parse(decompressed) as EncodedResult[];
-
+    const encoded = JSON.parse(await decompressed) as EncodedResult[];
     return encoded.map(decodeResult);
 }
 
