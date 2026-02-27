@@ -8,6 +8,10 @@ import { ResultListPage } from "./pages/results";
 declare const __EMBEDDED_RESULTS__: string | undefined;
 
 async function decodeEmbeddedResults(base64: string): Promise<ParsedResult[]> {
+    if (typeof DecompressionStream === "undefined") {
+        throw new Error("DecompressionStream is not supported in this browser");
+    }
+
     // base64 -> gzip -> JSON
     const binary = atob(base64);
     const bytes = new Uint8Array(binary.length);
@@ -18,8 +22,8 @@ async function decodeEmbeddedResults(base64: string): Promise<ParsedResult[]> {
     // Decompress using DecompressionStream (browser native)
     const ds = new DecompressionStream("gzip");
     const writer = ds.writable.getWriter();
-    writer.write(bytes);
-    writer.close();
+    await writer.write(bytes);
+    await writer.close();
 
     const decompressed = await new Response(ds.readable).text();
     const encoded = JSON.parse(decompressed) as EncodedResult[];
