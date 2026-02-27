@@ -255,7 +255,7 @@ function ResultTableContents(props: ResultTableContentsProps) {
     }
 
     onMount(() => {
-        document.addEventListener("scroll", handleScroll, { passive: true });
+        window.addEventListener("scroll", handleScroll, { passive: true });
 
         const container = containerRef();
         let observer: ResizeObserver | null = null;
@@ -266,7 +266,7 @@ function ResultTableContents(props: ResultTableContentsProps) {
         }
 
         onCleanup(() => {
-            document.removeEventListener("scroll", handleScroll);
+            window.removeEventListener("scroll", handleScroll);
             if (observer) observer.disconnect();
         });
     });
