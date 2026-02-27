@@ -125,12 +125,18 @@ export function ResultListPage(props: ResultListPageProps) {
                     if (a.student.name > b.student.name) return asc ? 1 : -1;
                     return 0;
                 case SortBy.Marks: {
-                    const obtainedPercend_A = a.grandTotal.obtained / a.grandTotal.maximum;
-                    const obtainedPercend_B = b.grandTotal.obtained / b.grandTotal.maximum;
+                    const obtainedPercentA =
+                        a.grandTotal.maximum > 0
+                            ? a.grandTotal.obtained / a.grandTotal.maximum
+                            : 0;
+                    const obtainedPercentB =
+                        b.grandTotal.maximum > 0
+                            ? b.grandTotal.obtained / b.grandTotal.maximum
+                            : 0;
 
                     return asc
-                        ? obtainedPercend_A - obtainedPercend_B
-                        : obtainedPercend_B - obtainedPercend_A;
+                        ? obtainedPercentA - obtainedPercentB
+                        : obtainedPercentB - obtainedPercentA;
                 }
                 case SortBy.sgpa:
                     return asc ? a.sgpa - b.sgpa : b.sgpa - a.sgpa;
