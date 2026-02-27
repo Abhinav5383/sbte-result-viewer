@@ -283,7 +283,10 @@ function ResultTableContents(props: ResultTableContentsProps) {
         }
     });
 
-    createEffect(() => handleScroll(), props.sortedResults.results);
+    createEffect(() => {
+        props.sortedResults.results;
+        handleScroll();
+    });
 
     // computed values
     const visibleItems = createMemo(() => {
