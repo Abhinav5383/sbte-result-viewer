@@ -12,7 +12,7 @@ import DownloadIcon from "lucide-solid/icons/download";
 import ExternalLinkIcon from "lucide-solid/icons/external-link";
 import ImageIcon from "lucide-solid/icons/image";
 import XIcon from "lucide-solid/icons/x";
-import { For, Show, createEffect, createSignal } from "solid-js";
+import { For, Show, createEffect, createSignal, onCleanup } from "solid-js";
 import { OrdinalSuffix, cn } from "~/components/utils";
 import { alphabeticalGradeClass, marksClass, sgpaClass } from "~/lib/grade-utils";
 import "./details-dialog.css";
@@ -60,11 +60,8 @@ export function DetailsDialog(props: DetailsDialogProps) {
     createEffect(() => {
         const dialog = dialogRef();
         if (dialog) {
-            if (props.open) {
-                dialog.showModal();
-            } else {
-                dialog.close();
-            }
+            if (props.open && !dialog.open) dialog.showModal();
+            if (!props.open && dialog.open) dialog.close();
         }
     });
 
@@ -253,11 +250,8 @@ function ImagePreviewDialog(props: ImagePreviewDialogProps) {
     createEffect(() => {
         const dialog = dialogRef();
         if (dialog) {
-            if (props.open) {
-                dialog.showModal();
-            } else {
-                dialog.close();
-            }
+            if (props.open && !dialog.open) dialog.showModal();
+            if (!props.open && dialog.open) dialog.close();
         }
     });
 
@@ -269,7 +263,14 @@ function ImagePreviewDialog(props: ImagePreviewDialogProps) {
         link.click();
     }
 
-    let timeoutRef: number;
+    let timeoutRef: ReturnType<typeof setTimeout> | undefined;
+    onCleanup(() => {
+        if (timeoutRef) {
+            clearTimeout(timeoutRef);
+            timeoutRef = undefined;
+        }
+    });
+
     async function copyToClipboard() {
         if (!props.imageUrl) return;
         try {
@@ -281,7 +282,10 @@ function ImagePreviewDialog(props: ImagePreviewDialogProps) {
             const blob = await response.blob();
             await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
             setCopied(true);
-            timeoutRef = setTimeout(() => setCopied(false), 2000);
+            timeoutRef = setTimeout(() => {
+                setCopied(false)
+                timeoutRef = undefined;
+            }, 2500);
         } catch (err) {
             console.error("Failed to copy image:", err);
         }
