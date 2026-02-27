@@ -141,10 +141,10 @@ function parseSubjectLine(line: string, paperType: PAPER_TYPE): SubjectResult | 
     const externalObtained = parseMarks(marksParts[7]);
 
     // internal
-    const internalMax = Number.parseInt(marksParts[1], 10);
+    const internalMax = parseMarks(marksParts[1]);
     const internalObtained = parseMarks(marksParts[6]);
 
-    const grade = marksParts[9]?.trim();
+    const grade = marksParts[9]?.trim() ?? "";
 
     return {
         name: formattedSubName,
