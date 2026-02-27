@@ -172,7 +172,7 @@ function SortableHeaderItem(props: SortableHeaderItemProps) {
                 "h-full rounded-none justify-between text-start", // reset defaults
                 "grid grid-cols-[1fr_min-content] items-center hover:bg-zinc-950 cursor-pointer transition-colors",
             )}
-            onclick={() => {
+            onClick={() => {
                 if (props.sortBy === props.value) {
                     props.setSortOrder(
                         props.sortOrder === SortOrder.Ascending
@@ -326,7 +326,7 @@ function ResultTableContents(props: ResultTableContentsProps) {
                 <button
                     type="button"
                     class="flex items-center justify-center bg-accent-bg text-white h-12 aspect-square rounded-full"
-                    onclick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
                 >
                     <ChevronUpIcon class="size-6" />
                 </button>
@@ -342,6 +342,11 @@ interface ResultRowProps {
     showCollege: boolean;
 }
 
+function calcPercentObtained(obtained: number, maximum: number) {
+    if (maximum <= 0) return 0;
+    return Math.round((obtained / maximum) * 100_00) / 100;
+}
+
 function ResultRow(props: ResultRowProps) {
     const commonProps = () => ({
         item: props.item,
@@ -353,9 +358,10 @@ function ResultRow(props: ResultRowProps) {
         formattedSgpa: props.item.sgpa.toFixed(2),
         marksClassName: marksClass(props.item.grandTotal.obtained, props.item.grandTotal.maximum),
         sgpaClassName: sgpaClass(props.item.sgpa),
-        percentObtained:
-            Math.round((props.item.grandTotal.obtained / props.item.grandTotal.maximum) * 100_00) /
-            100,
+        percentObtained: calcPercentObtained(
+            props.item.grandTotal.obtained,
+            props.item.grandTotal.maximum,
+        ),
     });
 
     return (

@@ -206,7 +206,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                                 type="button"
                                 class="flex items-center justify-center gap-2 bg-zinc-50 text-normal-fg rounded-full ring-zinc-600 hover:scale-105 transition-transform duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
                                 disabled={saving()}
-                                onclick={saveAsImage}
+                                onClick={saveAsImage}
                             >
                                 <ImageIcon />
                                 {saving() ? "Saving..." : "Save Image"}
@@ -215,7 +215,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                             <button
                                 type="button"
                                 class="bg-zinc-50 text-normal-fg rounded-full ring-zinc-600 hover:scale-105 transition-transform duration-500"
-                                onclick={closeDialog}
+                                onClick={closeDialog}
                             >
                                 <XIcon />
                             </button>
@@ -309,7 +309,7 @@ function ImagePreviewDialog(props: ImagePreviewDialogProps) {
                         <button
                             type="button"
                             class="p-2 aspect-square flex items-center justify-center rounded-full bg-zinc-800 text-white hover:bg-zinc-600 transition-colors"
-                            onclick={props.onClose}
+                            onClick={props.onClose}
                         >
                             <XIcon />
                         </button>
@@ -329,7 +329,7 @@ function ImagePreviewDialog(props: ImagePreviewDialogProps) {
                         <button
                             type="button"
                             class="flex items-center gap-2 px-4 py-2 rounded-lg border text-dim-fg border-zinc-300 hover:bg-zinc-100 transition-colors"
-                            onclick={copyToClipboard}
+                            onClick={copyToClipboard}
                         >
                             <Show when={copied()} fallback={<ClipboardIcon />}>
                                 <CheckIcon class="text-accent-fg" />
@@ -340,7 +340,7 @@ function ImagePreviewDialog(props: ImagePreviewDialogProps) {
                         <button
                             type="button"
                             class="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent-bg text-white font-bold hover:bg-accent-bg/90 transition-colors"
-                            onclick={download}
+                            onClick={download}
                         >
                             <DownloadIcon />
                             Download
