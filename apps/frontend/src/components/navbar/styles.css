@@ -1,9 +1,11 @@
 .page-header {
 	isolation: isolate;
 	anchor-name: --nav;
-	background-image: linear-gradient(90deg,
-			lch(from var(--color-accent-bg) calc(l - 10) c calc(h + 10)),
-			var(--color-accent-bg));
+	background-image: linear-gradient(
+		90deg,
+		lch(from var(--color-accent-bg) calc(l - 10) c calc(h + 10)),
+		var(--color-accent-bg)
+	);
 
 	nav::after {
 		content: "";
@@ -18,11 +20,11 @@
 
 		transition: all 300ms ease-in-out;
 		border-radius: 0.5em;
-		background: #FFF0;
+		background: #fff0;
 	}
 
 	nav:has(a:is(:hover, :focus-visible))::after {
-		background: #FFF3;
+		background: #fff3;
 
 		top: anchor(top);
 		left: anchor(left);

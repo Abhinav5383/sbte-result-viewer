@@ -1,11 +1,5 @@
 import { COLLEGE_NAME, type ParsedResult } from "@app/shared/types";
-import {
-	createMemo,
-	createSignal,
-	onCleanup,
-	type Setter,
-	Show,
-} from "solid-js";
+import { createMemo, createSignal, onCleanup, type Setter, Show } from "solid-js";
 import { ResultsListTable } from "~/components/ui/results-table";
 import { Select } from "~/components/ui/select";
 import { OrdinalSuffix } from "~/components/utils";
@@ -21,8 +15,7 @@ type FilterOptions = {
 
 export function ResultListPage(props: ResultListPageProps) {
 	const [searchBy, setSearchBy] = createSignal(SearchBy.Name);
-	const [searchQuery, debouncedSearchQuery, setSearchQuery] =
-		createDebouncedSignal("", 200);
+	const [searchQuery, debouncedSearchQuery, setSearchQuery] = createDebouncedSignal("", 200);
 
 	const [filters, setFilters] = createSignal({
 		college: COLLEGE_NAME.NGP_PATNA_13 as string,
@@ -89,27 +82,16 @@ export function ResultListPage(props: ResultListPageProps) {
 		const hasSearch = searchQ.length > 0;
 
 		// fast path: no filters
-		if (
-			!hasCollegeFilter &&
-			!hasBranchFilter &&
-			!hasSemesterFilter &&
-			!hasSearch
-		) {
+		if (!hasCollegeFilter && !hasBranchFilter && !hasSemesterFilter && !hasSearch) {
 			return fullList.slice();
 		}
 
 		const filtered: ParsedResult[] = [];
 
 		for (const item of fullList) {
-			if (hasCollegeFilter && item.student.college !== filterValues.college)
-				continue;
-			if (hasBranchFilter && item.student.branch !== filterValues.branch)
-				continue;
-			if (
-				hasSemesterFilter &&
-				item.student.roll.charAt(0) !== filterValues.semester
-			)
-				continue;
+			if (hasCollegeFilter && item.student.college !== filterValues.college) continue;
+			if (hasBranchFilter && item.student.branch !== filterValues.branch) continue;
+			if (hasSemesterFilter && item.student.roll.charAt(0) !== filterValues.semester) continue;
 
 			if (hasSearch) {
 				if (searchMode === SearchBy.Roll) {
@@ -142,18 +124,10 @@ export function ResultListPage(props: ResultListPageProps) {
 					if (a.student.name > b.student.name) return asc ? 1 : -1;
 					return 0;
 				case SortBy.Marks: {
-					const obtainedPercentA =
-						a.grandTotal.maximum > 0
-							? a.grandTotal.obtained / a.grandTotal.maximum
-							: 0;
-					const obtainedPercentB =
-						b.grandTotal.maximum > 0
-							? b.grandTotal.obtained / b.grandTotal.maximum
-							: 0;
+					const obtainedPercentA = a.grandTotal.maximum > 0 ? a.grandTotal.obtained / a.grandTotal.maximum : 0;
+					const obtainedPercentB = b.grandTotal.maximum > 0 ? b.grandTotal.obtained / b.grandTotal.maximum : 0;
 
-					return asc
-						? obtainedPercentA - obtainedPercentB
-						: obtainedPercentB - obtainedPercentA;
+					return asc ? obtainedPercentA - obtainedPercentB : obtainedPercentB - obtainedPercentA;
 				}
 				case SortBy.sgpa:
 					return asc ? a.sgpa - b.sgpa : b.sgpa - a.sgpa;
@@ -255,9 +229,7 @@ function Controls(props: ControlProps) {
 							onInput={(e) => props.setSearchQuery(e.currentTarget.value)}
 						/>
 						<Show when={props.isFiltering}>
-							<span class="absolute right-3 top-1/2 -translate-y-1/2 text-dim-fg text-xs animate-pulse">
-								...
-							</span>
+							<span class="absolute right-3 top-1/2 -translate-y-1/2 text-dim-fg text-xs animate-pulse">...</span>
 						</Show>
 					</div>
 				</div>

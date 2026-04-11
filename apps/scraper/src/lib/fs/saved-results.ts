@@ -1,8 +1,4 @@
-import {
-	type EncodedResult,
-	decodeResult,
-	encodeResult,
-} from "@app/shared/encoder";
+import { type EncodedResult, decodeResult, encodeResult } from "@app/shared/encoder";
 import type { ParsedResult } from "@app/shared/types";
 import config from "~/config";
 import { tryJsonParse } from "~/lib/utils";

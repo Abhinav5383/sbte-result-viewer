@@ -1,16 +1,7 @@
-import {
-	BRANCH_CODES,
-	BRANCH_NAME,
-	type BranchConfig,
-	COLLEGE_CODES,
-} from "@app/shared/types";
+import { BRANCH_CODES, BRANCH_NAME, type BranchConfig, COLLEGE_CODES } from "@app/shared/types";
 import { numRange } from "~/lib/utils";
 
-export const ROLL_LIST = [
-	...numRange(1, 120),
-	...numRange(301, 310),
-	...numRange(351, 360),
-];
+export const ROLL_LIST = [...numRange(1, 120), ...numRange(301, 310), ...numRange(351, 360)];
 
 const defaultSemesters = [
 	{ sem: 1, admissionYear: 2025 },
@@ -31,29 +22,18 @@ export function getAllCollegeBranches() {
 	return allBranches;
 }
 
-export function getCollegeBranches(
-	collegeCode: number,
-	semesters = defaultSemesters,
-) {
+export function getCollegeBranches(collegeCode: number, semesters = defaultSemesters) {
 	const branches = [];
 
 	for (const semObj of semesters) {
-		const semBranches = getBranches_ForSemester(
-			collegeCode,
-			semObj.sem,
-			semObj.admissionYear,
-		);
+		const semBranches = getBranches_ForSemester(collegeCode, semObj.sem, semObj.admissionYear);
 		branches.push(...semBranches);
 	}
 
 	return branches;
 }
 
-function getBranches_ForSemester(
-	collegeCode: number,
-	semester: number,
-	admissionYear: number,
-) {
+function getBranches_ForSemester(collegeCode: number, semester: number, admissionYear: number) {
 	const branchConfigs: BranchConfig[] = [];
 
 	for (const [branch, branchCode] of Object.entries(BRANCH_CODES)) {

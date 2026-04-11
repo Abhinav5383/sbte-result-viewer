@@ -1,9 +1,7 @@
 import config from "~/config";
 
 export async function getInvalidRolls() {
-	const rollsFile = Bun.file(
-		`${config.STORE_DIR}/${config.INVALID_ROLLS_STORE}`,
-	);
+	const rollsFile = Bun.file(`${config.STORE_DIR}/${config.INVALID_ROLLS_STORE}`);
 	if (!(await rollsFile.exists())) return [];
 
 	try {
@@ -16,9 +14,7 @@ export async function getInvalidRolls() {
 }
 
 export async function saveInvalidRolls(rolls: string[]) {
-	const rollsFile = Bun.file(
-		`${config.STORE_DIR}/${config.INVALID_ROLLS_STORE}`,
-	);
+	const rollsFile = Bun.file(`${config.STORE_DIR}/${config.INVALID_ROLLS_STORE}`);
 	const existingRolls = await getInvalidRolls();
 
 	try {

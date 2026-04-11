@@ -18,17 +18,14 @@ export default defineConfig(async (ctx) => ({
 	},
 
 	define: {
-		__EMBEDDED_RESULTS__:
-			ctx.command === "build" ? await getEmbeddedResults() : undefined,
+		__EMBEDDED_RESULTS__: ctx.command === "build" ? await getEmbeddedResults() : undefined,
 	},
 }));
 
 async function getEmbeddedResults(): Promise<string> {
 	const res = await fetch("http://localhost:5500/students-data");
 	if (!res.ok) {
-		throw new Error(
-			`Failed to fetch embedded results: ${res.status} ${res.statusText}.`,
-		);
+		throw new Error(`Failed to fetch embedded results: ${res.status} ${res.statusText}.`);
 	}
 	const data = (await res.json()) as ParsedResult[];
 
@@ -41,9 +38,7 @@ async function getEmbeddedResults(): Promise<string> {
 	const base64 = gzipped.toString("base64");
 
 	console.log(
-		`Embedded data: ${data.length} results, ${(
-			json.length / 1024 / 1024
-		).toFixed(
+		`Embedded data: ${data.length} results, ${(json.length / 1024 / 1024).toFixed(
 			2,
 		)}MB JSON -> ${(base64.length / 1024 / 1024).toFixed(2)}MB gzipped+base64`,
 	);

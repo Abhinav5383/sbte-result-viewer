@@ -1,10 +1,4 @@
-import {
-	BRANCH_NAME,
-	COLLEGE_NAME,
-	PAPER_TYPE,
-	type ParsedResult,
-	type SubjectResult,
-} from "@app/shared/types";
+import { BRANCH_NAME, COLLEGE_NAME, PAPER_TYPE, type ParsedResult, type SubjectResult } from "@app/shared/types";
 import { getCollegeFromRoll } from "@app/shared/utils";
 
 export function parseTxtToJson(txt: string): ParsedResult {
@@ -42,9 +36,7 @@ export function parseTxtToJson(txt: string): ParsedResult {
 			const roll = line.split(":")[1]?.trim();
 			if (roll) result.student.roll = roll;
 		} else if (lineLower.startsWith("following are the marks obtained by")) {
-			const name = line
-				.replace(/following are the marks obtained by/i, "")
-				.trim();
+			const name = line.replace(/following are the marks obtained by/i, "").trim();
 			const formattedName = name
 				.split(" ")
 				.map((p) => {
@@ -118,10 +110,7 @@ export function parseTxtToJson(txt: string): ParsedResult {
 	return result;
 }
 
-function parseSubjectLine(
-	line: string,
-	paperType: PAPER_TYPE,
-): SubjectResult | null {
+function parseSubjectLine(line: string, paperType: PAPER_TYPE): SubjectResult | null {
 	const parts = line
 		.split(" ")
 		.map((p) => p.trim())
@@ -129,8 +118,7 @@ function parseSubjectLine(
 
 	const marksParts = parts.slice(-10);
 	const subName = parts.slice(0, parts.length - 10).join(" ");
-	const formattedSubName =
-		subName.charAt(0).toUpperCase() + subName.slice(1).toLowerCase();
+	const formattedSubName = subName.charAt(0).toUpperCase() + subName.slice(1).toLowerCase();
 
 	if (marksParts.length < 10) return null;
 

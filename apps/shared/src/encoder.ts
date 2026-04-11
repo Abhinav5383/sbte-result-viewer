@@ -14,11 +14,7 @@ export function encodeResult(data: ParsedResult): EncodedResult {
 	return [
 		data.student.name,
 		data.student.roll,
-		[
-			data.grandTotal.maximum,
-			data.grandTotal.passing,
-			data.grandTotal.obtained,
-		],
+		[data.grandTotal.maximum, data.grandTotal.passing, data.grandTotal.obtained],
 		data.subjects.map(encodeSubject),
 		data.sgpa,
 		data.remarks,

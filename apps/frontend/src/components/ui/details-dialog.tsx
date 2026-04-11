@@ -1,10 +1,5 @@
 import { apiUrl } from "@app/shared/consts";
-import {
-	COLLEGE_FULL_NAME,
-	PAPER_TYPE,
-	type ParsedResult,
-	type SubjectResult,
-} from "@app/shared/types";
+import { COLLEGE_FULL_NAME, PAPER_TYPE, type ParsedResult, type SubjectResult } from "@app/shared/types";
 import { toPng } from "html-to-image";
 import CheckIcon from "lucide-solid/icons/check";
 import ClipboardIcon from "lucide-solid/icons/clipboard";
@@ -14,11 +9,7 @@ import ImageIcon from "lucide-solid/icons/image";
 import XIcon from "lucide-solid/icons/x";
 import { For, Show, createEffect, createSignal, onCleanup } from "solid-js";
 import { OrdinalSuffix, cn } from "~/components/utils";
-import {
-	alphabeticalGradeClass,
-	marksClass,
-	sgpaClass,
-} from "~/lib/grade-utils";
+import { alphabeticalGradeClass, marksClass, sgpaClass } from "~/lib/grade-utils";
 import "./details-dialog.css";
 
 interface DetailsDialogProps {
@@ -28,9 +19,7 @@ interface DetailsDialogProps {
 }
 
 export function DetailsDialog(props: DetailsDialogProps) {
-	const [dialogRef, setDialogRef] = createSignal<HTMLDialogElement | null>(
-		null,
-	);
+	const [dialogRef, setDialogRef] = createSignal<HTMLDialogElement | null>(null);
 
 	const [contentRef, setContentRef] = createSignal<HTMLDivElement | null>(null);
 	const [saving, setSaving] = createSignal(false);
@@ -129,9 +118,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
 									</div>
 								</div>
 
-								<span class="text-accent-bg-text font-medium">
-									{COLLEGE_FULL_NAME[data.student.college]}
-								</span>
+								<span class="text-accent-bg-text font-medium">{COLLEGE_FULL_NAME[data.student.college]}</span>
 
 								<div class="flex items-center gap-3">
 									<span class="font-semibold py-1">{data.student.roll}</span>
@@ -150,34 +137,18 @@ export function DetailsDialog(props: DetailsDialogProps) {
 							<div class="grid gap-4 p-4">
 								<div class="grid grid-cols-2 gap-4">
 									<div class="grid gap-1 place-items-center bg-zinc-100 rounded-lg p-6">
-										<h2 class="uppercase font-semibold text-dim-fg text-sm">
-											Obtained Marks
-										</h2>
+										<h2 class="uppercase font-semibold text-dim-fg text-sm">Obtained Marks</h2>
 										<span
-											class={cn(
-												"text-4xl font-bold",
-												marksClass(
-													data.grandTotal.obtained,
-													data.grandTotal.maximum,
-												),
-											)}
+											class={cn("text-4xl font-bold", marksClass(data.grandTotal.obtained, data.grandTotal.maximum))}
 										>
 											{data.grandTotal.obtained}
 										</span>
-										<span class="text-dim-fg">
-											Out of {data.grandTotal.maximum}
-										</span>
+										<span class="text-dim-fg">Out of {data.grandTotal.maximum}</span>
 									</div>
 
 									<div class="grid gap-1 place-items-center bg-zinc-100 rounded-lg p-6">
-										<h2 class="uppercase font-semibold text-dim-fg text-sm">
-											SGPA
-										</h2>
-										<span
-											class={cn("text-4xl font-bold", sgpaClass(data.sgpa))}
-										>
-											{data.sgpa.toFixed(2)}
-										</span>
+										<h2 class="uppercase font-semibold text-dim-fg text-sm">SGPA</h2>
+										<span class={cn("text-4xl font-bold", sgpaClass(data.sgpa))}>{data.sgpa.toFixed(2)}</span>
 										<span class="text-dim-fg">{data.remarks}</span>
 									</div>
 								</div>
@@ -185,23 +156,17 @@ export function DetailsDialog(props: DetailsDialogProps) {
 								<div class="grid gap-6">
 									<SubjectCategory
 										title={PAPER_TYPE.THEORY.toLowerCase()}
-										subjects={data.subjects.filter(
-											(sub) => sub.type === PAPER_TYPE.THEORY,
-										)}
+										subjects={data.subjects.filter((sub) => sub.type === PAPER_TYPE.THEORY)}
 									/>
 
 									<SubjectCategory
 										title={PAPER_TYPE.PRACTICAL.toLowerCase()}
-										subjects={data.subjects.filter(
-											(sub) => sub.type === PAPER_TYPE.PRACTICAL,
-										)}
+										subjects={data.subjects.filter((sub) => sub.type === PAPER_TYPE.PRACTICAL)}
 									/>
 
 									<SubjectCategory
 										title={PAPER_TYPE.TERM_WORK.toLowerCase().replace("_", " ")}
-										subjects={data.subjects.filter(
-											(sub) => sub.type === PAPER_TYPE.TERM_WORK,
-										)}
+										subjects={data.subjects.filter((sub) => sub.type === PAPER_TYPE.TERM_WORK)}
 									/>
 								</div>
 							</div>
@@ -234,9 +199,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
 				open={previewOpen()}
 				onClose={() => setPreviewOpen(false)}
 				imageUrl={previewImage()}
-				filename={`${props.data?.student.name.replace(" ", "_")}-${
-					props.data?.student.roll
-				}-result.png`}
+				filename={`${props.data?.student.name.replace(" ", "_")}-${props.data?.student.roll}-result.png`}
 			/>
 		</dialog>
 	);
@@ -250,9 +213,7 @@ interface ImagePreviewDialogProps {
 }
 
 function ImagePreviewDialog(props: ImagePreviewDialogProps) {
-	const [dialogRef, setDialogRef] = createSignal<HTMLDialogElement | null>(
-		null,
-	);
+	const [dialogRef, setDialogRef] = createSignal<HTMLDialogElement | null>(null);
 	const [copied, setCopied] = createSignal(false);
 
 	createEffect(() => {
@@ -288,9 +249,7 @@ function ImagePreviewDialog(props: ImagePreviewDialogProps) {
 
 			const response = await fetch(props.imageUrl);
 			const blob = await response.blob();
-			await navigator.clipboard.write([
-				new ClipboardItem({ "image/png": blob }),
-			]);
+			await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
 			setCopied(true);
 			timeoutRef = setTimeout(() => {
 				setCopied(false);
@@ -371,12 +330,8 @@ function SubjectCategory(props: SubjectCategoryProps) {
 	return (
 		<Show when={props.subjects.length > 0}>
 			<div class="grid grid-cols-1 @md:grid-cols-2 @4xl:grid-cols-3 gap-3 border-t border-border mt-3 pt-3">
-				<span class="capitalize text-xl font-bold text-dim-fg col-span-full">
-					{props.title}
-				</span>
-				<For each={props.subjects}>
-					{(subject) => <SubjectMarksDetails sub={subject} />}
-				</For>
+				<span class="capitalize text-xl font-bold text-dim-fg col-span-full">{props.title}</span>
+				<For each={props.subjects}>{(subject) => <SubjectMarksDetails sub={subject} />}</For>
 			</div>
 		</Show>
 	);
@@ -415,10 +370,7 @@ function SubjectMarksRow(props: { sub: SubjectResult }) {
 					<div class="grid items-end col-span-full grid-cols-subgrid">
 						<span class="trim-both">Internal:</span>
 						<span
-							class={cn(
-								"trim-both font-semibold text-lg",
-								marksClass(props.sub.total.obtained, props.sub.total.max),
-							)}
+							class={cn("trim-both font-semibold text-lg", marksClass(props.sub.total.obtained, props.sub.total.max))}
 						>
 							{props.sub.internal.obtained}
 						</span>
@@ -430,9 +382,7 @@ function SubjectMarksRow(props: { sub: SubjectResult }) {
 			>
 				<div class="grid items-end col-span-full grid-cols-subgrid">
 					<span class="trim-both">External:</span>
-					<span class="trim-both font-semibold text-normal-fg">
-						{props.sub.external.obtained}
-					</span>
+					<span class="trim-both font-semibold text-normal-fg">{props.sub.external.obtained}</span>
 
 					<MarksDivider />
 					<span class="trim-both">{props.sub.external.max}</span>
@@ -440,9 +390,7 @@ function SubjectMarksRow(props: { sub: SubjectResult }) {
 
 				<div class="grid items-end col-span-full grid-cols-subgrid">
 					<span class="trim-both">Internal:</span>
-					<span class="trim-both font-semibold text-normal-fg">
-						{props.sub.internal.obtained}
-					</span>
+					<span class="trim-both font-semibold text-normal-fg">{props.sub.internal.obtained}</span>
 
 					<MarksDivider />
 					<span class="trim-both">{props.sub.internal.max}</span>
@@ -451,10 +399,7 @@ function SubjectMarksRow(props: { sub: SubjectResult }) {
 				<div class="grid items-end col-span-full grid-cols-subgrid">
 					<span class="trim-both">Total:</span>
 					<span
-						class={cn(
-							"trim-both font-semibold text-lg",
-							marksClass(props.sub.total.obtained, props.sub.total.max),
-						)}
+						class={cn("trim-both font-semibold text-lg", marksClass(props.sub.total.obtained, props.sub.total.max))}
 					>
 						{props.sub.total.obtained}
 					</span>

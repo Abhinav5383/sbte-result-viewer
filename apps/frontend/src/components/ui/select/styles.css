@@ -69,7 +69,10 @@
 
 			opacity: 1;
 			transform: translateY(0.3rem);
-			transition: opacity 0.25s ease-in-out, transform 0.3s, display 1s;
+			transition:
+				opacity 0.25s ease-in-out,
+				transform 0.3s,
+				display 1s;
 
 			@starting-style {
 				opacity: 0;

@@ -119,19 +119,15 @@ export const COLLEGE_FULL_NAME: Record<COLLEGE_NAME, string> = {
 	[COLLEGE_NAME.GP_VAISHALI]: "Government Polytechnic, Vaishali",
 	[COLLEGE_NAME.GP_LAKHISARAI]: "Government Polytechnic, Lakhisarai",
 	[COLLEGE_NAME.GP_DEHRIONSONE]: "Government Polytechnic, Dehrionsone",
-	[COLLEGE_NAME.GP_ASTHAWAN_NALANDA]:
-		"Government Polytechnic, Asthawan, Nalanda",
+	[COLLEGE_NAME.GP_ASTHAWAN_NALANDA]: "Government Polytechnic, Asthawan, Nalanda",
 	[COLLEGE_NAME.GP_SHEOHAR]: "Government Polytechnic, Sheohar",
 	[COLLEGE_NAME.GP_MOTIHARI]: "Government Polytechnic, Motihari",
 	[COLLEGE_NAME.GP_MADHUBANI]: "Government Polytechnic, Madhubani",
-	[COLLEGE_NAME.BKPI_SITAMARHI]:
-		"Baddiuzama Khan Polytechnic Institute, Sitamarhi",
+	[COLLEGE_NAME.BKPI_SITAMARHI]: "Baddiuzama Khan Polytechnic Institute, Sitamarhi",
 	[COLLEGE_NAME.GP_MADHEPURA]: "Government Polytechnic, Madhepura",
 	[COLLEGE_NAME.GP_RAGHOPUR_SUPAUL]: "Government Polytechnic, Raghopur, Supaul",
-	[COLLEGE_NAME.KNSGP_SAMASTIPUR]:
-		"Kameshwar Narayan Singh Government Polytechnic, Samastipur",
-	[COLLEGE_NAME.BKNSGP_GOPALGANJ]:
-		"Braj Kishor Narayan Singh Government Polytechnic, Gopalganj",
+	[COLLEGE_NAME.KNSGP_SAMASTIPUR]: "Kameshwar Narayan Singh Government Polytechnic, Samastipur",
+	[COLLEGE_NAME.BKNSGP_GOPALGANJ]: "Braj Kishor Narayan Singh Government Polytechnic, Gopalganj",
 	[COLLEGE_NAME.GP_MUNGER]: "Government Polytechnic, Munger",
 	[COLLEGE_NAME.GP_SHEIKHPURA]: "Government Polytechnic, Sheikhpura",
 	[COLLEGE_NAME.GP_JAMUI]: "Government Polytechnic, Jamui",
@@ -151,8 +147,7 @@ export const COLLEGE_FULL_NAME: Record<COLLEGE_NAME, string> = {
 	[COLLEGE_NAME.GP_JEHANABAD]: "Government Polytechnic, Jehanabad",
 	[COLLEGE_NAME.GP_KHAGARIA]: "Government Polytechnic, Khagaria",
 	[COLLEGE_NAME.GP_BARH]: "Government Polytechnic, Barh",
-	[COLLEGE_NAME.GPTT_BHAGALPUR]:
-		"Government Textile Technology Institute, Bhagalpur",
+	[COLLEGE_NAME.GPTT_BHAGALPUR]: "Government Textile Technology Institute, Bhagalpur",
 	[COLLEGE_NAME.UNKNOWN]: "Unknown College",
 };
 

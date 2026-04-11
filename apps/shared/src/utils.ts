@@ -1,9 +1,4 @@
-import {
-	BRANCH_CODES,
-	BRANCH_NAME,
-	COLLEGE_CODES,
-	COLLEGE_NAME,
-} from "./types";
+import { BRANCH_CODES, BRANCH_NAME, COLLEGE_CODES, COLLEGE_NAME } from "./types";
 
 export function getCollegeFromRoll(code: string): COLLEGE_NAME {
 	const collegeCode = code.substring(2, 5);

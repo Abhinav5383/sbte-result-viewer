@@ -7,9 +7,7 @@ import { extractTextFromPdfBuffer } from "~/lib/parser/extract-text";
 import { parseTxtToJson } from "~/lib/parser/parse-txt";
 import { formatRollList } from "~/lib/utils";
 
-export async function getAllBranchesData(
-	branches: BranchConfig[],
-): Promise<ParsedResult[]> {
+export async function getAllBranchesData(branches: BranchConfig[]): Promise<ParsedResult[]> {
 	// Use Set/Map for O(1) lookups
 	const invalidRolls = new Set(await getInvalidRolls());
 	const existingResults = new Map<string, ParsedResult>();
@@ -21,8 +19,11 @@ export async function getAllBranchesData(
 	const allResults: ParsedResult[] = [];
 
 	for (const branch of branches) {
-		const { requestedResults, newResults, newInvalidRolls } =
-			await parseAllStudentsData(branch, invalidRolls, existingResults);
+		const { requestedResults, newResults, newInvalidRolls } = await parseAllStudentsData(
+			branch,
+			invalidRolls,
+			existingResults,
+		);
 
 		// save and update cache if there's new data
 		if (newResults.length > 0) {
@@ -114,9 +115,7 @@ export async function parseAllStudentsData(
 		await Promise.all(fetchPromises);
 	}
 	console.log(
-		`Fetched ${newResults.length} results for ${getCollegeFromRoll(filteredRolls[0])} ${
-			branch.branchName
-		} branch\n`,
+		`Fetched ${newResults.length} results for ${getCollegeFromRoll(filteredRolls[0])} ${branch.branchName} branch\n`,
 	);
 
 	return { requestedResults, newResults, newInvalidRolls };

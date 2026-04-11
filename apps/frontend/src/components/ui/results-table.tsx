@@ -1,22 +1,13 @@
-import { type ParsedResult } from "@app/shared/types";
+import type { ParsedResult } from "@app/shared/types";
 import ArrowDownWideNarrow from "lucide-solid/icons/arrow-down-wide-narrow";
 import ArrowUpWideNarrow from "lucide-solid/icons/arrow-up-wide-narrow";
 import ChevronUpIcon from "lucide-solid/icons/chevron-up";
-import {
-	For,
-	type Setter,
-	Show,
-	batch,
-	createEffect,
-	createMemo,
-	createSignal,
-	onCleanup,
-	onMount,
-} from "solid-js";
+import { batch, createEffect, createMemo, createSignal, For, onCleanup, onMount, type Setter, Show } from "solid-js";
 import { marksClass, sgpaClass } from "~/lib/grade-utils";
 import { type Filters, SortBy, SortOrder } from "~/lib/types";
-import { OrdinalSuffix, cn } from "../utils";
+import { cn, OrdinalSuffix } from "../utils";
 import { DetailsDialog } from "./details-dialog";
+
 import "./results-table.css";
 
 interface ResultsListTableProps {
@@ -174,11 +165,7 @@ function SortableHeaderItem(props: SortableHeaderItemProps) {
 			)}
 			onClick={() => {
 				if (props.sortBy === props.value) {
-					props.setSortOrder(
-						props.sortOrder === SortOrder.Ascending
-							? SortOrder.Descending
-							: SortOrder.Ascending,
-					);
+					props.setSortOrder(props.sortOrder === SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending);
 				} else {
 					batch(() => {
 						props.setSortBy(props.value);
@@ -222,9 +209,7 @@ function ResultTableContents(props: ResultTableContentsProps) {
 
 	const [scrollToTopVisible, setScrollToTopVisible] = createSignal(false);
 	const [rowHeight, setRowHeight] = createSignal<number>(DEFAULT_ROW_HEIGHT);
-	const [containerRef, setContainerRef] = createSignal<
-		HTMLDivElement | undefined
-	>();
+	const [containerRef, setContainerRef] = createSignal<HTMLDivElement | undefined>();
 	const [visibleIndices, setVisibleIndices] = createSignal({
 		start: 0,
 		end: 0,
@@ -248,19 +233,14 @@ function ResultTableContents(props: ResultTableContentsProps) {
 		const containerYScroll = Math.max(0, -containerTop);
 
 		const startIndex = Math.floor(containerYScroll / rHeight);
-		const endIndex = Math.ceil(
-			(containerYScroll + window.innerHeight) / rHeight,
-		);
+		const endIndex = Math.ceil((containerYScroll + window.innerHeight) / rHeight);
 
 		const overscan = endIndex - startIndex; // overscan by one viewport height
 		const adjustedStartIndex = Math.max(0, startIndex - overscan);
-		const adjustedEndIndex = Math.min(
-			props.sortedResults.results.length - 1,
-			endIndex + overscan,
-		);
+		const adjustedEndIndex = Math.min(props.sortedResults.results.length - 1, endIndex + overscan);
 
 		batch(() => {
-		setVisibleIndices({ start: adjustedStartIndex, end: adjustedEndIndex });
+			setVisibleIndices({ start: adjustedStartIndex, end: adjustedEndIndex });
 
 			if (
 				window.scrollY > window.innerHeight * 4 &&
@@ -292,9 +272,7 @@ function ResultTableContents(props: ResultTableContentsProps) {
 
 	createEffect(() => {
 		const paddingTop = visibleIndices().start * rowHeight();
-		const paddingBottom =
-			(props.sortedResults.results.length - (visibleIndices().end + 1)) *
-			rowHeight();
+		const paddingBottom = (props.sortedResults.results.length - (visibleIndices().end + 1)) * rowHeight();
 
 		const el = containerRef();
 		if (el) {
@@ -372,15 +350,9 @@ function ResultRow(props: ResultRowProps) {
 
 		semester: props.item.student.roll.charAt(0),
 		formattedSgpa: props.item.sgpa.toFixed(2),
-		marksClassName: marksClass(
-			props.item.grandTotal.obtained,
-			props.item.grandTotal.maximum,
-		),
+		marksClassName: marksClass(props.item.grandTotal.obtained, props.item.grandTotal.maximum),
 		sgpaClassName: sgpaClass(props.item.sgpa),
-		percentObtained: calcPercentObtained(
-			props.item.grandTotal.obtained,
-			props.item.grandTotal.maximum,
-		),
+		percentObtained: calcPercentObtained(props.item.grandTotal.obtained, props.item.grandTotal.maximum),
 	});
 
 	return (
@@ -401,11 +373,11 @@ interface RowVariantProps extends ResultRowProps {
 
 function MobileResultRow(props: RowVariantProps) {
 	return (
+		// biome-ignore lint/a11y/noStaticElementInteractions: --
 		<div
 			class="lg:hidden grid grid-cols-[max-content_1fr] gap-3 px-3 py-5 border-b border-border hover:bg-zinc-100 active:bg-zinc-100 cursor-pointer focus-ring"
 			onClick={props.onSelect}
 			onKeyDown={(e) => handleRowKbEvent(e, props.onSelect)}
-			role="button"
 			tabindex={0}
 		>
 			<div>
@@ -414,14 +386,8 @@ function MobileResultRow(props: RowVariantProps) {
 
 			<div class="grid gap-2">
 				<div class="flex items-center gap-x-2">
-					<span class="font-semibold text-lg leading-tight truncate">
-						{props.item.student.name}
-					</span>
-					<BranchBadge
-						branch={props.item.student.branch}
-						semester={props.semester}
-						class="text-xs"
-					/>
+					<span class="font-semibold text-lg leading-tight truncate">{props.item.student.name}</span>
+					<BranchBadge branch={props.item.student.branch} semester={props.semester} class="text-xs" />
 				</div>
 
 				<div class="flex items-center gap-2">
@@ -432,26 +398,17 @@ function MobileResultRow(props: RowVariantProps) {
 
 				<div class="grid grid-cols-2 gap-4">
 					<div class="flex items-center justify-center flex-col bg-zinc-50 p-3 rounded-lg border border-zinc-200">
-						<span class="text-dim-fg font-medium uppercase text-xs opacity-70">
-							Marks Obtained
-						</span>
+						<span class="text-dim-fg font-medium uppercase text-xs opacity-70">Marks Obtained</span>
 
 						<div class="text-dim-fg text-xs">
-							<span class={cn(props.marksClassName, "text-lg font-medium")}>
-								{props.item.grandTotal.obtained}
-							</span>{" "}
-							<span class="opacity-50">/</span>{" "}
-							<span class="opacity-70">{props.item.grandTotal.maximum}</span>
+							<span class={cn(props.marksClassName, "text-lg font-medium")}>{props.item.grandTotal.obtained}</span>{" "}
+							<span class="opacity-50">/</span> <span class="opacity-70">{props.item.grandTotal.maximum}</span>
 						</div>
 					</div>
 
 					<div class="flex items-center justify-center flex-col bg-zinc-50 p-3 rounded-lg border border-zinc-200">
-						<span class="text-dim-fg font-medium uppercase text-xs opacity-70">
-							SGPA
-						</span>
-						<span class={cn(props.sgpaClassName, "font-semibold text-lg")}>
-							{props.item.sgpa}
-						</span>
+						<span class="text-dim-fg font-medium uppercase text-xs opacity-70">SGPA</span>
+						<span class={cn(props.sgpaClassName, "font-semibold text-lg")}>{props.item.sgpa}</span>
 					</div>
 				</div>
 			</div>
@@ -461,6 +418,7 @@ function MobileResultRow(props: RowVariantProps) {
 
 function DesktopResultRow(props: RowVariantProps) {
 	return (
+		// biome-ignore lint/a11y/noStaticElementInteractions: __
 		<div
 			class={cn(
 				"hidden lg:grid",
@@ -470,7 +428,6 @@ function DesktopResultRow(props: RowVariantProps) {
 			onClick={props.onSelect}
 			onKeyDown={(e) => handleRowKbEvent(e, props.onSelect)}
 			tabindex={0}
-			role="button"
 		>
 			<span class="text-dim-fg text-sm">{props.index + 1}</span>
 			<span class="truncate">{props.item.student.name}</span>
@@ -481,46 +438,28 @@ function DesktopResultRow(props: RowVariantProps) {
 
 			<div class="grid grid-cols-2 gap-2 items-center pe-8">
 				<div class="text-dim-fg text-xs">
-					<span class="text-base font-medium">
-						{props.item.grandTotal.obtained}
-					</span>{" "}
+					<span class="text-base font-medium">{props.item.grandTotal.obtained}</span>{" "}
 					<span class="text-xs opacity-50">/</span>{" "}
-					<span class="text-xs opacity-70">
-						{props.item.grandTotal.maximum}
-					</span>
+					<span class="text-xs opacity-70">{props.item.grandTotal.maximum}</span>
 				</div>
 
-				<PercentageBadge
-					percentObtained={props.percentObtained}
-					class={props.marksClassName}
-				/>
+				<PercentageBadge percentObtained={props.percentObtained} class={props.marksClassName} />
 			</div>
 
-			<span class={cn("saturate-70", props.sgpaClassName)}>
-				{props.formattedSgpa}
-			</span>
+			<span class={cn("saturate-70", props.sgpaClassName)}>{props.formattedSgpa}</span>
 
 			<div class="block">
-				<BranchBadge
-					branch={props.item.student.branch}
-					semester={props.semester}
-				/>
+				<BranchBadge branch={props.item.student.branch} semester={props.semester} />
 			</div>
 
 			<Show when={props.showCollege}>
-				<span class="text-dim-fg text-sm truncate">
-					{props.item.student.college}
-				</span>
+				<span class="text-dim-fg text-sm truncate">{props.item.student.college}</span>
 			</Show>
 		</div>
 	);
 }
 
-function BranchBadge(props: {
-	branch: string;
-	semester: string;
-	class?: string;
-}) {
+function BranchBadge(props: { branch: string; semester: string; class?: string }) {
 	return (
 		<span
 			class={cn(
@@ -540,12 +479,7 @@ function BranchBadge(props: {
 
 function PercentageBadge(props: { percentObtained: number; class?: string }) {
 	return (
-		<span
-			class={cn(
-				"bg-(--clr)/10 px-1.5 rounded-lg w-fit text-[0.83rem]",
-				props.class,
-			)}
-		>
+		<span class={cn("bg-(--clr)/10 px-1.5 rounded-lg w-fit text-[0.83rem]", props.class)}>
 			<span>{props.percentObtained}</span>
 			<span class="text-xs opacity-80 saturate-50">{" %"}</span>
 		</span>

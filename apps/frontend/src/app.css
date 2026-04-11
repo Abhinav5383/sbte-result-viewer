@@ -15,10 +15,11 @@
 
 .hero-surface::before,
 .about-surface::before {
-	background:
-		radial-gradient(700px 550px at var(--x, 50%) var(--y, 70%),
-			color-mix(in oklab, var(--color-accent-fg) 26%, transparent) 0%,
-			transparent 64%);
+	background: radial-gradient(
+		700px 550px at var(--x, 50%) var(--y, 70%),
+		color-mix(in oklab, var(--color-accent-fg) 26%, transparent) 0%,
+		transparent 64%
+	);
 	filter: blur(16px);
 }
 
