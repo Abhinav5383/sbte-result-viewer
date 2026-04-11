@@ -1,10 +1,10 @@
 import { COLLEGE_NAME, type ParsedResult } from "@app/shared/types";
 import {
-	type Setter,
-	Show,
 	createMemo,
 	createSignal,
 	onCleanup,
+	type Setter,
+	Show,
 } from "solid-js";
 import { ResultsListTable } from "~/components/ui/results-table";
 import { Select } from "~/components/ui/select";
@@ -173,7 +173,7 @@ export function ResultListPage(props: ResultListPageProps) {
 	});
 
 	return (
-		<div>
+		<div id="results">
 			<Controls
 				searchBy={searchBy()}
 				setSearchBy={setSearchBy}
