@@ -30,6 +30,7 @@ body {
 	@apply font-body;
 	scrollbar-gutter: stable;
 	background-color: var(--color-zinc-50);
+	scroll-behavior: smooth;
 }
 
 @layer base {
@@ -40,7 +41,7 @@ body {
 	}
 
 	a {
-		@apply text-accent-fg-light underline-offset-2 hover:underline;
+		@apply text-accent-fg underline-offset-2 hover:underline;
 	}
 
 	button {
