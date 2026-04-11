@@ -24,7 +24,7 @@ export default function Navbar() {
 			<nav class="flex items-center justify-between gap-x-4 flex-wrap px-8 text-accent-bg-text">
 				<span class="font-extrabold text-2xl">SBTE Exam Results</span>
 
-				<div class="links flex">
+				<div class="links flex flex-wrap justify-center items-center">
 					<a href="#results" class="nav-target" onMouseEnter={handleMouseEnter} onFocus={handleMouseEnter}>
 						Results
 					</a>
