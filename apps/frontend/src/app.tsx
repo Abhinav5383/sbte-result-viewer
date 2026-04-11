@@ -33,16 +33,16 @@ async function decodeEmbeddedResults(base64: string): Promise<ParsedResult[]> {
 
 export default function App() {
 	const [results, { refetch }] = createResource(async (): Promise<ParsedResult[]> => {
-			if (typeof __EMBEDDED_RESULTS__ !== "undefined") {
-				return decodeEmbeddedResults(__EMBEDDED_RESULTS__);
-			}
+		if (typeof __EMBEDDED_RESULTS__ !== "undefined") {
+			return decodeEmbeddedResults(__EMBEDDED_RESULTS__);
+		}
 
-			const res = await fetch("http://localhost:5500/students-data");
-			if (!res.ok) {
-				throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
-			}
-			const data = (await res.json()) as ParsedResult[];
-			return data;
+		const res = await fetch("http://localhost:5500/students-data");
+		if (!res.ok) {
+			throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+		}
+		const data = (await res.json()) as ParsedResult[];
+		return data;
 	});
 
 	return (
@@ -77,6 +77,7 @@ export default function App() {
 				</Show>
 			</main>
 
+			<AboutSection />
 
 			<Footer />
 		</div>
@@ -122,6 +123,43 @@ function HeroSection(props: { total: number; loading: boolean; error?: string })
 	);
 }
 
+function AboutSection() {
+	return (
+		<aside id="about" class="mt-[4em] py-[6em] px-[2em] bg-zinc-100 text-zinc-800">
+			<div class="max-w-3xl mx-auto">
+				<h2 class="text-3xl">Disclaimer</h2>
+
+				<div class="leading-relaxed space-y-4 mt-4">
+					<p>
+						This project is an independent, unofficial viewer built for convenience. It is{" "}
+						<span>not affiliated with</span>, <span>endorsed by</span>, or <span>connected to</span> SBTE (or any
+						related institution/website).
+					</p>
+
+					<p>
+						<span class="font-medium">Data source & availability:</span> For past exams, results are parsed from PDFs
+						and stored as JSON during the build process, then embedded directly into the website. Because of this, the
+						deployed site does not need any results API to show past results.
+					</p>
+
+					<p>
+						<span class="font-medium">Privacy:</span> When viewing the deployed site, results are loaded from the page
+						itself (embedded data) and no API request is made to any third-party results server for normal usage. Your
+						searches/filters run locally in your browser.
+					</p>
+
+					<p class="text-sm">
+						If you believe any information is inaccurate or should be removed, please{" "}
+						<a class="underline hover:decoration-2" href="https://github.com/Abhinav5383/sbte-result-viewer/issues">
+							open an issue on the repository
+						</a>
+						.
+					</p>
+				</div>
+			</div>
+		</aside>
+	);
+}
 
 function Footer() {
 	return (
