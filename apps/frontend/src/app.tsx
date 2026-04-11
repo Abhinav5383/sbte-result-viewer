@@ -4,6 +4,8 @@ import { createResource, Show } from "solid-js";
 import Navbar from "./components/navbar";
 import { ResultListPage } from "./pages/results";
 
+import "./app.css";
+
 // Declare the global embedded data (injected at build time) - gzip+base64 encoded string
 declare const __EMBEDDED_RESULTS__: string | undefined;
 
@@ -86,7 +88,7 @@ export default function App() {
 
 function HeroSection(props: { total: number; loading: boolean; error?: string }) {
 	return (
-		<section class="min-h-[80svb] grid place-items-center px-6 py-12">
+		<section class="min-h-[80svb] grid place-items-center px-6 py-12 hero-surface">
 			<div class="w-full max-w-3xl text-center grid gap-8">
 				<header class="grid gap-4">
 					<p class="text-dim-fg text-sm font-semibold tracking-widest uppercase">SBTE Result Viewer</p>
@@ -115,10 +117,6 @@ function HeroSection(props: { total: number; loading: boolean; error?: string })
 						<div class="text-sm text-dim-fg">{props.error}</div>
 					</div>
 				) : null}
-
-				{/* <p class="pt-2 text-xs text-dim-fg">
-					Tip: Use the filters below to narrow results by college, branch, and semester.
-				</p> */}
 			</div>
 		</section>
 	);
@@ -126,7 +124,7 @@ function HeroSection(props: { total: number; loading: boolean; error?: string })
 
 function AboutSection() {
 	return (
-		<aside id="about" class="mt-[4em] py-[6em] px-[2em] bg-zinc-50">
+		<aside id="about" class="mt-[4em] py-[6em] px-[2em] bg-zinc-50 about-surface">
 			<div class="max-w-3xl mx-auto grid gap-5">
 				<header class="grid gap-2">
 					<h2 class="text-3xl text-bright-fg font-semibold">Disclaimer</h2>
