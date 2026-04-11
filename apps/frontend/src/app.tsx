@@ -32,8 +32,7 @@ async function decodeEmbeddedResults(base64: string): Promise<ParsedResult[]> {
 }
 
 export default function App() {
-	const [results, { refetch }] = createResource(
-		async (): Promise<ParsedResult[]> => {
+	const [results, { refetch }] = createResource(async (): Promise<ParsedResult[]> => {
 			if (typeof __EMBEDDED_RESULTS__ !== "undefined") {
 				return decodeEmbeddedResults(__EMBEDDED_RESULTS__);
 			}
@@ -44,22 +43,19 @@ export default function App() {
 			}
 			const data = (await res.json()) as ParsedResult[];
 			return data;
-		},
-	);
+	});
 
 	return (
 		<div class="grid grid-rows-[min-content_1fr_min-content]">
 			<Navbar />
 
 			<main class="min-h-screen">
+				<HeroSection total={results()?.length ?? 0} loading={results.loading} error={results.error?.message} />
+
 				<Show when={results.error}>
 					<div class="flex flex-col items-center justify-center gap-4 p-8">
-						<span class="text-lg text-red-600 font-semibold">
-							Failed to load results
-						</span>
-						<span class="text-dim-fg text-sm">
-							{results.error?.message || "Unknown error occurred"}
-						</span>
+						<span class="text-lg text-red-600 font-semibold">Failed to load results</span>
+						<span class="text-dim-fg text-sm">{results.error?.message || "Unknown error occurred"}</span>
 						<button
 							type="button"
 							class="bg-accent-bg text-white px-4 py-2 rounded-md hover:opacity-90"
@@ -72,9 +68,7 @@ export default function App() {
 
 				<Show when={results.loading}>
 					<div class="flex items-center justify-center p-8">
-						<span class="text-lg text-dim-fg font-semibold">
-							Loading results...
-						</span>
+						<span class="text-lg text-dim-fg font-semibold">Loading results...</span>
 					</div>
 				</Show>
 
@@ -83,10 +77,51 @@ export default function App() {
 				</Show>
 			</main>
 
+
 			<Footer />
 		</div>
 	);
 }
+
+function HeroSection(props: { total: number; loading: boolean; error?: string }) {
+	return (
+		<section class="min-h-[80svb] grid place-items-center px-6 py-12">
+			<div class="w-full max-w-3xl text-center grid gap-8">
+				<div class="grid gap-3">
+					<p class="text-dim-fg text-sm font-semibold tracking-widest uppercase">SBTE Result Viewer</p>
+
+					<h1 class="text-bright-fg text-4xl sm:text-5xl leading-tight font-semibold flex flex-col">
+						<span>Search through SBTE results — </span>
+						<span>
+							<span class="text-accent-fg">Fast</span>, clean, minimal.
+						</span>
+					</h1>
+				</div>
+
+				<div class="grid place-content-center">
+					<div class="space-x-3 px-4 py-2 bg-accent-bg rounded-md">
+						<div class="text-3xl font-semibold text-white tabular-nums">
+							{props.loading ? "—" : props.total.toLocaleString()}
+						</div>
+						<span class="text-xs text-accent-bg-text font-medium uppercase tracking-widest">Student records</span>
+					</div>
+				</div>
+
+				{props.error ? (
+					<div class="border-2 border-border rounded-md p-4 text-left">
+						<div class="text-sm font-semibold text-pink-600">Failed to load</div>
+						<div class="text-sm text-dim-fg">{props.error}</div>
+					</div>
+				) : null}
+
+				<div class="pt-2 text-xs text-dim-fg">
+					Tip: Use the filters below to narrow results by college, branch, and semester.
+				</div>
+			</div>
+		</section>
+	);
+}
+
 
 function Footer() {
 	return (
