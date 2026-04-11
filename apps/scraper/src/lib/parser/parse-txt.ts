@@ -1,195 +1,201 @@
 import {
-    BRANCH_NAME,
-    COLLEGE_NAME,
-    PAPER_TYPE,
-    type ParsedResult,
-    type SubjectResult,
+	BRANCH_NAME,
+	COLLEGE_NAME,
+	PAPER_TYPE,
+	type ParsedResult,
+	type SubjectResult,
 } from "@app/shared/types";
 import { getCollegeFromRoll } from "@app/shared/utils";
 
 export function parseTxtToJson(txt: string): ParsedResult {
-    const lines = txt.split("\n").map((line) => line.trim());
+	const lines = txt.split("\n").map((line) => line.trim());
 
-    const result: ParsedResult = {
-        student: {
-            name: "",
-            roll: "",
-            branch: BRANCH_NAME.UNKNOWN,
-            college: COLLEGE_NAME.UNKNOWN,
-        },
-        grandTotal: {
-            maximum: 0,
-            passing: 0,
-            obtained: 0,
-        },
-        subjects: [],
-        sgpa: 0,
-        remarks: "",
-    };
+	const result: ParsedResult = {
+		student: {
+			name: "",
+			roll: "",
+			branch: BRANCH_NAME.UNKNOWN,
+			college: COLLEGE_NAME.UNKNOWN,
+		},
+		grandTotal: {
+			maximum: 0,
+			passing: 0,
+			obtained: 0,
+		},
+		subjects: [],
+		sgpa: 0,
+		remarks: "",
+	};
 
-    let parsingSubject: PAPER_TYPE | null = null;
+	let parsingSubject: PAPER_TYPE | null = null;
 
-    for (const line of lines) {
-        if (line.length < 1) continue;
-        if (line.split("-").length >= line.length / 2) {
-            parsingSubject = null;
-            continue;
-        }
+	for (const line of lines) {
+		if (line.length < 1) continue;
+		if (line.split("-").length >= line.length / 2) {
+			parsingSubject = null;
+			continue;
+		}
 
-        const lineLower = line.toLowerCase();
+		const lineLower = line.toLowerCase();
 
-        if (lineLower.startsWith("roll no")) {
-            const roll = line.split(":")[1]?.trim();
-            if (roll) result.student.roll = roll;
-        } else if (lineLower.startsWith("following are the marks obtained by")) {
-            const name = line.replace(/following are the marks obtained by/i, "").trim();
-            const formattedName = name
-                .split(" ")
-                .map((p) => {
-                    return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase();
-                })
-                .join(" ");
-            result.student.name = formattedName;
-        } else if (lineLower.includes("of diploma in")) {
-            const branchPart = lineLower.split("of diploma in")[1];
-            if (branchPart) {
-                result.student.branch = mapBranchStrToEnum(branchPart);
-            }
-        }
+		if (lineLower.startsWith("roll no")) {
+			const roll = line.split(":")[1]?.trim();
+			if (roll) result.student.roll = roll;
+		} else if (lineLower.startsWith("following are the marks obtained by")) {
+			const name = line
+				.replace(/following are the marks obtained by/i, "")
+				.trim();
+			const formattedName = name
+				.split(" ")
+				.map((p) => {
+					return p.charAt(0).toUpperCase() + p.slice(1).toLowerCase();
+				})
+				.join(" ");
+			result.student.name = formattedName;
+		} else if (lineLower.includes("of diploma in")) {
+			const branchPart = lineLower.split("of diploma in")[1];
+			if (branchPart) {
+				result.student.branch = mapBranchStrToEnum(branchPart);
+			}
+		}
 
-        // subject sections
-        else if (lineLower.includes("theory papers")) {
-            parsingSubject = PAPER_TYPE.THEORY;
-        } else if (lineLower.includes("practical papers")) {
-            parsingSubject = PAPER_TYPE.PRACTICAL;
-        } else if (lineLower.includes("term work papers")) {
-            parsingSubject = PAPER_TYPE.TERM_WORK;
-        } else if (parsingSubject) {
-            const subjectResult = parseSubjectLine(line, parsingSubject);
-            if (subjectResult) {
-                result.subjects.push(subjectResult);
-            }
-        }
+		// subject sections
+		else if (lineLower.includes("theory papers")) {
+			parsingSubject = PAPER_TYPE.THEORY;
+		} else if (lineLower.includes("practical papers")) {
+			parsingSubject = PAPER_TYPE.PRACTICAL;
+		} else if (lineLower.includes("term work papers")) {
+			parsingSubject = PAPER_TYPE.TERM_WORK;
+		} else if (parsingSubject) {
+			const subjectResult = parseSubjectLine(line, parsingSubject);
+			if (subjectResult) {
+				result.subjects.push(subjectResult);
+			}
+		}
 
-        // grand total
-        else if (lineLower.startsWith("grand total")) {
-            const parts = line
-                .split(" ")
-                .map((p) => p.trim())
-                .filter((p) => p.length);
-            const maxMarksStr = parts[parts.length - 2] || "0";
-            const obtainedStr = parts[parts.length - 1] || "0";
+		// grand total
+		else if (lineLower.startsWith("grand total")) {
+			const parts = line
+				.split(" ")
+				.map((p) => p.trim())
+				.filter((p) => p.length);
+			const maxMarksStr = parts[parts.length - 2] || "0";
+			const obtainedStr = parts[parts.length - 1] || "0";
 
-            const maximum = Number.parseInt(maxMarksStr, 10);
-            const obtained = Number.parseInt(obtainedStr, 10);
+			const maximum = Number.parseInt(maxMarksStr, 10);
+			const obtained = Number.parseInt(obtainedStr, 10);
 
-            result.grandTotal.maximum = maximum;
-            result.grandTotal.obtained = obtained;
-        }
+			result.grandTotal.maximum = maximum;
+			result.grandTotal.obtained = obtained;
+		}
 
-        // sgpa
-        else if (lineLower.startsWith("sgpa")) {
-            const parts = line
-                .split(" ")
-                .map((p) => p.trim())
-                .filter((p) => p.length);
-            const sgpaStr = parts[parts.length - 1] || "0";
-            const sgpa = Number.parseFloat(sgpaStr);
+		// sgpa
+		else if (lineLower.startsWith("sgpa")) {
+			const parts = line
+				.split(" ")
+				.map((p) => p.trim())
+				.filter((p) => p.length);
+			const sgpaStr = parts[parts.length - 1] || "0";
+			const sgpa = Number.parseFloat(sgpaStr);
 
-            result.sgpa = sgpa || 0;
-        }
+			result.sgpa = sgpa || 0;
+		}
 
-        // remarks
-        else if (lineLower.startsWith("remarks")) {
-            const remarksPart = line.split(":")[1]?.trim();
-            if (remarksPart) {
-                result.remarks = remarksPart;
-            }
-        }
-    }
+		// remarks
+		else if (lineLower.startsWith("remarks")) {
+			const remarksPart = line.split(":")[1]?.trim();
+			if (remarksPart) {
+				result.remarks = remarksPart;
+			}
+		}
+	}
 
-    for (const sub of result.subjects) {
-        result.grandTotal.passing += sub.total.passing;
-    }
+	for (const sub of result.subjects) {
+		result.grandTotal.passing += sub.total.passing;
+	}
 
-    result.student.college = getCollegeFromRoll(result.student.roll);
-    return result;
+	result.student.college = getCollegeFromRoll(result.student.roll);
+	return result;
 }
 
-function parseSubjectLine(line: string, paperType: PAPER_TYPE): SubjectResult | null {
-    const parts = line
-        .split(" ")
-        .map((p) => p.trim())
-        .filter((p) => p.length);
+function parseSubjectLine(
+	line: string,
+	paperType: PAPER_TYPE,
+): SubjectResult | null {
+	const parts = line
+		.split(" ")
+		.map((p) => p.trim())
+		.filter((p) => p.length);
 
-    const marksParts = parts.slice(-10);
-    const subName = parts.slice(0, parts.length - 10).join(" ");
-    const formattedSubName = subName.charAt(0).toUpperCase() + subName.slice(1).toLowerCase();
+	const marksParts = parts.slice(-10);
+	const subName = parts.slice(0, parts.length - 10).join(" ");
+	const formattedSubName =
+		subName.charAt(0).toUpperCase() + subName.slice(1).toLowerCase();
 
-    if (marksParts.length < 10) return null;
+	if (marksParts.length < 10) return null;
 
-    const credits = Number.parseFloat(marksParts[0]);
+	const credits = Number.parseFloat(marksParts[0]);
 
-    // total
-    const totalMax = parseMarks(marksParts[3]);
-    const totalPassing = parseMarks(marksParts[5]);
-    const totalObtained = parseMarks(marksParts[8]);
+	// total
+	const totalMax = parseMarks(marksParts[3]);
+	const totalPassing = parseMarks(marksParts[5]);
+	const totalObtained = parseMarks(marksParts[8]);
 
-    // external
-    const externalMax = parseMarks(marksParts[2]);
-    const externalPassing = parseMarks(marksParts[4]);
-    const externalObtained = parseMarks(marksParts[7]);
+	// external
+	const externalMax = parseMarks(marksParts[2]);
+	const externalPassing = parseMarks(marksParts[4]);
+	const externalObtained = parseMarks(marksParts[7]);
 
-    // internal
-    const internalMax = parseMarks(marksParts[1]);
-    const internalObtained = parseMarks(marksParts[6]);
+	// internal
+	const internalMax = parseMarks(marksParts[1]);
+	const internalObtained = parseMarks(marksParts[6]);
 
-    const grade = marksParts[9]?.trim() ?? "";
+	const grade = marksParts[9]?.trim() ?? "";
 
-    return {
-        name: formattedSubName,
-        type: paperType,
+	return {
+		name: formattedSubName,
+		type: paperType,
 
-        total: {
-            max: totalMax,
-            passing: totalPassing,
-            obtained: totalObtained,
-        },
-        external: {
-            max: externalMax,
-            passing: externalPassing,
-            obtained: externalObtained,
-        },
-        internal: {
-            max: internalMax,
-            obtained: internalObtained,
-        },
+		total: {
+			max: totalMax,
+			passing: totalPassing,
+			obtained: totalObtained,
+		},
+		external: {
+			max: externalMax,
+			passing: externalPassing,
+			obtained: externalObtained,
+		},
+		internal: {
+			max: internalMax,
+			obtained: internalObtained,
+		},
 
-        credits: credits,
-        grade: grade,
-    } satisfies SubjectResult;
+		credits: credits,
+		grade: grade,
+	} satisfies SubjectResult;
 }
 
 function parseMarks(marks: string) {
-    if (marks === "-") return 0;
+	if (marks === "-") return 0;
 
-    const parsed = Number.parseInt(marks, 10);
-    if (Number.isNaN(parsed)) return 0;
+	const parsed = Number.parseInt(marks, 10);
+	if (Number.isNaN(parsed)) return 0;
 
-    return parsed;
+	return parsed;
 }
 
 function mapBranchStrToEnum(_str: string) {
-    const str = _str.toLowerCase().trim();
+	const str = _str.toLowerCase().trim();
 
-    if (str.includes("civil")) return BRANCH_NAME.CIVIL;
-    if (str.includes("computer")) return BRANCH_NAME.CSE;
-    if (str.includes("electrical")) return BRANCH_NAME.ELECTRICAL;
-    if (str.includes("electronics")) return BRANCH_NAME.ELECTRONICS;
-    if (str.includes("automobile")) return BRANCH_NAME.AUTOMOBILE;
-    if (str.includes("mechanical")) return BRANCH_NAME.MECHANICAL;
+	if (str.includes("civil")) return BRANCH_NAME.CIVIL;
+	if (str.includes("computer")) return BRANCH_NAME.CSE;
+	if (str.includes("electrical")) return BRANCH_NAME.ELECTRICAL;
+	if (str.includes("electronics")) return BRANCH_NAME.ELECTRONICS;
+	if (str.includes("automobile")) return BRANCH_NAME.AUTOMOBILE;
+	if (str.includes("mechanical")) return BRANCH_NAME.MECHANICAL;
 
-    return BRANCH_NAME.UNKNOWN;
+	return BRANCH_NAME.UNKNOWN;
 }
 
 // ---- example text that is to be parsed ------

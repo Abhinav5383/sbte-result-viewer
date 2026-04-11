@@ -1,6 +1,6 @@
-import { type EncodedResult, decodeResult } from "@app/shared/encoder";
+import { decodeResult, type EncodedResult } from "@app/shared/encoder";
 import type { ParsedResult } from "@app/shared/types";
-import { Show, createResource } from "solid-js";
+import { createResource, Show } from "solid-js";
 import Navbar from "./components/navbar";
 import { ResultListPage } from "./pages/results";
 
@@ -8,92 +8,96 @@ import { ResultListPage } from "./pages/results";
 declare const __EMBEDDED_RESULTS__: string | undefined;
 
 async function decodeEmbeddedResults(base64: string): Promise<ParsedResult[]> {
-    if (typeof DecompressionStream === "undefined") {
-        throw new Error("DecompressionStream is not supported in this browser");
-    }
+	if (typeof DecompressionStream === "undefined") {
+		throw new Error("DecompressionStream is not supported in this browser");
+	}
 
-    // base64 -> gzip -> JSON
-    const binary = atob(base64);
-    const bytes = new Uint8Array(binary.length);
-    for (let i = 0; i < binary.length; i++) {
-        bytes[i] = binary.charCodeAt(i);
-    }
+	// base64 -> gzip -> JSON
+	const binary = atob(base64);
+	const bytes = new Uint8Array(binary.length);
+	for (let i = 0; i < binary.length; i++) {
+		bytes[i] = binary.charCodeAt(i);
+	}
 
-    // Decompress using DecompressionStream (browser native)
-    const ds = new DecompressionStream("gzip");
-    const decompressed = new Response(ds.readable).text();
-    
-    const writer = ds.writable.getWriter();
-    await writer.write(bytes);
-    await writer.close();
+	// Decompress using DecompressionStream (browser native)
+	const ds = new DecompressionStream("gzip");
+	const decompressed = new Response(ds.readable).text();
 
-    const encoded = JSON.parse(await decompressed) as EncodedResult[];
-    return encoded.map(decodeResult);
+	const writer = ds.writable.getWriter();
+	await writer.write(bytes);
+	await writer.close();
+
+	const encoded = JSON.parse(await decompressed) as EncodedResult[];
+	return encoded.map(decodeResult);
 }
 
 export default function App() {
-    const [results, { refetch }] = createResource(async (): Promise<ParsedResult[]> => {
-        if (typeof __EMBEDDED_RESULTS__ !== "undefined") {
-            return decodeEmbeddedResults(__EMBEDDED_RESULTS__);
-        }
+	const [results, { refetch }] = createResource(
+		async (): Promise<ParsedResult[]> => {
+			if (typeof __EMBEDDED_RESULTS__ !== "undefined") {
+				return decodeEmbeddedResults(__EMBEDDED_RESULTS__);
+			}
 
-        const res = await fetch("http://localhost:5500/students-data");
-        if (!res.ok) {
-            throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
-        }
-        const data = (await res.json()) as ParsedResult[];
-        return data;
-    });
+			const res = await fetch("http://localhost:5500/students-data");
+			if (!res.ok) {
+				throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+			}
+			const data = (await res.json()) as ParsedResult[];
+			return data;
+		},
+	);
 
-    return (
-        <div class="grid grid-rows-[min-content_1fr_min-content]">
-            <Navbar />
+	return (
+		<div class="grid grid-rows-[min-content_1fr_min-content]">
+			<Navbar />
 
-            <main class="min-h-screen">
-                <Show when={results.error}>
-                    <div class="flex flex-col items-center justify-center gap-4 p-8">
-                        <span class="text-lg text-red-600 font-semibold">
-                            Failed to load results
-                        </span>
-                        <span class="text-dim-fg text-sm">
-                            {results.error?.message || "Unknown error occurred"}
-                        </span>
-                        <button
-                            type="button"
-                            class="bg-accent-bg text-white px-4 py-2 rounded-md hover:opacity-90"
-                            onClick={() => refetch()}
-                        >
-                            Retry
-                        </button>
-                    </div>
-                </Show>
+			<main class="min-h-screen">
+				<Show when={results.error}>
+					<div class="flex flex-col items-center justify-center gap-4 p-8">
+						<span class="text-lg text-red-600 font-semibold">
+							Failed to load results
+						</span>
+						<span class="text-dim-fg text-sm">
+							{results.error?.message || "Unknown error occurred"}
+						</span>
+						<button
+							type="button"
+							class="bg-accent-bg text-white px-4 py-2 rounded-md hover:opacity-90"
+							onClick={() => refetch()}
+						>
+							Retry
+						</button>
+					</div>
+				</Show>
 
-                <Show when={results.loading}>
-                    <div class="flex items-center justify-center p-8">
-                        <span class="text-lg text-dim-fg font-semibold">Loading results...</span>
-                    </div>
-                </Show>
+				<Show when={results.loading}>
+					<div class="flex items-center justify-center p-8">
+						<span class="text-lg text-dim-fg font-semibold">
+							Loading results...
+						</span>
+					</div>
+				</Show>
 
-                <Show keyed when={!results.loading && !results.error && results()}>
-                    {(list) => <ResultListPage studentResultList={list} />}
-                </Show>
-            </main>
+				<Show keyed when={!results.loading && !results.error && results()}>
+					{(list) => <ResultListPage studentResultList={list} />}
+				</Show>
+			</main>
 
-            <Footer />
-        </div>
-    );
+			<Footer />
+		</div>
+	);
 }
 
 function Footer() {
-    return (
-        <footer class="bg-zinc-900 text-zinc-50 py-4 px-8 grid gap-3 place-items-center">
-            <div class="grid place-items-center text-center">
-                <span>
-                    COPYRIGHT &copy; {new Date().getFullYear()}{" "}
-                    <a href="https://github.com/Abhinav5383">Abhinav5383</a>;
-                </span>
-                <span>Licensed under the GNU Affero General Public License v3.0</span>
-            </div>
-        </footer>
-    );
+	return (
+		<footer class="bg-zinc-900 text-zinc-50 py-4 px-8 grid gap-3 place-items-center">
+			<div class="grid place-items-center text-center">
+				<span>
+					COPYRIGHT &copy; {new Date().getFullYear()}{" "}
+					<a href="https://github.com/Abhinav5383">Abhinav5383</a>;
+				</span>
+				<span>Licensed under the GNU Affero General Public License v3.0</span>
+			</div>
+		</footer>
+	);
 }
