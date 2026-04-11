@@ -220,6 +220,7 @@ interface ResultTableContentsProps {
 function ResultTableContents(props: ResultTableContentsProps) {
 	const DEFAULT_ROW_HEIGHT = 52;
 
+	const [scrollToTopVisible, setScrollToTopVisible] = createSignal(false);
 	const [rowHeight, setRowHeight] = createSignal<number>(DEFAULT_ROW_HEIGHT);
 	const [containerRef, setContainerRef] = createSignal<
 		HTMLDivElement | undefined
@@ -258,7 +259,18 @@ function ResultTableContents(props: ResultTableContentsProps) {
 			endIndex + overscan,
 		);
 
+		batch(() => {
 		setVisibleIndices({ start: adjustedStartIndex, end: adjustedEndIndex });
+
+			if (
+				window.scrollY > window.innerHeight * 4 &&
+				document.body.scrollHeight - window.scrollY > 3 * window.innerHeight
+			) {
+				setScrollToTopVisible(true);
+			} else {
+				setScrollToTopVisible(false);
+			}
+		});
 	}
 
 	onMount(() => {
@@ -322,13 +334,9 @@ function ResultTableContents(props: ResultTableContentsProps) {
 			</div>
 
 			<div
-				class="fixed bottom-4 end-4"
+				class="fixed bottom-4 end-4 z-50"
 				style={{
-					visibility:
-						visibleIndices().start > 15 &&
-						visibleIndices().end < props.sortedResults.results.length - 15
-							? "visible"
-							: "hidden",
+					visibility: scrollToTopVisible() ? "visible" : "hidden",
 				}}
 			>
 				<button
