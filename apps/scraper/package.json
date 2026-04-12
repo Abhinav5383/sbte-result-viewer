@@ -12,10 +12,10 @@
 		"unpdf": "^1.4.0"
 	},
 	"peerDependencies": {
-		"typescript": "^5"
+		"typescript": "^6.0.2"
 	},
 	"dependencies": {
 		"@app/shared": "workspace:*",
-		"hono": "^4.11.4"
+		"hono": "^4.12.12"
 	}
 }

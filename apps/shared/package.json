@@ -2,6 +2,6 @@
 	"name": "@app/shared",
 	"type": "module",
 	"peerDependencies": {
-		"typescript": "^5.9.2"
+		"typescript": "^6"
 	}
 }
