@@ -8,6 +8,7 @@ import solid from "vite-plugin-solid";
 
 export default defineConfig(async (ctx) => ({
 	plugins: [tailwindcss(), solid(), viteSingleFile()],
+	base: process.env.BASE_PATH,
 
 	resolve: {
 		alias: {
