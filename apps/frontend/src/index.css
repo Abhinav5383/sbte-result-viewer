@@ -30,7 +30,12 @@ body {
 	@apply font-body;
 	scrollbar-gutter: stable;
 	background-color: var(--color-zinc-50);
-	scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+	body {
+		scroll-behavior: smooth;
+	}
 }
 
 @layer base {
