@@ -20,7 +20,7 @@
 		color-mix(in oklab, var(--color-accent-fg) 26%, transparent) 0%,
 		transparent 64%
 	);
-	filter: blur(16px);
+	filter: blur(12px);
 }
 
 .about-surface::before {

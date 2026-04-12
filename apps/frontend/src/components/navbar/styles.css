@@ -18,7 +18,7 @@
 		left: anchor(left);
 		right: anchor(right);
 
-		transition: all 300ms ease-in-out;
+		transition: all 250ms ease;
 		border-radius: 0.5em;
 		background: #fff0;
 	}
