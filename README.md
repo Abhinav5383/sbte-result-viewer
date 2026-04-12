@@ -2,7 +2,7 @@
 
 A monorepo containing tools to bulk-download, parse, and display results from the SBTE polytechnic examinations.
 
-Try it out: https://sbte-results.devabhinav.online
+Try it out: https://abhinav5383.github.io/sbte-result-viewer
 
 ## Packages
 
