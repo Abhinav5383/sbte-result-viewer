@@ -1,9 +1,9 @@
 import tailwindcss from "@tailwindcss/vite";
-import path from "path";
+import path from "node:path";
+import { gzipSync } from "node:zlib";
 import { defineConfig } from "vite";
 import { viteSingleFile } from "vite-plugin-singlefile";
 import solid from "vite-plugin-solid";
-import { gzipSync } from "zlib";
 import { type EncodedResult, encodeResult } from "../shared/src/encoder";
 import type { ParsedResult } from "../shared/src/types";
 
