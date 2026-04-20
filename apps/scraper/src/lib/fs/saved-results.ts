@@ -1,13 +1,19 @@
-import { type EncodedResult, decodeResult, encodeResult } from "@app/shared/encoder";
+import { decodeResult, type EncodedResult, encodeResult } from "@app/shared/encoder";
 import type { ParsedResult } from "@app/shared/types";
+import { existsSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
 import config from "~/config";
 import { tryJsonParse } from "~/lib/utils";
 
-export async function getSavedResults(): Promise<ParsedResult[]> {
-	const file = Bun.file(`${config.STORE_DIR}/${config.RESULTS_DATABASE}`);
-	if (!(await file.exists())) return [];
+function RESULTS_DB() {
+	return `${config.STORE_DIR}/${config.RESULTS_DATABASE}`;
+}
 
-	const encoded = tryJsonParse<EncodedResult[]>(await file.text());
+export async function getSavedResults(path = RESULTS_DB()): Promise<ParsedResult[]> {
+	if (!existsSync(path)) return [];
+
+	const fileContents = (await readFile(path, { encoding: "utf-8" })).toString();
+	const encoded = tryJsonParse<EncodedResult[]>(fileContents);
 	if (!encoded) return [];
 
 	const decoded: ParsedResult[] = [];
@@ -18,9 +24,7 @@ export async function getSavedResults(): Promise<ParsedResult[]> {
 	return decoded;
 }
 
-export async function saveResults(results: ParsedResult[]) {
-	const file = Bun.file(`${config.STORE_DIR}/${config.RESULTS_DATABASE}`);
-
+export async function saveResults(results: ParsedResult[], path = RESULTS_DB()) {
 	const addedRolls = new Set<string>();
 	const encoded: EncodedResult[] = [];
 
@@ -31,5 +35,5 @@ export async function saveResults(results: ParsedResult[]) {
 		encoded.push(encodeResult(item));
 	}
 
-	await file.write(JSON.stringify(encoded));
+	await writeFile(path, JSON.stringify(encoded));
 }

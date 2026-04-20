@@ -1,12 +1,17 @@
+import { existsSync } from "node:fs";
+import { readFile, writeFile } from "node:fs/promises";
 import config from "~/config";
 
+function ROLLS_FILE() {
+	return `${config.STORE_DIR}/${config.INVALID_ROLLS_STORE}`;
+}
+
 export async function getInvalidRolls() {
-	const rollsFile = Bun.file(`${config.STORE_DIR}/${config.INVALID_ROLLS_STORE}`);
-	if (!(await rollsFile.exists())) return [];
+	if (!existsSync(ROLLS_FILE())) return [];
 
 	try {
-		const data = await rollsFile.text();
-		return data.split("\n");
+		const fileContents = await readFile(ROLLS_FILE(), { encoding: "utf-8" });
+		return fileContents.toString().split("\n");
 	} catch (error) {
 		console.error("Error reading invalid rolls file:", error);
 		return [];
@@ -14,11 +19,10 @@ export async function getInvalidRolls() {
 }
 
 export async function saveInvalidRolls(rolls: string[]) {
-	const rollsFile = Bun.file(`${config.STORE_DIR}/${config.INVALID_ROLLS_STORE}`);
 	const existingRolls = await getInvalidRolls();
 
 	try {
-		await rollsFile.write([...existingRolls, ...rolls].join("\n"));
+		await writeFile(ROLLS_FILE(), [...existingRolls, ...rolls].join("\n"));
 	} catch (error) {
 		console.error(`Error writing ${config.INVALID_ROLLS_STORE} file:`, error);
 	}
