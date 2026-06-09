@@ -65,10 +65,10 @@
             background-color: var(--color-white);
             box-shadow: 2px 6px 8px #0006;
             border-radius: var(--radius-md);
-            border: 1px solid var(--color-border);
+            border: 2px solid var(--color-border);
 
             opacity: 1;
-            transform: translateY(0.3rem);
+            transform: translateY(0);
             transition:
                 opacity 0.25s ease-in-out,
                 transform 0.3s,
@@ -76,7 +76,7 @@
 
             @starting-style {
                 opacity: 0;
-                transform: translateY(1em);
+                transform: translateY(0.5em);
             }
         }
 
