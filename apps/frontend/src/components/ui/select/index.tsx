@@ -74,7 +74,7 @@ function FancySelect(props: SelectProps) {
                 props.onChange(e.currentTarget.value);
             }}
             onTouchStart={(e) => {
-                if (e.currentTarget.matches(":open")) {
+                if (e.target.matches("select:open")) {
                     ignoreClick = true;
                 }
             }}
