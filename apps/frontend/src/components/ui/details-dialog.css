@@ -1,39 +1,39 @@
 body:has(dialog[open]) {
-	overflow: hidden;
+    overflow: hidden;
 }
 
 dialog {
-	margin: 0;
-	padding: 0;
-	align-self: center;
-	justify-self: center;
-	width: 100%;
-	max-width: min(calc(100% - 3rem), 72rem);
-	max-height: calc(100% - max(4rem, 5vh));
-	border: none;
-	outline: none;
+    margin: 0;
+    padding: 0;
+    align-self: center;
+    justify-self: center;
+    width: 100%;
+    max-width: min(calc(100% - 3rem), 72rem);
+    max-height: calc(100% - max(4rem, 5vh));
+    border: none;
+    outline: none;
 
-	opacity: 1;
-	transform: translateY(0);
-	transition:
-		opacity 0.3s ease-in-out,
-		transform 0.3s ease-in-out;
+    opacity: 1;
+    transform: translateY(0);
+    transition:
+        opacity 0.3s ease-in-out,
+        transform 0.3s ease-in-out;
 
-	@starting-style {
-		opacity: 0;
-		transform: translateY(-1rem);
-	}
+    @starting-style {
+        opacity: 0;
+        transform: translateY(-1rem);
+    }
 
-	scrollbar-width: thin;
+    scrollbar-width: thin;
 }
 
 ::backdrop {
-	background-image: linear-gradient(0deg, #000a, lch(from var(--color-accent-fg-dark) calc(l - 90) c h / 0.8));
-	backdrop-filter: blur(3px);
-	opacity: 1;
-	transition: opacity 0.17s ease-in-out;
+    background-image: linear-gradient(0deg, #000a, lch(from var(--color-accent-fg-dark) calc(l - 90) c h / 0.8));
+    backdrop-filter: blur(3px);
+    opacity: 1;
+    transition: opacity 0.17s ease-in-out;
 
-	@starting-style {
-		opacity: 0;
-	}
+    @starting-style {
+        opacity: 0;
+    }
 }

@@ -1,60 +1,60 @@
 .page-header {
-	isolation: isolate;
-	anchor-name: --nav;
-	background-image: linear-gradient(
-		90deg,
-		lch(from var(--color-accent-bg) calc(l - 10) c calc(h + 10)),
-		var(--color-accent-bg)
-	);
+    isolation: isolate;
+    anchor-name: --nav;
+    background-image: linear-gradient(
+        90deg,
+        lch(from var(--color-accent-bg) calc(l - 10) c calc(h + 10)),
+        var(--color-accent-bg)
+    );
 
-	nav::after {
-		content: "";
-		position: absolute;
-		z-index: -1;
+    nav::after {
+        content: "";
+        position: absolute;
+        z-index: -1;
 
-		position-anchor: --nav;
-		top: anchor(top);
-		bottom: anchor(bottom);
-		left: anchor(left);
-		right: anchor(right);
+        position-anchor: --nav;
+        top: anchor(top);
+        bottom: anchor(bottom);
+        left: anchor(left);
+        right: anchor(right);
 
-		transition: all 250ms ease;
-		border-radius: 0.5em;
-		background: #fff0;
-	}
+        transition: all 250ms ease;
+        border-radius: 0.5em;
+        background: #fff0;
+    }
 
-	nav:has(a:is(:hover, :focus-visible))::after {
-		background: #fff3;
+    nav:has(a:is(:hover, :focus-visible))::after {
+        background: #fff3;
 
-		top: anchor(top);
-		left: anchor(left);
-		bottom: anchor(bottom);
-		right: anchor(right);
-	}
+        top: anchor(top);
+        left: anchor(left);
+        bottom: anchor(bottom);
+        right: anchor(right);
+    }
 
-	nav:not(:has(a:is(:hover, :focus-visible))) .curr-focus {
-		anchor-name: --nav;
-	}
+    nav:not(:has(a:is(:hover, :focus-visible))) .curr-focus {
+        anchor-name: --nav;
+    }
 
-	nav a:is(:hover, :focus-visible) {
-		anchor-name: --nav;
-	}
+    nav a:is(:hover, :focus-visible) {
+        anchor-name: --nav;
+    }
 }
 
 .nav-target {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	gap: 0.5em;
-	padding: 0.5em 1em;
-	color: inherit;
-	font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5em;
+    padding: 0.5em 1em;
+    color: inherit;
+    font-weight: 600;
 
-	&:where(:focus-visible, :hover) {
-		text-decoration: none;
-	}
+    &:where(:focus-visible, :hover) {
+        text-decoration: none;
+    }
 
-	span {
-		text-box: trim-both cap alphabetic;
-	}
+    span {
+        text-box: trim-both cap alphabetic;
+    }
 }

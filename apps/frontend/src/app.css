@@ -1,29 +1,29 @@
 .hero-surface,
 .about-surface {
-	position: relative;
-	isolation: isolate;
+    position: relative;
+    isolation: isolate;
 }
 
 .hero-surface::before,
 .about-surface::before {
-	content: "";
-	position: absolute;
-	inset: 0;
-	z-index: -1;
-	pointer-events: none;
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
 }
 
 .hero-surface::before,
 .about-surface::before {
-	background: radial-gradient(
-		700px 550px at var(--x, 50%) var(--y, 70%),
-		color-mix(in oklab, var(--color-accent-fg) 26%, transparent) 0%,
-		transparent 64%
-	);
-	filter: blur(12px);
+    background: radial-gradient(
+        700px 550px at var(--x, 50%) var(--y, 70%),
+        color-mix(in oklab, var(--color-accent-fg) 26%, transparent) 0%,
+        transparent 64%
+    );
+    filter: blur(12px);
 }
 
 .about-surface::before {
-	--x: 20%;
-	--y: 15%;
+    --x: 20%;
+    --y: 15%;
 }

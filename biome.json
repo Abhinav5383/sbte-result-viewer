@@ -1,22 +1,23 @@
 {
-	"$schema": "https://biomejs.dev/schemas/2.3.15/schema.json",
-	"files": {
-		"includes": [
-			"**/*.{ts,tsx,js,jsx,css,html,json}",
-			"!**/node_modules/*",
-			"!**/dist/*",
-			"!**/build/*",
-			"!**/public/*",
-			"!**/generated/*"
-		]
-	},
-	"formatter": {
-		"lineWidth": 120,
-		"indentStyle": "tab"
-	},
-	"css": {
-		"parser": {
-			"tailwindDirectives": true
-		}
-	}
+    "$schema": "https://biomejs.dev/schemas/2.3.15/schema.json",
+    "files": {
+        "includes": [
+            "**/*.{ts,tsx,js,jsx,css,html,json}",
+            "!**/node_modules/*",
+            "!**/dist/*",
+            "!**/build/*",
+            "!**/public/*",
+            "!**/generated/*"
+        ]
+    },
+    "formatter": {
+        "lineWidth": 120,
+        "indentStyle": "space",
+        "indentWidth": 4
+    },
+    "css": {
+        "parser": {
+            "tailwindDirectives": true
+        }
+    }
 }

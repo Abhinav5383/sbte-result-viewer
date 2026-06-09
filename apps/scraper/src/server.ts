@@ -9,19 +9,19 @@ const parsedData = await getAllBranchesData(config.BRANCHES_LIST);
 const app = new Hono();
 
 app.use(
-	cors({
-		origin: "*",
-	}),
+    cors({
+        origin: "*",
+    }),
 );
 
 app.get("/", (c) => c.text("Scraper is running"));
 app.get("/students-data", (c) => {
-	return c.json(parsedData);
+    return c.json(parsedData);
 });
 
 Bun.serve({
-	fetch: app.fetch,
-	port: 5500,
+    fetch: app.fetch,
+    port: 5500,
 });
 
 console.log("Scraper server is running on http://localhost:5500");

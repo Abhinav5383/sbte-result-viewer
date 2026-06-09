@@ -4,122 +4,122 @@
 @layer base;
 
 @theme {
-	/* text colors */
-	--color-bright-fg: lch(10.0% 0 0);
-	--color-normal-fg: lch(25.0% 5 220);
-	--color-dim-fg: lch(40.0% 10 220);
+    /* text colors */
+    --color-bright-fg: lch(10.0% 0 0);
+    --color-normal-fg: lch(25.0% 5 220);
+    --color-dim-fg: lch(40.0% 10 220);
 
-	--color-accent-fg-light: lch(80.0% 40 190);
-	--color-accent-fg: lch(55.0% 40 190);
-	--color-accent-fg-dark: lch(40.0% 40 190);
+    --color-accent-fg-light: lch(80.0% 40 190);
+    --color-accent-fg: lch(55.0% 40 190);
+    --color-accent-fg-dark: lch(40.0% 40 190);
 
-	/* backgrounds */
-	--color-accent-bg: lch(66% 40 185);
-	--color-accent-bg-text: lch(100% 18 200);
+    /* backgrounds */
+    --color-accent-bg: lch(66% 40 185);
+    --color-accent-bg-text: lch(100% 18 200);
 
-	--font-body: "Space Grotesk", sans-serif;
+    --font-body: "Space Grotesk", sans-serif;
 
-	--color-border: lch(84% 8 190);
+    --color-border: lch(84% 8 190);
 
-	--breakpoint-xs: 26rem;
-	--breakpoint-lg: 58rem;
+    --breakpoint-xs: 26rem;
+    --breakpoint-lg: 58rem;
 }
 
 html,
 body {
-	@apply font-body;
-	scrollbar-gutter: stable;
-	background-color: var(--color-zinc-50);
+    @apply font-body;
+    scrollbar-gutter: stable;
+    background-color: var(--color-zinc-50);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-	body {
-		scroll-behavior: smooth;
-	}
+    body {
+        scroll-behavior: smooth;
+    }
 }
 
 @layer base {
-	svg {
-		width: 1.2em;
-		height: 1.2em;
-		color: currentColor;
-	}
+    svg {
+        width: 1.2em;
+        height: 1.2em;
+        color: currentColor;
+    }
 
-	a {
-		@apply text-accent-fg underline-offset-2 hover:underline;
-	}
+    a {
+        @apply text-accent-fg underline-offset-2 hover:underline;
+    }
 
-	button {
-		cursor: pointer;
-	}
+    button {
+        cursor: pointer;
+    }
 
-	a,
-	button,
-	select,
-	input,
-	textarea,
-	.focus-ring {
-		outline: none;
+    a,
+    button,
+    select,
+    input,
+    textarea,
+    .focus-ring {
+        outline: none;
 
-		&:focus-visible {
-			@apply ring-2 ring-accent-fg-light;
+        &:focus-visible {
+            @apply ring-2 ring-accent-fg-light;
 
-			&.no-focus-ring {
-				@apply ring-transparent;
-			}
-		}
+            &.no-focus-ring {
+                @apply ring-transparent;
+            }
+        }
 
-		&.no-focus-ring {
-			@apply ring-transparent;
-		}
-	}
+        &.no-focus-ring {
+            @apply ring-transparent;
+        }
+    }
 
-	button,
-	select,
-	input,
-	textarea {
-		@apply rounded-md min-h-10 px-3 py-2 text-base;
-	}
+    button,
+    select,
+    input,
+    textarea {
+        @apply rounded-md min-h-10 px-3 py-2 text-base;
+    }
 
-	select,
-	input {
-		@apply text-normal-fg border-2 border-border;
-	}
+    select,
+    input {
+        @apply text-normal-fg border-2 border-border;
+    }
 
-	label {
-		font-weight: 600;
-		margin-bottom: 0.2em;
-		display: inline-block;
-		color: var(--color-dim-fg);
-	}
+    label {
+        font-weight: 600;
+        margin-bottom: 0.2em;
+        display: inline-block;
+        color: var(--color-dim-fg);
+    }
 
-	.class-excellent {
-		--clr: var(--color-accent-fg);
-		color: var(--clr);
-	}
+    .class-excellent {
+        --clr: var(--color-accent-fg);
+        color: var(--clr);
+    }
 
-	.class-good {
-		--clr: var(--color-lime-600);
-		color: var(--clr);
-	}
+    .class-good {
+        --clr: var(--color-lime-600);
+        color: var(--clr);
+    }
 
-	.class-average {
-		--clr: var(--color-amber-600);
-		color: var(--clr);
-	}
+    .class-average {
+        --clr: var(--color-amber-600);
+        color: var(--clr);
+    }
 
-	.class-pass {
-		--clr: var(--color-orange-600);
-		color: var(--clr);
-	}
+    .class-pass {
+        --clr: var(--color-orange-600);
+        color: var(--clr);
+    }
 
-	.class-fail {
-		--clr: var(--color-red-600);
-		color: var(--clr);
-	}
+    .class-fail {
+        --clr: var(--color-red-600);
+        color: var(--clr);
+    }
 
-	.trim-both {
-		text-box: trim-both cap alphabetic;
-		line-height: 1;
-	}
+    .trim-both {
+        text-box: trim-both cap alphabetic;
+        line-height: 1;
+    }
 }
