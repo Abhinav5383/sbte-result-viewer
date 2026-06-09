@@ -64,12 +64,25 @@ function RegularSelect(props: SelectProps) {
 }
 
 function FancySelect(props: SelectProps) {
+    let ignoreClick = false;
+
     return (
         <select
             id={props.id}
             class={props.class}
             onChange={(e) => {
                 props.onChange(e.currentTarget.value);
+            }}
+            onTouchStart={(e) => {
+                if (e.currentTarget.matches(":open")) {
+                    ignoreClick = true;
+                }
+            }}
+            onTouchEnd={(e) => {
+                if (ignoreClick) {
+                    e.preventDefault();
+                    ignoreClick = false;
+                }
             }}
         >
             <button type="button" class="select-trigger">
