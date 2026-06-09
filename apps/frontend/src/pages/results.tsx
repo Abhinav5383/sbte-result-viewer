@@ -224,7 +224,7 @@ function Controls(props: ControlProps) {
                     <div class="relative">
                         <input
                             id="searchBy"
-                            type="text"
+                            type={props.searchBy === SearchBy.Roll ? "number" : "text"}
                             placeholder={`Enter ${props.searchBy} to search`}
                             class="no-focus-ring xs:rounded-s-none border-2 border-border focus:border-accent-bg w-full"
                             value={props.searchQuery}
