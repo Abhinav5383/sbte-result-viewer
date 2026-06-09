@@ -1,11 +1,13 @@
-import { BRANCH_CODES, BRANCH_NAME, type BranchConfig, COLLEGE_CODES } from "@app/shared/types";
+import { BRANCH_CODES, type BRANCH_NAME, type BranchConfig, COLLEGE_CODES } from "@app/shared/types";
 import { numRange } from "~/lib/utils";
 
 export const ROLL_LIST = [...numRange(1, 120), ...numRange(301, 310), ...numRange(351, 360)];
 
 const defaultSemesters = [
     { sem: 1, admissionYear: 2025 },
+    { sem: 2, admissionYear: 2025 },
     { sem: 3, admissionYear: 2024 },
+    { sem: 4, admissionYear: 2024 },
     { sem: 5, admissionYear: 2023 },
 ];
 

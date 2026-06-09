@@ -121,7 +121,7 @@ export async function parseAllStudentsData(
     return { requestedResults, newResults, newInvalidRolls };
 }
 
-async function fetchResultPdf(roll: string) {
+async function fetchResultPdf(roll: string, count = 0) {
     const url = apiUrl(roll);
     const res = await fetch(url, {
         headers: {
@@ -131,6 +131,15 @@ async function fetchResultPdf(roll: string) {
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3",
         },
     });
+
+    if (res.status > 417 && count < 3) {
+        if (res.status === 429) {
+            console.log("Sleeping for 60 seconds due to rate limit!");
+            await new Promise((resolve) => setTimeout(resolve, 60_000));
+        }
+
+        return await fetchResultPdf(roll, count + 1);
+    }
 
     if (!res.ok) return null;
     console.log(`Fetched result for roll number: ${roll}`);
