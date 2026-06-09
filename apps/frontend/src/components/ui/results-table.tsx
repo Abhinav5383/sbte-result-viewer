@@ -2,9 +2,9 @@ import type { ParsedResult } from "@app/shared/types";
 import ArrowDownWideNarrow from "lucide-solid/icons/arrow-down-wide-narrow";
 import ArrowUpWideNarrow from "lucide-solid/icons/arrow-up-wide-narrow";
 import ChevronUpIcon from "lucide-solid/icons/chevron-up";
-import { batch, createEffect, createMemo, createSignal, For, onCleanup, onMount, type Setter, Show } from "solid-js";
+import { batch, createEffect, createMemo, createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { marksClass, sgpaClass } from "~/lib/grade-utils";
-import { type Filters, SortBy, SortOrder } from "~/lib/types";
+import { SortBy, SortOrder } from "~/lib/types";
 import { cn, OrdinalSuffix } from "../utils";
 import { DetailsDialog } from "./details-dialog";
 
@@ -13,9 +13,7 @@ import "./results-table.css";
 interface ResultsListTableProps {
     totalItems: number;
     sortedResults: SortedResults;
-
-    setSortBy: Setter<SortBy>;
-    setSortOrder: Setter<SortOrder>;
+    setSortFilter: (by: SortBy, order: SortOrder) => void;
 
     maxStrSizes: {
         // name: number;
@@ -23,7 +21,7 @@ interface ResultsListTableProps {
         branch: number;
     };
 
-    filters: Filters;
+    showCollegeColumn: boolean;
 }
 
 interface SortedResults {
@@ -41,8 +39,6 @@ export function ResultsListTable(props: ResultsListTableProps) {
         if (!roll) return undefined;
         return props.sortedResults.results.find((r) => r.student.roll === roll);
     }
-
-    const showCollegeCol = () => !props.filters.college;
 
     return (
         <div>
@@ -66,7 +62,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                         // adding extra for the semester suffix + spacing
                         "--max-branch-len": `${props.maxStrSizes.branch + 10}ch`,
                         "grid-template-columns": `minmax(8ch, max-content) minmax(max-content, 1fr) minmax(14ch, 0.5fr) minmax(max-content, 0.7fr) minmax(max-content, 0.7fr) minmax(var(--max-branch-len), 1fr) ${
-                            showCollegeCol() ? "minmax(max-content, 2fr)" : ""
+                            props.showCollegeColumn ? "minmax(max-content, 2fr)" : ""
                         }`,
                     }}
                 >
@@ -79,43 +75,39 @@ export function ResultsListTable(props: ResultsListTableProps) {
                             title="Name"
                             value={SortBy.Name}
                             sortBy={props.sortedResults.sortedBy}
-                            setSortBy={props.setSortBy}
                             sortOrder={props.sortedResults.sortOrder}
-                            setSortOrder={props.setSortOrder}
+                            setSortFilter={props.setSortFilter}
                         />
 
                         <SortableHeaderItem
                             title="Roll No"
                             value={SortBy.Roll}
                             sortBy={props.sortedResults.sortedBy}
-                            setSortBy={props.setSortBy}
                             sortOrder={props.sortedResults.sortOrder}
-                            setSortOrder={props.setSortOrder}
+                            setSortFilter={props.setSortFilter}
                         />
 
                         <SortableHeaderItem
                             title="Marks"
                             value={SortBy.Marks}
                             sortBy={props.sortedResults.sortedBy}
-                            setSortBy={props.setSortBy}
                             sortOrder={props.sortedResults.sortOrder}
-                            setSortOrder={props.setSortOrder}
+                            setSortFilter={props.setSortFilter}
                         />
 
                         <SortableHeaderItem
                             title="SGPA"
                             value={SortBy.sgpa}
                             sortBy={props.sortedResults.sortedBy}
-                            setSortBy={props.setSortBy}
                             sortOrder={props.sortedResults.sortOrder}
-                            setSortOrder={props.setSortOrder}
+                            setSortFilter={props.setSortFilter}
                         />
 
                         <div>
                             <strong>Branch</strong>
                         </div>
 
-                        <Show when={showCollegeCol()}>
+                        <Show when={props.showCollegeColumn}>
                             <div>
                                 <strong>College</strong>
                             </div>
@@ -128,7 +120,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                             setSelectedRoll(roll);
                             setDialogOpen(true);
                         }}
-                        showCollege={showCollegeCol()}
+                        showCollege={props.showCollegeColumn}
                     />
                 </div>
             </Show>
@@ -150,9 +142,8 @@ interface SortableHeaderItemProps {
     value: SortBy;
 
     sortBy: SortBy;
-    setSortBy: Setter<SortBy>;
     sortOrder: SortOrder;
-    setSortOrder: Setter<SortOrder>;
+    setSortFilter: (by: SortBy, order: SortOrder) => void;
 }
 
 function SortableHeaderItem(props: SortableHeaderItemProps) {
@@ -164,26 +155,31 @@ function SortableHeaderItem(props: SortableHeaderItemProps) {
                 "grid grid-cols-[1fr_min-content] items-center hover:bg-zinc-950 cursor-pointer transition-colors",
             )}
             onClick={() => {
+                console.log({
+                    "props.value": props.value,
+                    "props.sortBy": props.sortBy,
+                });
+
                 if (props.sortBy === props.value) {
-                    props.setSortOrder(
+                    props.setSortFilter(
+                        props.value,
                         props.sortOrder === SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending,
                     );
                 } else {
-                    batch(() => {
-                        props.setSortBy(props.value);
-                        props.setSortOrder(() => {
-                            switch (props.value) {
-                                case SortBy.Name:
-                                case SortBy.Roll:
-                                    return SortOrder.Ascending;
-                                case SortBy.Marks:
-                                case SortBy.sgpa:
-                                    return SortOrder.Descending;
-                                default:
-                                    return SortOrder.Descending;
-                            }
-                        });
-                    });
+                    let order = SortOrder.Descending;
+                    switch (props.value) {
+                        case SortBy.Name:
+                        case SortBy.Roll: {
+                            order = SortOrder.Ascending;
+                            break;
+                        }
+                        case SortBy.Marks:
+                        case SortBy.sgpa: {
+                            order = SortOrder.Descending;
+                        }
+                    }
+
+                    props.setSortFilter(props.value, order);
                 }
             }}
         >
@@ -314,7 +310,7 @@ function ResultTableContents(props: ResultTableContentsProps) {
             </div>
 
             <div
-                class="fixed bottom-4 end-4 z-50"
+                class="fixed bottom-4 inset-e-4 z-50"
                 style={{
                     visibility: scrollToTopVisible() ? "visible" : "hidden",
                 }}
