@@ -7,8 +7,8 @@ import DownloadIcon from "lucide-solid/icons/download";
 import ExternalLinkIcon from "lucide-solid/icons/external-link";
 import ImageIcon from "lucide-solid/icons/image";
 import XIcon from "lucide-solid/icons/x";
-import { For, Show, createEffect, createSignal, onCleanup } from "solid-js";
-import { OrdinalSuffix, cn } from "~/components/utils";
+import { createEffect, createSignal, For, onCleanup, Show } from "solid-js";
+import { cn, OrdinalSuffix } from "~/components/utils";
 import { alphabeticalGradeClass, marksClass, sgpaClass } from "~/lib/grade-utils";
 import "./details-dialog.css";
 
@@ -179,7 +179,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                             </div>
                         </div>
 
-                        <div class="absolute top-6 end-4 flex items-center gap-2">
+                        <div class="absolute top-6 inset-e-4 flex items-center gap-2">
                             <button
                                 type="button"
                                 class="flex items-center justify-center gap-2 bg-zinc-50 text-normal-fg rounded-full ring-zinc-600 hover:scale-105 transition-transform duration-500 disabled:opacity-50 disabled:cursor-not-allowed"

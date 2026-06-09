@@ -36,7 +36,6 @@ export function ResultListPage(props: ResultListPageProps) {
         return "";
     };
     const setSearchQuery = createDebouncedParamSetter("query");
-    // const [searchQuery, debouncedSearchQuery, setSearchQuery] = createDebouncedParam("");
 
     const college = () => getValidEntry(searchParams.college, COLLEGE_NAME, "");
     function setCollege(clg: string) {
@@ -60,9 +59,9 @@ export function ResultListPage(props: ResultListPageProps) {
     const sortBy = () => getValidEntry(searchParams.sortBy, SortBy, SortBy.Marks);
     const sortOrder = () => getValidEntry(searchParams.order, SortOrder, SortOrder.Descending);
     function setSortFilter(by: SortBy, order: SortOrder) {
-        setSearchParams({ 
+        setSearchParams({
             sortBy: by === SortBy.Marks ? null : by,
-            order: order
+            order: order,
         });
     }
 

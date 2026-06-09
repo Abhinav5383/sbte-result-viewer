@@ -1,10 +1,9 @@
 import { decodeResult, type EncodedResult } from "@app/shared/encoder";
 import type { ParsedResult } from "@app/shared/types";
 import { createResource, Show } from "solid-js";
+import "./app.css";
 import Navbar from "./components/navbar";
 import { ResultListPage } from "./pages/results";
-
-import "./app.css";
 
 // Declare the global embedded data (injected at build time) - gzip+base64 encoded string
 declare const __EMBEDDED_RESULTS__: string | undefined;

@@ -1,4 +1,5 @@
 import type { ParsedResult } from "@app/shared/types";
+import { useSearchParams } from "@solidjs/router";
 import ArrowDownWideNarrow from "lucide-solid/icons/arrow-down-wide-narrow";
 import ArrowUpWideNarrow from "lucide-solid/icons/arrow-up-wide-narrow";
 import ChevronUpIcon from "lucide-solid/icons/chevron-up";
@@ -7,7 +8,6 @@ import { marksClass, sgpaClass } from "~/lib/grade-utils";
 import { SortBy, SortOrder } from "~/lib/types";
 import { cn, OrdinalSuffix } from "../utils";
 import { DetailsDialog } from "./details-dialog";
-
 import "./results-table.css";
 
 interface ResultsListTableProps {
@@ -31,8 +31,21 @@ interface SortedResults {
 }
 
 export function ResultsListTable(props: ResultsListTableProps) {
-    const [dialogOpen, setDialogOpen] = createSignal(false);
-    const [selectedRoll, setSelectedRoll] = createSignal<string | null>(null);
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    const selectedRoll = () => {
+        const roll = searchParams.dialog;
+        if (typeof roll === "string") return roll;
+        return null;
+    };
+    function setSelectedRoll(roll: string) {
+        setSearchParams({ dialog: roll });
+    }
+
+    const dialogOpen = () => !!selectedRoll();
+    function closeDialog() {
+        setSelectedRoll("");
+    }
 
     function dialogData() {
         const roll = selectedRoll();
@@ -116,23 +129,13 @@ export function ResultsListTable(props: ResultsListTableProps) {
 
                     <ResultTableContents
                         sortedResults={props.sortedResults}
-                        onSelect={(roll) => {
-                            setSelectedRoll(roll);
-                            setDialogOpen(true);
-                        }}
+                        onSelect={setSelectedRoll}
                         showCollege={props.showCollegeColumn}
                     />
                 </div>
             </Show>
 
-            <DetailsDialog
-                open={dialogOpen()}
-                onClose={() => {
-                    setSelectedRoll(null);
-                    setDialogOpen(false);
-                }}
-                data={dialogData()}
-            />
+            <DetailsDialog open={dialogOpen()} onClose={closeDialog} data={dialogData()} />
         </div>
     );
 }
