@@ -20,41 +20,63 @@ type FilterOptions = {
 interface ResultListPageProps {
     studentResultList: ParsedResult[];
 }
+
+enum FilterParams {
+    SEARCH_BY = "searchBy",
+    QUERY = "query",
+    COLLEGE = "college",
+    BRANCH = "branch",
+    SEMESTER = "sem",
+}
+
 export function ResultListPage(props: ResultListPageProps) {
     const [searchParams, setSearchParams] = useSearchParams();
 
-    const searchBy = () => getValidEntry(searchParams.searchBy, SearchBy, SearchBy.Name);
+    const searchBy = () => getValidEntry(searchParams[FilterParams.SEARCH_BY], SearchBy, SearchBy.Name);
     function setSearchBy(newVal: SearchBy) {
         setSearchParams({
-            searchBy: newVal === SearchBy.Name ? null : newVal,
+            [FilterParams.SEARCH_BY]: newVal === SearchBy.Name ? null : newVal,
+            // reset 'query'
+            [FilterParams.QUERY]: "",
         });
     }
 
     const searchQuery = () => {
-        const q = searchParams.query;
+        const q = searchParams[FilterParams.QUERY];
         if (typeof q === "string") return q;
         return "";
     };
-    const setSearchQuery = createDebouncedParamSetter("query");
+    const setSearchQuery = createDebouncedParamSetter(FilterParams.QUERY);
 
-    const college = () => getValidEntry(searchParams.college, COLLEGE_NAME, "");
+    const college = () => getValidEntry(searchParams[FilterParams.COLLEGE], COLLEGE_NAME, "");
     function setCollege(clg: string) {
-        setSearchParams({ college: clg });
+        setSearchParams({ [FilterParams.COLLEGE]: clg });
     }
 
-    const branch = () => getValidEntry(searchParams.branch, BRANCH_NAME, "");
+    const branch = () => getValidEntry(searchParams[FilterParams.BRANCH], BRANCH_NAME, "");
     function setBranch(br: string) {
-        setSearchParams({ branch: br });
+        setSearchParams({ [FilterParams.BRANCH]: br });
     }
 
     const semester = () => {
-        const sem = searchParams.sem;
+        const sem = searchParams[FilterParams.SEMESTER];
         if (typeof sem === "string") return sem;
         return "";
     };
     function setSemester(sem: string) {
-        setSearchParams({ sem: sem });
+        setSearchParams({ [FilterParams.SEMESTER]: sem });
     }
+
+    function clearFilters() {
+        const newVal: Record<string, string> = {};
+        for (const key of Object.values(FilterParams)) {
+            newVal[key] = "";
+        }
+
+        setSearchParams(newVal);
+    }
+
+    // ---------- SORTING STUFF ----------------
 
     const sortBy = () => getValidEntry(searchParams.sortBy, SortBy, SortBy.Marks);
     const sortOrder = () => getValidEntry(searchParams.order, SortOrder, SortOrder.Descending);
@@ -219,7 +241,11 @@ export function ResultListPage(props: ResultListPageProps) {
                         <div class="relative">
                             <input
                                 id="searchBy"
-                                type={searchBy() === SearchBy.Roll ? "number" : "text"}
+                                type="text"
+                                inputMode={searchBy() === SearchBy.Roll ? "numeric" : "text"}
+                                autocomplete="off"
+                                spellcheck={false}
+                                enterkeyhint="search"
                                 placeholder={`Enter ${searchBy()} to search`}
                                 class="no-focus-ring xs:rounded-s-none border-2 border-border focus:border-accent-bg w-full"
                                 value={searchQuery()}
@@ -318,6 +344,7 @@ export function ResultListPage(props: ResultListPageProps) {
 
             <ResultsListTable
                 setSortFilter={setSortFilter}
+                clearFilters={clearFilters}
                 sortedResults={sortedResults()}
                 totalItems={props.studentResultList.length}
                 maxStrSizes={indexedData().maxStrSizes}

@@ -14,6 +14,7 @@ interface ResultsListTableProps {
     totalItems: number;
     sortedResults: SortedResults;
     setSortFilter: (by: SortBy, order: SortOrder) => void;
+    clearFilters: () => void;
 
     maxStrSizes: {
         // name: number;
@@ -61,6 +62,14 @@ export function ResultsListTable(props: ResultsListTableProps) {
                     <div class="flex flex-col items-center justify-center gap-2 py-16 text-dim-fg">
                         <span class="text-xl font-semibold">No results found</span>
                         <span class="text-sm">Try adjusting your search or filters</span>
+
+                        <button
+                            type="button"
+                            onClick={props.clearFilters}
+                            class="font-medium rounded-full px-4 border-2 border-border hover:bg-accent-bg hover:text-accent-bg-text hover:border-accent-bg transition-all"
+                        >
+                            Clear Filters
+                        </button>
                     </div>
                 }
             >
@@ -158,11 +167,6 @@ function SortableHeaderItem(props: SortableHeaderItemProps) {
                 "grid grid-cols-[1fr_min-content] items-center hover:bg-zinc-950 cursor-pointer transition-colors",
             )}
             onClick={() => {
-                console.log({
-                    "props.value": props.value,
-                    "props.sortBy": props.sortBy,
-                });
-
                 if (props.sortBy === props.value) {
                     props.setSortFilter(
                         props.value,
