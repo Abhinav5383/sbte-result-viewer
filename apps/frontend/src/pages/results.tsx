@@ -216,7 +216,7 @@ export function ResultListPage(props: ResultListPageProps) {
 
     return (
         <div id="results">
-            <div class="grid grid-cols-1 lg:grid-cols-[3fr_3fr_2fr_2fr] gap-4 py-4 px-6">
+            <div class="grid grid-cols-1 xl:grid-cols-[3fr_3fr_2fr_2fr] gap-4 py-4 px-6">
                 <div class="grid">
                     <label for="searchBy" class="w-fit">
                         Search
@@ -312,7 +312,7 @@ export function ResultListPage(props: ResultListPageProps) {
                     />
                 </div>
 
-                <div class="lg:hidden">
+                <div class="xl:hidden">
                     <div>
                         <label for="mb-sort">Sort By</label>
                         <div class="grid gap-y-3 grid-cols-1 xs:grid-cols-[3fr_max-content]">

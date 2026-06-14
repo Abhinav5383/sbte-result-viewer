@@ -79,7 +79,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                 </div>
 
                 <div
-                    class="block lg:grid gap-x-8 relative justify-between"
+                    class="block xl:grid gap-x-8 relative justify-between"
                     style={{
                         // adding extra for the semester suffix + spacing
                         "--max-branch-len": `${props.maxStrSizes.branch + 10}ch`,
@@ -88,7 +88,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                         }`,
                     }}
                 >
-                    <div class="hidden lg:grid z-10 sticky top-0 col-span-full grid-cols-subgrid gap-x-0 *:px-4 *:py-3 border-b border-border bg-zinc-700 text-zinc-200">
+                    <div class="hidden xl:grid z-10 sticky top-0 col-span-full grid-cols-subgrid gap-x-0 *:px-4 *:py-3 border-b border-border bg-zinc-700 text-zinc-200">
                         <div>
                             <strong>#</strong>
                         </div>
@@ -380,7 +380,7 @@ function MobileResultRow(props: RowVariantProps) {
     return (
         // biome-ignore lint/a11y/noStaticElementInteractions: --
         <div
-            class="lg:hidden grid grid-cols-[max-content_1fr] gap-3 px-3 py-5 border-b border-border hover:bg-zinc-100 active:bg-zinc-100 cursor-pointer focus-ring"
+            class="xl:hidden grid grid-cols-[max-content_1fr] gap-3 px-3 py-5 border-b border-border hover:bg-zinc-100 active:bg-zinc-100 cursor-pointer focus-ring"
             onClick={props.onSelect}
             onKeyDown={(e) => handleRowKbEvent(e, props.onSelect)}
             tabindex={0}
@@ -429,7 +429,7 @@ function DesktopResultRow(props: RowVariantProps) {
         // biome-ignore lint/a11y/noStaticElementInteractions: __
         <div
             class={cn(
-                "hidden lg:grid",
+                "hidden xl:grid",
                 "items-center col-span-full grid-cols-subgrid py-3 border-b border-border hover:bg-zinc-100 cursor-pointer px-6",
                 "focus-ring",
             )}
