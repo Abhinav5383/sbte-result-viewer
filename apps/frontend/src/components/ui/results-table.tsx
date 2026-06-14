@@ -4,6 +4,7 @@ import ArrowDownWideNarrow from "lucide-solid/icons/arrow-down-wide-narrow";
 import ArrowUpWideNarrow from "lucide-solid/icons/arrow-up-wide-narrow";
 import ChevronUpIcon from "lucide-solid/icons/chevron-up";
 import { batch, createEffect, createMemo, createSignal, For, onCleanup, onMount, Show } from "solid-js";
+import { ChevronRightIcon } from "~/components/icons/chevron-right";
 import { marksClass, sgpaClass } from "~/lib/grade-utils";
 import { SortBy, SortOrder } from "~/lib/types";
 import { cn, OrdinalSuffix } from "../utils";
@@ -421,6 +422,16 @@ function MobileResultRow(props: RowVariantProps) {
                         <span class="text-dim-fg font-medium uppercase text-xs opacity-70">SGPA</span>
                         <span class={cn(props.sgpaClassName, "font-semibold text-lg")}>{props.item.sgpa}</span>
                     </div>
+                </div>
+
+                <div
+                    class="text-[0.67rem] text-accent-fg/70 flex items-center"
+                    style={{
+                        "justify-self": "end",
+                    }}
+                >
+                    <span class="trim-both hover:underline">Details</span>
+                    <ChevronRightIcon class="w-[1.3em] h-[1.3em]"/>
                 </div>
             </div>
         </div>
