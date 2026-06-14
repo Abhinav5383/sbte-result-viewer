@@ -347,23 +347,26 @@ function calcPercentObtained(obtained: number, maximum: number) {
 }
 
 function ResultRow(props: ResultRowProps) {
-    const commonProps = () => ({
-        item: props.item,
-        index: props.index,
-        onSelect: props.onSelect,
-        showCollege: props.showCollege,
-
-        semester: props.item.student.roll.charAt(0),
-        formattedSgpa: props.item.sgpa.toFixed(2),
-        marksClassName: marksClass(props.item.grandTotal.obtained, props.item.grandTotal.maximum),
-        sgpaClassName: sgpaClass(props.item.sgpa),
-        percentObtained: calcPercentObtained(props.item.grandTotal.obtained, props.item.grandTotal.maximum),
-    });
-
     return (
         <div class="result-row grid col-span-full grid-cols-subgrid">
-            <MobileResultRow {...commonProps()} />
-            <DesktopResultRow {...commonProps()} />
+            <For each={[DesktopResultRow, MobileResultRow]}>
+                {(Row) => (
+                    <Row
+                        item={props.item}
+                        index={props.index}
+                        onSelect={props.onSelect}
+                        showCollege={props.showCollege}
+                        semester={props.item.student.roll.charAt(0)}
+                        formattedSgpa={props.item.sgpa.toFixed(2)}
+                        marksClassName={marksClass(props.item.grandTotal.obtained, props.item.grandTotal.maximum)}
+                        sgpaClassName={sgpaClass(props.item.sgpa)}
+                        percentObtained={calcPercentObtained(
+                            props.item.grandTotal.obtained,
+                            props.item.grandTotal.maximum,
+                        )}
+                    />
+                )}
+            </For>
         </div>
     );
 }
