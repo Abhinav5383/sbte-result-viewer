@@ -3,13 +3,21 @@ import { numRange } from "~/lib/utils";
 
 export const ROLL_LIST = [...numRange(1, 120), ...numRange(301, 310), ...numRange(351, 360)];
 
-const defaultSemesters = [
-    { sem: 1, admissionYear: 2025 },
+const semestersList = [
+    // December 2026 exam
+    // { sem: 1, admissionYear: 2026 },
+    // { sem: 3, admissionYear: 2025 },
+    // { sem: 5, admissionYear: 2024 },
+
+    // May 2026 exam
     { sem: 2, admissionYear: 2025 },
-    { sem: 3, admissionYear: 2024 },
     { sem: 4, admissionYear: 2024 },
-    { sem: 5, admissionYear: 2023 },
     { sem: 6, admissionYear: 2023 },
+
+    // December 2025 exam
+    { sem: 1, admissionYear: 2025 },
+    { sem: 3, admissionYear: 2024 },
+    { sem: 5, admissionYear: 2023 },
 ];
 
 export function getAllCollegeBranches() {
@@ -18,14 +26,14 @@ export function getAllCollegeBranches() {
     for (const collegeCode of Object.values(COLLEGE_CODES)) {
         if (!collegeCode) continue;
 
-        const collegeBranches = getCollegeBranches(collegeCode, defaultSemesters);
+        const collegeBranches = getCollegeBranches(collegeCode, semestersList);
         allBranches.push(...collegeBranches);
     }
 
     return allBranches;
 }
 
-export function getCollegeBranches(collegeCode: number, semesters = defaultSemesters) {
+export function getCollegeBranches(collegeCode: number, semesters = semestersList) {
     const branches = [];
 
     for (const semObj of semesters) {
