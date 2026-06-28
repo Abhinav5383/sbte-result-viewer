@@ -290,6 +290,7 @@ export function ResultListPage(props: ResultListPageProps) {
                                 onInput={(e) => {
                                     if (!e.currentTarget.value) setSearchQuery("");
                                 }}
+                                onBlur={(e) => setSearchQuery(e.currentTarget.value)}
                             />
 
                             <button
