@@ -142,7 +142,7 @@ export function ResultListPage(props: ResultListPageProps) {
                 semester: Array.from(semesters).sort(),
                 branch: Array.from(branches).sort(),
                 college: Array.from(colleges).sort(),
-                admissionYear: Array.from(admissionYear).sort(),
+                admissionYear: Array.from(admissionYear).sort().reverse(),
             } satisfies FilterOptions,
             maxStrSizes: {
                 // name: maxNameLen,
@@ -241,8 +241,8 @@ export function ResultListPage(props: ResultListPageProps) {
 
     return (
         <div id="results">
-            <div class="grid grid-cols-1 xl:grid-cols-[3fr_3fr_2fr_2fr] gap-4 py-4 px-6">
-                <div class="grid">
+            <div class="grid grid-cols-1 xl:grid-cols-[4fr_3fr_2fr_2fr_2fr] gap-4 py-4 px-6">
+                <div>
                     <label for="searchBy" class="w-fit">
                         Search
                     </label>
@@ -285,7 +285,7 @@ export function ResultListPage(props: ResultListPageProps) {
                     <Select
                         id="college-filter"
                         value={college()}
-                        onChange={(val) => setCollege(val)}
+                        onChange={setCollege}
                         options={[
                             {
                                 value: "",
@@ -304,7 +304,7 @@ export function ResultListPage(props: ResultListPageProps) {
                     <Select
                         id="branch-filter"
                         value={branch()}
-                        onChange={(br) => setBranch(br)}
+                        onChange={setBranch}
                         options={[
                             {
                                 value: "",
@@ -323,7 +323,7 @@ export function ResultListPage(props: ResultListPageProps) {
                     <Select
                         id="semester-filter"
                         value={semester()}
-                        onChange={(sem) => setSemester(sem)}
+                        onChange={setSemester}
                         options={[
                             {
                                 value: "",
@@ -332,6 +332,25 @@ export function ResultListPage(props: ResultListPageProps) {
                             ...indexedData().filters.semester.map((sem) => ({
                                 value: sem,
                                 label: SemesterLabel(sem),
+                            })),
+                        ]}
+                    />
+                </div>
+
+                <div>
+                    <label for="session-filter">Session</label>
+                    <Select
+                        id="session-filter"
+                        value={session()}
+                        onChange={setSession}
+                        options={[
+                            {
+                                value: "",
+                                label: "All Sessions",
+                            },
+                            ...indexedData().filters.admissionYear.map((year) => ({
+                                value: year,
+                                label: `20${year}`,
                             })),
                         ]}
                     />
