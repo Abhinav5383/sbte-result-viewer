@@ -1,6 +1,7 @@
 import { BRANCH_NAME, COLLEGE_NAME, type ParsedResult } from "@app/shared/types";
 import { getSessionFromRoll } from "@app/shared/utils";
 import { useSearchParams } from "@solidjs/router";
+import { SearchIcon } from "lucide-solid";
 import { createEffect, createMemo } from "solid-js";
 import { ResultsListTable } from "~/components/ui/results-table";
 import { Select } from "~/components/ui/select";
@@ -283,7 +284,17 @@ export function ResultListPage(props: ResultListPageProps) {
                                 class="no-focus-ring xs:rounded-s-none border-2 border-border focus:border-accent-bg w-full"
                                 ref={(e) => (queryInputRef = e)}
                                 onChange={(e) => setSearchQuery(e.currentTarget.value)}
+                                onInput={(e) => {
+                                    if (!e.currentTarget.value) setSearchQuery("");
+                                }}
                             />
+
+                            <button
+                                type="button"
+                                class="grid place-content-center absolute rounded-md text-dim-fg transition-all min-h-0 py-0 px-0 aspect-square inset-y-0 inset-e-0 hover:text-accent-fg focus-visible:text-accent-fg"
+                            >
+                                <SearchIcon />
+                            </button>
                         </div>
                     </div>
                 </div>
