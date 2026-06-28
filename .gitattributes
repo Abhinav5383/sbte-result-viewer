@@ -1,0 +1,2 @@
+generated/invalid-rolls.txt filter=lfs diff=lfs merge=lfs -text
+generated/saved-results.json filter=lfs diff=lfs merge=lfs -text
