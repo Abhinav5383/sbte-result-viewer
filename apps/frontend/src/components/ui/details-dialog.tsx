@@ -95,6 +95,19 @@ export function DetailsDialog(props: DetailsDialogProps) {
                                                 {OrdinalSuffix(data.student.roll.charAt(0))} sem
                                             </em>
                                         </span>
+
+                                        <Show when={data.cgpa}>
+                                            {(cgpa) => (
+                                                <span
+                                                    class={`branch-badge ${data.student.branch.toLowerCase()} inline-block ps-2 pe-0.5 rounded-lg text-sm`}
+                                                >
+                                                    CGPA
+                                                    <em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 rounded-md">
+                                                        {cgpa().toFixed(2)}
+                                                    </em>
+                                                </span>
+                                            )}
+                                        </Show>
                                     </div>
 
                                     {/* dummy buttons to reserve space for the absolute positioned actual buttons */}
