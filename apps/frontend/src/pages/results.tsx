@@ -1,7 +1,7 @@
 import { BRANCH_NAME, COLLEGE_NAME, type ParsedResult } from "@app/shared/types";
 import { getSessionFromRoll } from "@app/shared/utils";
 import { useSearchParams } from "@solidjs/router";
-import { SearchIcon } from "lucide-solid";
+import SearchIcon from "lucide-solid/icons/search";
 import { createEffect, createMemo } from "solid-js";
 import { ResultsListTable } from "~/components/ui/results-table";
 import { Select } from "~/components/ui/select";
@@ -283,7 +283,10 @@ export function ResultListPage(props: ResultListPageProps) {
                                 placeholder={`Enter ${searchBy()} to search`}
                                 class="no-focus-ring xs:rounded-s-none border-2 border-border focus:border-accent-bg w-full"
                                 ref={(e) => (queryInputRef = e)}
-                                onChange={(e) => setSearchQuery(e.currentTarget.value)}
+                                onChange={(e) => {
+                                    setSearchQuery(e.currentTarget.value);
+                                    e.currentTarget.blur();
+                                }}
                                 onInput={(e) => {
                                     if (!e.currentTarget.value) setSearchQuery("");
                                 }}

@@ -1,3 +1,4 @@
+import { encodeResults } from "@app/shared/encoder";
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import config from "./config";
@@ -16,7 +17,7 @@ app.use(
 
 app.get("/", (c) => c.text("Scraper is running"));
 app.get("/students-data", (c) => {
-    return c.json(parsedData);
+    return c.json(encodeResults(parsedData));
 });
 
 Bun.serve({

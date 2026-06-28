@@ -38,12 +38,12 @@ export default function App() {
             return decodeEmbeddedResults(__EMBEDDED_RESULTS__);
         }
 
-        const res = await fetch("http://localhost:5500/students-data");
+        const res = await fetch(`http://${window.location.hostname}:5500/students-data`);
         if (!res.ok) {
             throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         }
-        const data = (await res.json()) as ParsedResult[];
-        return data;
+        const data = (await res.json()) as EncodedResult[];
+        return decodeResults(data);
     });
 
     return (

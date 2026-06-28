@@ -75,7 +75,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                     </div>
                 }
             >
-                <div class="flex items-center text-sm text-dim-fg px-6 py-2 gap-4">
+                <div class="flex items-center text-sm text-dim-fg px-6 py-3 gap-4 border-be border-border">
                     <p>
                         Showing <span class="font-medium">{props.sortedResults.results.length}</span> of{" "}
                         <span class="font-medium">{props.totalItems} </span>
