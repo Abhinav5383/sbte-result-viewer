@@ -241,7 +241,7 @@ function ResultTableContents(props: ResultTableContentsProps) {
         const startIndex = Math.floor(containerYScroll / rHeight);
         const endIndex = Math.ceil((containerYScroll + window.innerHeight) / rHeight);
 
-        const overscan = endIndex - startIndex; // overscan by one viewport height
+        const overscan = Math.max(30, endIndex - startIndex); // overscan by one viewport height
         const adjustedStartIndex = Math.max(0, startIndex - overscan);
         const adjustedEndIndex = Math.min(props.sortedResults.results.length - 1, endIndex + overscan);
 
