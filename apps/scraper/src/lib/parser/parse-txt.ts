@@ -17,7 +17,8 @@ export function parseTxtToJson(txt: string): ParsedResult {
             obtained: 0,
         },
         subjects: [],
-        sgpa: 0,
+        sgpa: -1,
+        cgpa: null,
         remarks: "",
     };
 
@@ -82,15 +83,20 @@ export function parseTxtToJson(txt: string): ParsedResult {
         }
 
         // sgpa
-        else if (lineLower.startsWith("sgpa")) {
+        else if (lineLower.startsWith("sgpa") || lineLower.startsWith("cgpa")) {
             const parts = line
                 .split(" ")
                 .map((p) => p.trim())
                 .filter((p) => p.length);
-            const sgpaStr = parts[parts.length - 1] || "0";
-            const sgpa = Number.parseFloat(sgpaStr);
+            const gpaStr = parts[parts.length - 1] || "0";
+            const gpa = Number.parseFloat(gpaStr);
 
-            result.sgpa = sgpa || 0;
+            const isSGPA = lineLower.startsWith("sgpa");
+            if (isSGPA) {
+                result.sgpa = gpa || 0;
+            } else {
+                result.cgpa = gpa || 0;
+            }
         }
 
         // remarks
@@ -99,6 +105,28 @@ export function parseTxtToJson(txt: string): ParsedResult {
             if (remarksPart) {
                 result.remarks = remarksPart;
             }
+        }
+    }
+
+    // either because SGPA wasn't parsed correctly or because it's a final sem result card
+    if (result.sgpa === -1) {
+        let totalPoints = 0;
+        let totalCredits = 0;
+
+        let failedAny = false;
+        for (const sub of result.subjects) {
+            const point = getGradePoint(sub.grade);
+            totalPoints += point * sub.credits;
+            totalCredits += sub.credits;
+
+            if (point === 0) failedAny = true;
+        }
+
+        // If failed in any subject, SGPA is considered 0
+        if (failedAny) {
+            result.sgpa = 0;
+        } else if (totalCredits > 0) {
+            result.sgpa = Math.round((totalPoints / totalCredits) * 100) / 100;
         }
     }
 
@@ -186,6 +214,27 @@ function mapBranchStrToEnum(_str: string) {
     return BRANCH_NAME.UNKNOWN;
 }
 
+function getGradePoint(grade: string): number {
+    switch (grade.toUpperCase().trim()) {
+        case "A+":
+            return 10;
+        case "A":
+            return 9;
+        case "B":
+            return 8;
+        case "C":
+            return 7;
+        case "D":
+            return 6;
+        case "P":
+            return 5;
+        case "F":
+            return 0;
+        default:
+            return 0;
+    }
+}
+
 // ---- example text that is to be parsed ------
 
 // Registration No : 1211825301
@@ -231,3 +280,47 @@ function mapBranchStrToEnum(_str: string) {
 // -------------------------------------------------------------------------------------------
 // REMARKS : First Class with Distinction
 // .
+
+// ++++++++++++============================================+++++++++++
+
+// ----------------- Final semester students have a bit different result card -----------------
+
+// Registration No : 1211823005
+// Roll No : 611211823005
+// Following are the marks obtained by PARMANAND KUMAR
+// of New Government Polytechnic, Patna - 13
+// at Semester VI of Diploma in Computer Science & Engineering
+// Examination 2026 (EVEN) held in the month of MAY, 2026
+// Result Published On: 09/06/2026
+// STATE BOARD OF TECHNICAL EDUCATION
+// BIHAR
+// (PROVISIONAL)
+// -----------------------------------------------------------------------------------------------
+// SUBJECT FULL MARKS PASS MARKS MARKS OBTAINED
+// NAME OF SUBJECTS CREDITS INT FIN TOTAL FIN TOTAL INT FIN TOTAL GRADE
+// -----------------------------------------------------------------------------------------------
+// THEORY PAPERS
+// ENTREPRENEURSHIP AND START-UPS 3 30 70 100 28 40 25 56 81 A
+// SOFTWARE ENGINEERING 4 30 70 100 28 40 25 55 80 A
+// DATA SC. ,D.W & D.M 3 30 70 100 28 40 24 62 86 A
+// INTRODUCTION TO E-GOVERNANCE 3 30 70 100 28 40 30 55 85 A
+// INTERNET OF THINGS (ADVANCE) 2 30 70 100 28 40 28 55 83 A
+// -----------------------------------------------------------------------------------------------
+// PRACTICAL PAPERS
+// I.O.T.(ADV. LAB. 2 20 30 050 - 20 20 29 49 A+
+// -----------------------------------------------------------------------------------------------
+// TERM WORK PAPERS
+// ENTREPRENEURSHIP & START UP 2 15 35 050 - 20 13 33 46 A+
+// SOFTWARE ENGINEERING 2 15 35 050 - 20 13 32 45 A+
+// INTERNET OF THINGS (ADVANCE) 1 20 30 050 - 20 20 29 49 A+
+// MAJOR PROJECT & SEMINAR 2 15 35 050 - 20 15 34 49 A+
+// -----------------------------------------------------------------------------------------------
+// GRAND TOTAL 24 750 653
+// -----------------------------------------------------------------------------------------------
+// 40% of SEMESTER - I TO V EXAMS 1500 1186
+// -----------------------------------------------------------------------------------------------
+// AGGREGATE 2250 1839
+// -----------------------------------------------------------------------------------------------
+// CGPA 8.92
+// -----------------------------------------------------------------------------------------------
+// REMARKS : First Class with Distinction

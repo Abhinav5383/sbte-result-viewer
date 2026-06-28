@@ -12,6 +12,7 @@ export interface ParsedResult {
     };
     subjects: SubjectResult[];
     sgpa: number;
+    cgpa: number | null; // only for 6th semester results
     remarks: string;
 }
 
