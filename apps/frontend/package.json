@@ -11,18 +11,18 @@
     "dependencies": {
         "@app/shared": "workspace:*",
         "@solidjs/router": "^0.16.1",
-        "@tailwindcss/vite": "^4.2.2",
         "clsx": "^2.1.1",
         "html-to-image": "^1.11.13",
-        "lucide-solid": "^1.8.0",
-        "solid-js": "^1.9.12",
-        "tailwind-merge": "^3.5.0",
-        "tailwindcss": "^4.2.2"
+        "lucide-solid": "^1.21.0",
+        "solid-js": "^1.9.13",
+        "tailwind-merge": "^3.6.0",
+        "tailwindcss": "^4.3.1"
     },
     "devDependencies": {
-        "typescript": "~6.0.2",
-        "vite": "^8.0.4",
-        "vite-plugin-singlefile": "^2.3.2",
+        "@tailwindcss/vite": "^4.3.1",
+        "typescript": "~6.0.3",
+        "vite": "^8.1.0",
+        "vite-plugin-singlefile": "^2.3.3",
         "vite-plugin-solid": "^2.11.12"
     }
 }
