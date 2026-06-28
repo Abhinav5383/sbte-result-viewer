@@ -16,6 +16,7 @@ interface ResultsListTableProps {
     sortedResults: SortedResults;
     setSortFilter: (by: SortBy, order: SortOrder) => void;
     clearFilters: () => void;
+    anyFilterActive: boolean;
 
     maxStrSizes: {
         // name: number;
@@ -74,9 +75,22 @@ export function ResultsListTable(props: ResultsListTableProps) {
                     </div>
                 }
             >
-                <div class="text-sm text-dim-fg px-6 py-2 border-b border-border bg-zinc-50">
-                    Showing {props.sortedResults.results.length} of {props.totalItems}{" "}
-                    {props.sortedResults.results.length !== 1 ? "results" : "result"}
+                <div class="flex items-center text-sm text-dim-fg px-6 py-2 gap-4">
+                    <p>
+                        Showing <span class="font-medium">{props.sortedResults.results.length}</span> of{" "}
+                        <span class="font-medium">{props.totalItems} </span>
+                        {props.sortedResults.results.length !== 1 ? "results" : "result"}
+                    </p>
+                    <Show when={props.anyFilterActive}>
+                        <span class="text-border">|</span>
+                        <button
+                            type="button"
+                            class="text-inherit text-sm min-h-0 px-0 py-0 hover:text-accent-fg underline underline-offset-[0.1lh]"
+                            onclick={props.clearFilters}
+                        >
+                            Clear Filters
+                        </button>
+                    </Show>
                 </div>
 
                 <div
@@ -431,7 +445,7 @@ function MobileResultRow(props: RowVariantProps) {
                     }}
                 >
                     <span class="trim-both hover:underline">Details</span>
-                    <ChevronRightIcon class="w-[1.3em] h-[1.3em]"/>
+                    <ChevronRightIcon class="w-[1.3em] h-[1.3em]" />
                 </div>
             </div>
         </div>

@@ -88,6 +88,13 @@ export function ResultListPage(props: ResultListPageProps) {
         setSearchParams(newVal);
     }
 
+    const anyFilterActive = () => {
+        for (const val of Object.values(FilterParams)) {
+            if (searchParams[val]) return true;
+        }
+        return false;
+    };
+
     // ---------- SORTING STUFF ----------------
 
     const sortBy = () => getValidEntry(searchParams.sortBy, SortBy, SortBy.Marks);
@@ -363,6 +370,7 @@ export function ResultListPage(props: ResultListPageProps) {
             <ResultsListTable
                 setSortFilter={setSortFilter}
                 clearFilters={clearFilters}
+                anyFilterActive={anyFilterActive()}
                 sortedResults={sortedResults()}
                 totalItems={props.studentResultList.length}
                 maxStrSizes={indexedData().maxStrSizes}
