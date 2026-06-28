@@ -23,3 +23,7 @@ export function getBranchFromRoll(code: string): BRANCH_NAME {
 
     return BRANCH_NAME.UNKNOWN;
 }
+
+export function getSessionFromRoll(code: string): string {
+    return code.substring(7, 9);
+}

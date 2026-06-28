@@ -1,4 +1,5 @@
 import { BRANCH_NAME, COLLEGE_NAME, type ParsedResult } from "@app/shared/types";
+import { getSessionFromRoll } from "@app/shared/utils";
 import { useSearchParams } from "@solidjs/router";
 import { createMemo, onCleanup } from "solid-js";
 import { ResultsListTable } from "~/components/ui/results-table";
@@ -11,6 +12,7 @@ interface Filters {
     college: string;
     branch: string;
     semester: string;
+    admissionYear: string;
 }
 
 type FilterOptions = {
@@ -27,6 +29,7 @@ enum FilterParams {
     COLLEGE = "college",
     BRANCH = "branch",
     SEMESTER = "sem",
+    SESSION = "session",
 }
 
 export function ResultListPage(props: ResultListPageProps) {
@@ -67,6 +70,15 @@ export function ResultListPage(props: ResultListPageProps) {
         setSearchParams({ [FilterParams.SEMESTER]: sem });
     }
 
+    const session = () => {
+        const sess = searchParams[FilterParams.SESSION];
+        if (typeof sess === "string") return sess;
+        return "";
+    };
+    function setSession(sess: string) {
+        setSearchParams({ [FilterParams.SESSION]: sess });
+    }
+
     function clearFilters() {
         const newVal: Record<string, string> = {};
         for (const key of Object.values(FilterParams)) {
@@ -92,6 +104,7 @@ export function ResultListPage(props: ResultListPageProps) {
         const semesters = new Set<string>();
         const branches = new Set<BRANCH_NAME>();
         const colleges = new Set<COLLEGE_NAME>();
+        const admissionYear = new Set<string>();
 
         // let maxNameLen = 0;
         // let maxCollegeLen = 0;
@@ -104,6 +117,7 @@ export function ResultListPage(props: ResultListPageProps) {
             semesters.add(semester);
             branches.add(item.student.branch);
             colleges.add(item.student.college);
+            admissionYear.add(getSessionFromRoll(item.student.roll));
 
             // if (item.student.name.length > maxNameLen) {
             //     maxNameLen = item.student.name.length;
@@ -121,6 +135,7 @@ export function ResultListPage(props: ResultListPageProps) {
                 semester: Array.from(semesters).sort(),
                 branch: Array.from(branches).sort(),
                 college: Array.from(colleges).sort(),
+                admissionYear: Array.from(admissionYear).sort(),
             } satisfies FilterOptions,
             maxStrSizes: {
                 // name: maxNameLen,
@@ -132,10 +147,11 @@ export function ResultListPage(props: ResultListPageProps) {
 
     const filteredResults = createMemo(() => {
         const fullList = props.studentResultList;
-        const filterValues = {
+        const filterValues: Filters = {
             college: college(),
             branch: branch(),
             semester: semester(),
+            admissionYear: session(),
         };
         const searchQ = searchQuery().trim();
         const searchMode = searchBy();
@@ -144,10 +160,11 @@ export function ResultListPage(props: ResultListPageProps) {
         const hasCollegeFilter = filterValues.college.length > 0;
         const hasBranchFilter = filterValues.branch.length > 0;
         const hasSemesterFilter = filterValues.semester.length > 0;
+        const hasSessionFilter = filterValues.admissionYear.length > 0;
         const hasSearch = searchQ.length > 0;
 
         // fast path: no filters
-        if (!hasCollegeFilter && !hasBranchFilter && !hasSemesterFilter && !hasSearch) {
+        if (!hasCollegeFilter && !hasBranchFilter && !hasSemesterFilter && !hasSessionFilter && !hasSearch) {
             return fullList.slice();
         }
 
@@ -157,6 +174,7 @@ export function ResultListPage(props: ResultListPageProps) {
             if (hasCollegeFilter && item.student.college !== filterValues.college) continue;
             if (hasBranchFilter && item.student.branch !== filterValues.branch) continue;
             if (hasSemesterFilter && item.student.roll.charAt(0) !== filterValues.semester) continue;
+            if (hasSessionFilter && getSessionFromRoll(item.student.roll) !== filterValues.admissionYear) continue;
 
             if (hasSearch) {
                 if (searchMode === SearchBy.Roll) {
