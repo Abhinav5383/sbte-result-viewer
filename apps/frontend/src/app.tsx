@@ -38,21 +38,21 @@ export default function App() {
             return decodeEmbeddedResults(__EMBEDDED_RESULTS__);
         }
 
-        const res = await fetch(
-            "https://raw.githubusercontent.com/Abhinav5383/sbte-result-viewer/refs/heads/main/generated/saved-results.json",
-        );
-        if (!res.ok) {
-            throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
-        }
-        const rawData = (await res.json()) as EncodedResult[];
-        return decodeResults(rawData);
-
-        // const res = await fetch("http://localhost:5500/students-data");
+        // const res = await fetch(
+        //     "https://raw.githubusercontent.com/Abhinav5383/sbte-result-viewer/refs/heads/main/generated/saved-results.json",
+        // );
         // if (!res.ok) {
         //     throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         // }
-        // const data = (await res.json()) as ParsedResult[];
-        // return data;
+        // const rawData = (await res.json()) as EncodedResult[];
+        // return decodeResults(rawData);
+
+        const res = await fetch("http://localhost:5500/students-data");
+        if (!res.ok) {
+            throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+        }
+        const data = (await res.json()) as ParsedResult[];
+        return data;
     });
 
     return (

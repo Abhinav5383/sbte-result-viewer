@@ -9,6 +9,7 @@ const defaultSemesters = [
     { sem: 3, admissionYear: 2024 },
     { sem: 4, admissionYear: 2024 },
     { sem: 5, admissionYear: 2023 },
+    { sem: 6, admissionYear: 2023 },
 ];
 
 export function getAllCollegeBranches() {
