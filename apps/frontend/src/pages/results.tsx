@@ -1,7 +1,7 @@
 import { BRANCH_NAME, COLLEGE_NAME, type ParsedResult } from "@app/shared/types";
 import { getSessionFromRoll } from "@app/shared/utils";
 import { useSearchParams } from "@solidjs/router";
-import { createMemo, onCleanup } from "solid-js";
+import { createEffect, createMemo } from "solid-js";
 import { ResultsListTable } from "~/components/ui/results-table";
 import { Select } from "~/components/ui/select";
 import { OrdinalSuffix } from "~/components/utils";
@@ -44,12 +44,20 @@ export function ResultListPage(props: ResultListPageProps) {
         });
     }
 
+    let queryInputRef = undefined as HTMLInputElement | undefined;
     const searchQuery = () => {
         const q = searchParams[FilterParams.QUERY];
         if (typeof q === "string") return q;
         return "";
     };
-    const setSearchQuery = createDebouncedParamSetter(FilterParams.QUERY);
+    function setSearchQuery(q: string) {
+        setSearchParams({ [FilterParams.QUERY]: q });
+    }
+    createEffect(() => {
+        if (queryInputRef) {
+            queryInputRef.value = searchQuery();
+        }
+    });
 
     const college = () => getValidEntry(searchParams[FilterParams.COLLEGE], COLLEGE_NAME, "");
     function setCollege(clg: string) {
@@ -273,8 +281,8 @@ export function ResultListPage(props: ResultListPageProps) {
                                 enterkeyhint="search"
                                 placeholder={`Enter ${searchBy()} to search`}
                                 class="no-focus-ring xs:rounded-s-none border-2 border-border focus:border-accent-bg w-full"
-                                value={searchQuery()}
-                                onInput={(e) => setSearchQuery(e.currentTarget.value)}
+                                ref={(e) => (queryInputRef = e)}
+                                onChange={(e) => setSearchQuery(e.currentTarget.value)}
                             />
                         </div>
                     </div>
@@ -397,24 +405,6 @@ export function ResultListPage(props: ResultListPageProps) {
             />
         </div>
     );
-}
-
-function createDebouncedParamSetter(key: string, delay = 200) {
-    const [_, setSearchParams] = useSearchParams();
-    let timeoutId: ReturnType<typeof setTimeout> | undefined;
-
-    const setParam = (newValue: string) => {
-        if (timeoutId) clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => {
-            setSearchParams({ [key]: newValue });
-        }, delay);
-    };
-
-    onCleanup(() => {
-        if (timeoutId) clearTimeout(timeoutId);
-    });
-
-    return setParam;
 }
 
 function SemesterLabel(sem: string) {
