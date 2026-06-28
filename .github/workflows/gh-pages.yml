@@ -15,3 +15,4 @@ jobs:
     with:
       project_loc: "apps/frontend"
       build_dir: "dist"
+      lfs: true
