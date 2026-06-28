@@ -1,4 +1,4 @@
-import { PAPER_TYPE, type ParsedResult, type SubjectResult } from "./types";
+import type { PAPER_TYPE, ParsedResult, SubjectResult } from "./types";
 import { getBranchFromRoll, getCollegeFromRoll } from "./utils";
 
 export type EncodedResult = [
@@ -7,18 +7,26 @@ export type EncodedResult = [
     [number, number, number], // [grandTotalMax, grandTotalPassing, grandTotalObtained]
     EncodedSubject[],
     number, // sgpa
+    null | number, // cgpa
     string, // remarks
 ];
 
-export function encodeResult(data: ParsedResult): EncodedResult {
-    return [
-        data.student.name,
-        data.student.roll,
-        [data.grandTotal.maximum, data.grandTotal.passing, data.grandTotal.obtained],
-        data.subjects.map(encodeSubject),
-        data.sgpa,
-        data.remarks,
-    ];
+export function encodeResults(results: ParsedResult[]): EncodedResult[] {
+    const encoded: EncodedResult[] = [];
+
+    for (const result of results) {
+        encoded.push([
+            result.student.name,
+            result.student.roll,
+            [result.grandTotal.maximum, result.grandTotal.passing, result.grandTotal.obtained],
+            encodeSubjects(result.subjects),
+            result.sgpa,
+            result.cgpa,
+            result.remarks,
+        ]);
+    }
+
+    return encoded;
 }
 
 export type EncodedSubject = [
@@ -31,46 +39,67 @@ export type EncodedSubject = [
     string, // grade
 ];
 
-function encodeSubject(subject: SubjectResult): EncodedSubject {
-    return [
-        subject.name,
-        subject.type,
-        subject.credits,
-        [subject.internal.max, subject.internal.obtained],
-        [subject.external.max, subject.external.passing, subject.external.obtained],
-        [subject.total.max, subject.total.passing, subject.total.obtained],
-        subject.grade,
-    ];
+function encodeSubjects(subjects: SubjectResult[]): EncodedSubject[] {
+    const encoded: EncodedSubject[] = [];
+
+    for (const subject of subjects) {
+        encoded.push([
+            subject.name,
+            subject.type,
+            subject.credits,
+            [subject.internal.max, subject.internal.obtained],
+            [subject.external.max, subject.external.passing, subject.external.obtained],
+            [subject.total.max, subject.total.passing, subject.total.obtained],
+            subject.grade,
+        ]);
+    }
+
+    return encoded;
 }
 
-export function decodeResult(arr: EncodedResult): ParsedResult {
-    const roll = arr[1];
-    return {
-        student: {
-            name: arr[0],
-            roll: roll,
-            branch: getBranchFromRoll(roll),
-            college: getCollegeFromRoll(roll),
-        },
-        grandTotal: {
-            maximum: arr[2][0],
-            passing: arr[2][1],
-            obtained: arr[2][2],
-        },
-        subjects: arr[3].map(decodeSubject),
-        sgpa: arr[4],
-        remarks: arr[5],
-    };
+// ================ DECODERS ================
+
+export function decodeResults(results: EncodedResult[]) {
+    const decoded: ParsedResult[] = [];
+
+    for (const res of results) {
+        const roll = res[1];
+        decoded.push({
+            student: {
+                name: res[0],
+                roll: roll,
+                branch: getBranchFromRoll(roll),
+                college: getCollegeFromRoll(roll),
+            },
+            grandTotal: {
+                maximum: res[2][0],
+                passing: res[2][1],
+                obtained: res[2][2],
+            },
+            subjects: decodeSubjects(res[3]),
+            sgpa: res[4],
+            cgpa: res[5],
+            remarks: res[6],
+        });
+    }
+
+    return decoded;
 }
 
-function decodeSubject(arr: EncodedSubject): SubjectResult {
-    return {
-        name: arr[0],
-        type: arr[1],
-        credits: arr[2],
-        internal: { max: arr[3][0], obtained: arr[3][1] },
-        external: { max: arr[4][0], passing: arr[4][1], obtained: arr[4][2] },
-        total: { max: arr[5][0], passing: arr[5][1], obtained: arr[5][2] },
-        grade: arr[6],
-    };
+function decodeSubjects(subjects: EncodedSubject[]): SubjectResult[] {
+    const decoded: SubjectResult[] = [];
+
+    for (const sub of subjects) {
+        decoded.push({
+            name: sub[0],
+            type: sub[1],
+            credits: sub[2],
+            internal: { max: sub[3][0], obtained: sub[3][1] },
+            external: { max: sub[4][0], passing: sub[4][1], obtained: sub[4][2] },
+            total: { max: sub[5][0], passing: sub[5][1], obtained: sub[5][2] },
+            grade: sub[6],
+        });
+    }
+
+    return decoded;
 }

@@ -1,4 +1,4 @@
-import { decodeResult, type EncodedResult } from "@app/shared/encoder";
+import { decodeResults, type EncodedResult } from "@app/shared/encoder";
 import type { ParsedResult } from "@app/shared/types";
 import { createResource, Show } from "solid-js";
 import "./app.css";
@@ -29,7 +29,7 @@ async function decodeEmbeddedResults(base64: string): Promise<ParsedResult[]> {
     await writer.close();
 
     const encoded = JSON.parse(await decompressed) as EncodedResult[];
-    return encoded.map(decodeResult);
+    return decodeResults(encoded);
 }
 
 export default function App() {
@@ -38,21 +38,21 @@ export default function App() {
             return decodeEmbeddedResults(__EMBEDDED_RESULTS__);
         }
 
-        // const res = await fetch(
-        //     "https://raw.githubusercontent.com/Abhinav5383/sbte-result-viewer/refs/heads/main/generated/saved-results.json",
-        // );
-        // if (!res.ok) {
-        //     throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
-        // }
-        // const rawData = (await res.json()) as EncodedResult[];
-        // return rawData.map(decodeResult);
-
-        const res = await fetch("http://localhost:5500/students-data");
+        const res = await fetch(
+            "https://raw.githubusercontent.com/Abhinav5383/sbte-result-viewer/refs/heads/main/generated/saved-results.json",
+        );
         if (!res.ok) {
             throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         }
-        const data = (await res.json()) as ParsedResult[];
-        return data;
+        const rawData = (await res.json()) as EncodedResult[];
+        return decodeResults(rawData);
+
+        // const res = await fetch("http://localhost:5500/students-data");
+        // if (!res.ok) {
+        //     throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
+        // }
+        // const data = (await res.json()) as ParsedResult[];
+        // return data;
     });
 
     return (
