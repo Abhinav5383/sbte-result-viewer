@@ -78,7 +78,22 @@ export function DetailsDialog(props: DetailsDialogProps) {
             }}
             class="rounded-xl overflow-x-clip"
         >
-            <Show keyed when={props.data}>
+            <Show
+                keyed
+                when={props.data}
+                fallback={
+                    <div class="flex flex-col items-center justify-center gap-4 p-6">
+                        <span class="text-lg font-semibold text-dim-fg">Result not found</span>
+                        <button
+                            type="button"
+                            class="px-4 py-2 rounded-lg bg-accent-bg text-white font-bold hover:bg-accent-bg/90 transition-colors"
+                            onClick={closeDialog}
+                        >
+                            Close
+                        </button>
+                    </div>
+                }
+            >
                 {(data) => (
                     <div class="relative">
                         <div ref={setContentRef} class="@container">

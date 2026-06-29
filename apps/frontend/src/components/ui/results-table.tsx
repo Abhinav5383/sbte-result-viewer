@@ -12,7 +12,7 @@ import { DetailsDialog } from "./details-dialog";
 import "./results-table.css";
 
 interface ResultsListTableProps {
-    totalItems: number;
+    allResults: ParsedResult[];
     sortedResults: SortedResults;
     setSortFilter: (by: SortBy, order: SortOrder) => void;
     clearFilters: () => void;
@@ -53,7 +53,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
     function dialogData() {
         const roll = selectedRoll();
         if (!roll) return undefined;
-        return props.sortedResults.results.find((r) => r.student.roll === roll);
+        return props.allResults.find((r) => r.student.roll === roll);
     }
 
     return (
@@ -78,7 +78,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                 <div class="flex items-center text-sm text-dim-fg px-6 py-3 gap-4 border-be border-border">
                     <p>
                         Showing <span class="font-medium">{props.sortedResults.results.length}</span> of{" "}
-                        <span class="font-medium">{props.totalItems} </span>
+                        <span class="font-medium">{props.allResults.length} </span>
                         {props.sortedResults.results.length !== 1 ? "results" : "result"}
                     </p>
                     <Show when={props.anyFilterActive}>
@@ -398,7 +398,7 @@ function MobileResultRow(props: RowVariantProps) {
     return (
         // biome-ignore lint/a11y/noStaticElementInteractions: --
         <div
-            class="xl:hidden grid grid-cols-[max-content_1fr] gap-3 px-3 py-5 border-b border-border hover:bg-zinc-100 active:bg-zinc-100 cursor-pointer focus-ring"
+            class="group/row xl:hidden grid grid-cols-[max-content_1fr] gap-3 px-3 py-5 border-b border-border hover:bg-zinc-100/50 active:bg-zinc-100 cursor-pointer focus-ring"
             onClick={props.onSelect}
             onKeyDown={(e) => handleRowKbEvent(e, props.onSelect)}
             tabindex={0}
@@ -420,7 +420,7 @@ function MobileResultRow(props: RowVariantProps) {
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="flex items-center justify-center flex-col bg-zinc-50 p-3 rounded-lg border border-zinc-200">
+                    <div class="flex items-center justify-center flex-col bg-zinc-50/50 p-3 rounded-lg border border-zinc-200">
                         <span class="text-dim-fg font-medium uppercase text-xs opacity-70">Marks Obtained</span>
 
                         <div class="text-dim-fg text-xs">
@@ -432,19 +432,14 @@ function MobileResultRow(props: RowVariantProps) {
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-center flex-col bg-zinc-50 p-3 rounded-lg border border-zinc-200">
+                    <div class="flex items-center justify-center flex-col bg-zinc-50/50 p-3 rounded-lg border border-zinc-200">
                         <span class="text-dim-fg font-medium uppercase text-xs opacity-70">SGPA</span>
                         <span class={cn(props.sgpaClassName, "font-semibold text-lg")}>{props.item.sgpa}</span>
                     </div>
                 </div>
 
-                <div
-                    class="text-[0.67rem] text-accent-fg/70 flex items-center"
-                    style={{
-                        "justify-self": "end",
-                    }}
-                >
-                    <span class="trim-both hover:underline">Details</span>
+                <div class="text-[0.67rem] text-dim-fg/60 flex items-center justify-self-end group-hover/row:underline group-hover/row:text-accent-fg">
+                    <span class="trim-both">Details</span>
                     <ChevronRightIcon class="w-[1.3em] h-[1.3em]" />
                 </div>
             </div>

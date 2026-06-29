@@ -34,7 +34,11 @@ enum FilterParams {
 }
 
 export function ResultListPage(props: ResultListPageProps) {
-    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams, _setSearchParams] = useSearchParams();
+
+    const setSearchParams: typeof _setSearchParams = (params, options) => {
+        _setSearchParams(params, { replace: true, ...options });
+    };
 
     const searchBy = () => getValidEntry(searchParams[FilterParams.SEARCH_BY], SearchBy, SearchBy.Name);
     function setSearchBy(newVal: SearchBy) {
@@ -414,7 +418,7 @@ export function ResultListPage(props: ResultListPageProps) {
                 clearFilters={clearFilters}
                 anyFilterActive={anyFilterActive()}
                 sortedResults={sortedResults()}
-                totalItems={props.studentResultList.length}
+                allResults={props.studentResultList}
                 maxStrSizes={indexedData().maxStrSizes}
                 showCollegeColumn={!college()}
             />
