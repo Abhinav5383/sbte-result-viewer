@@ -1,4 +1,4 @@
-import { BRANCH_CODES, type BRANCH_NAME, type BranchConfig, COLLEGE_CODES } from "@app/shared/types";
+import { BRANCH, type BranchConfig, COLLEGE } from "@app/shared/types";
 import { numRange } from "~/lib/utils";
 
 export const ROLL_LIST = [...numRange(1, 120), ...numRange(301, 310), ...numRange(351, 360)];
@@ -23,7 +23,7 @@ const semestersList = [
 export function getAllCollegeBranches() {
     const allBranches: BranchConfig[] = [];
 
-    for (const collegeCode of Object.values(COLLEGE_CODES)) {
+    for (const collegeCode of Object.values(COLLEGE)) {
         if (!collegeCode) continue;
 
         const collegeBranches = getCollegeBranches(collegeCode, semestersList);
@@ -47,12 +47,11 @@ export function getCollegeBranches(collegeCode: number, semesters = semestersLis
 function getBranches_ForSemester(collegeCode: number, semester: number, admissionYear: number) {
     const branchConfigs: BranchConfig[] = [];
 
-    for (const [branch, branchCode] of Object.entries(BRANCH_CODES)) {
+    for (const branchCode of Object.values(BRANCH)) {
         branchConfigs.push({
-            branchName: branch as BRANCH_NAME,
+            branchCode: branchCode,
             semester: semester,
             collegeCode: collegeCode,
-            branchCode: branchCode,
             admissionYear: admissionYear,
             rollList: ROLL_LIST,
         });

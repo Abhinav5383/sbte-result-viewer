@@ -1,27 +1,27 @@
-import { BRANCH_CODES, BRANCH_NAME, COLLEGE_CODES, COLLEGE_NAME } from "./types";
+import { BRANCH, COLLEGE } from "./types";
 
-export function getCollegeFromRoll(code: string): COLLEGE_NAME {
-    const collegeCode = code.substring(2, 5);
+export function getCollegeFromRoll(code: string): COLLEGE {
+    const collegeCode = Number.parseInt(code.substring(2, 5), 10);
 
-    for (const [name, ccode] of Object.entries(COLLEGE_CODES)) {
-        if (ccode.toString() === collegeCode) {
-            return name as COLLEGE_NAME;
+    for (const ccode of Object.values(COLLEGE)) {
+        if (ccode === collegeCode) {
+            return ccode;
         }
     }
 
-    return COLLEGE_NAME.UNKNOWN;
+    return COLLEGE.UNKNOWN;
 }
 
-export function getBranchFromRoll(code: string): BRANCH_NAME {
-    const branchCode = code.substring(5, 7);
+export function getBranchFromRoll(code: string): BRANCH {
+    const branchCode = Number.parseInt(code.substring(5, 7), 10);
 
-    for (const [name, bcode] of Object.entries(BRANCH_CODES)) {
-        if (bcode.toString() === branchCode) {
-            return name as BRANCH_NAME;
+    for (const bcode of Object.values(BRANCH)) {
+        if (bcode === branchCode) {
+            return bcode;
         }
     }
 
-    return BRANCH_NAME.UNKNOWN;
+    return BRANCH.UNKNOWN;
 }
 
 export function getSessionFromRoll(code: string): string {

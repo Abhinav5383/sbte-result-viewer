@@ -8,6 +8,15 @@ interface ResultsContext {
 }
 const resultsContext = createContext<ResultsContext>();
 
+export function useResults(): ResultsContext {
+    const context = useContext(resultsContext);
+    if (!context) {
+        throw new Error("useResults must be used within a ResultsProvider");
+    }
+
+    return context;
+}
+
 export function ResultsProvider(props: { children: JSX.Element }) {
     const [results, { refetch }] = createResource(async (): Promise<ParsedResult[]> => {
         if (typeof __EMBEDDED_RESULTS__ !== "undefined") {
@@ -32,15 +41,6 @@ export function ResultsProvider(props: { children: JSX.Element }) {
             {props.children}
         </resultsContext.Provider>
     );
-}
-
-export function useResults(): ResultsContext {
-    const context = useContext(resultsContext);
-    if (!context) {
-        throw new Error("useResults must be used within a ResultsProvider");
-    }
-
-    return context;
 }
 
 // Declare the global embedded data (injected at build time) - gzip+base64 encoded string

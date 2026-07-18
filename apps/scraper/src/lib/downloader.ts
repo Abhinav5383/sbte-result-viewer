@@ -1,5 +1,5 @@
 import { apiUrl } from "@app/shared/consts";
-import type { BranchConfig, ParsedResult } from "@app/shared/types";
+import { BRANCH_NAME, type BranchConfig, type ParsedResult } from "@app/shared/types";
 import { getCollegeFromRoll } from "@app/shared/utils";
 import { getInvalidRolls, saveInvalidRolls } from "~/lib/fs/invalid-rolls";
 import { getSavedResults, saveResults } from "~/lib/fs/saved-results";
@@ -86,7 +86,7 @@ export async function parseAllStudentsData(
     console.log(
         `Fetching results for ${filteredRolls.length} students in ${getCollegeFromRoll(
             filteredRolls[0],
-        )} ${branch.branchName} branch...`,
+        )} ${BRANCH_NAME[branch.branchCode]} branch...`,
     );
 
     const newInvalidRolls: string[] = [];
@@ -115,7 +115,7 @@ export async function parseAllStudentsData(
         await Promise.all(fetchPromises);
     }
     console.log(
-        `Fetched ${newResults.length} results for ${getCollegeFromRoll(filteredRolls[0])} ${branch.branchName} branch\n`,
+        `Fetched ${newResults.length} results for ${getCollegeFromRoll(filteredRolls[0])} ${BRANCH_NAME[branch.branchCode]} branch\n`,
     );
 
     return { requestedResults, newResults, newInvalidRolls };

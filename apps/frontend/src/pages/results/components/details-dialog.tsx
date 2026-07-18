@@ -1,5 +1,12 @@
 import { apiUrl } from "@app/shared/consts";
-import { COLLEGE_FULL_NAME, PAPER_TYPE, type ParsedResult, type SubjectResult } from "@app/shared/types";
+import {
+    BRANCH_NAME,
+    COLLEGE_FULL_NAME,
+    PAPER_NAME,
+    PAPER_TYPE,
+    type ParsedResult,
+    type SubjectResult,
+} from "@app/shared/types";
 import { toPng } from "html-to-image";
 import CheckIcon from "lucide-solid/icons/check";
 import ClipboardIcon from "lucide-solid/icons/clipboard";
@@ -27,6 +34,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
     const [previewOpen, setPreviewOpen] = createSignal(false);
 
     function closeDialog() {
+        console.log(props.data);
         props.onClose();
     }
 
@@ -102,9 +110,9 @@ export function DetailsDialog(props: DetailsDialogProps) {
                                     <div class="flex flex-wrap items-center gap-3">
                                         <h1 class="text-3xl font-extrabold">{data.student.name}</h1>
                                         <span
-                                            class={`branch-badge ${data.student.branch.toLowerCase()} inline-block ps-2 pe-0.5 rounded-lg text-sm`}
+                                            class={`branch-badge ${BRANCH_NAME[data.student.branch].toLowerCase()} inline-block ps-2 pe-0.5 rounded-lg text-sm`}
                                         >
-                                            {data.student.branch}
+                                            {BRANCH_NAME[data.student.branch]}
                                             <em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 rounded-md">
                                                 {data.student.roll.charAt(0)}
                                                 {OrdinalSuffix(data.student.roll.charAt(0))} sem
@@ -114,7 +122,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                                         <Show when={data.cgpa}>
                                             {(cgpa) => (
                                                 <span
-                                                    class={`branch-badge ${data.student.branch.toLowerCase()} inline-block ps-2 pe-0.5 rounded-lg text-sm`}
+                                                    class={`branch-badge ${BRANCH_NAME[data.student.branch].toLowerCase()} inline-block ps-2 pe-0.5 rounded-lg text-sm`}
                                                 >
                                                     CGPA
                                                     <em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 rounded-md">
@@ -189,20 +197,14 @@ export function DetailsDialog(props: DetailsDialogProps) {
                                 </div>
 
                                 <div class="grid gap-6">
-                                    <SubjectCategory
-                                        title={PAPER_TYPE.THEORY.toLowerCase()}
-                                        subjects={data.subjects.filter((sub) => sub.type === PAPER_TYPE.THEORY)}
-                                    />
-
-                                    <SubjectCategory
-                                        title={PAPER_TYPE.PRACTICAL.toLowerCase()}
-                                        subjects={data.subjects.filter((sub) => sub.type === PAPER_TYPE.PRACTICAL)}
-                                    />
-
-                                    <SubjectCategory
-                                        title={PAPER_TYPE.TERM_WORK.toLowerCase().replace("_", " ")}
-                                        subjects={data.subjects.filter((sub) => sub.type === PAPER_TYPE.TERM_WORK)}
-                                    />
+                                    <For each={Object.values(PAPER_TYPE)}>
+                                        {(paperType) => (
+                                            <SubjectCategory
+                                                title={PAPER_NAME[paperType]}
+                                                subjects={data.subjects.filter((sub) => sub.type === paperType)}
+                                            />
+                                        )}
+                                    </For>
                                 </div>
                             </div>
                         </div>

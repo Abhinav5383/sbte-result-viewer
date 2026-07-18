@@ -1,9 +1,9 @@
 import { decodeResults, type EncodedResult } from "@app/shared/encoder";
-import { BRANCH_NAME, COLLEGE_NAME, PAPER_TYPE, type ParsedResult } from "@app/shared/types";
+import { BRANCH, COLLEGE, PAPER_TYPE, type ParsedResult } from "@app/shared/types";
 
 interface Props {
-    college: COLLEGE_NAME;
-    branch: BRANCH_NAME;
+    college: COLLEGE;
+    branch: BRANCH;
     semester: string;
 }
 
@@ -58,8 +58,8 @@ async function getCSV(props: Props) {
 }
 
 await getCSV({
-    college: COLLEGE_NAME.NGP_PATNA_13,
-    branch: BRANCH_NAME.CSE,
+    college: COLLEGE.NGP_PATNA_13,
+    branch: BRANCH.CSE,
     semester: "2",
 });
 process.exit(0);

@@ -1,4 +1,4 @@
-import type { ParsedResult } from "@app/shared/types";
+import { BRANCH_NAME, COLLEGE_NAME, type ParsedResult } from "@app/shared/types";
 import { useSearchParams } from "@solidjs/router";
 import ArrowDownWideNarrow from "lucide-solid/icons/arrow-down-wide-narrow";
 import ArrowUpWideNarrow from "lucide-solid/icons/arrow-up-wide-narrow";
@@ -344,13 +344,17 @@ function MobileResultRow(props: RowVariantProps) {
             <div class="grid gap-2">
                 <div class="flex items-center gap-x-2">
                     <span class="font-semibold text-lg leading-tight truncate">{props.item.student.name}</span>
-                    <BranchBadge branch={props.item.student.branch} semester={props.semester} class="text-xs" />
+                    <BranchBadge
+                        branch={BRANCH_NAME[props.item.student.branch]}
+                        semester={props.semester}
+                        class="text-xs"
+                    />
                 </div>
 
                 <div class="flex items-center gap-2">
                     <span class="text-sm text-dim-fg">{props.item.student.roll}</span>
                     <span class="text-xs opacity-50">•</span>
-                    <span class="text-sm text-dim-fg">{props.item.student.college}</span>
+                    <span class="text-sm text-dim-fg">{COLLEGE_NAME[props.item.student.college]}</span>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -414,17 +418,17 @@ function DesktopResultRow(props: RowVariantProps) {
             <span class={cn("saturate-70", props.sgpaClassName)}>{props.formattedSgpa}</span>
 
             <div class="block">
-                <BranchBadge branch={props.item.student.branch} semester={props.semester} />
+                <BranchBadge branch={BRANCH_NAME[props.item.student.branch]} semester={props.semester} />
             </div>
 
             <Show when={props.showCollege}>
-                <span class="text-dim-fg text-sm truncate">{props.item.student.college}</span>
+                <span class="text-dim-fg text-sm truncate">{COLLEGE_NAME[props.item.student.college]}</span>
             </Show>
         </div>
     );
 }
 
-function BranchBadge(props: { branch: string; semester: string; class?: string }) {
+function BranchBadge(props: { branch: BRANCH_NAME; semester: string; class?: string }) {
     return (
         <span
             class={cn(

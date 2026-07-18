@@ -127,8 +127,8 @@ export function useResultsFilter(results: ParsedResult[], defaultOps?: Partial<t
         const filtered: ParsedResult[] = [];
 
         for (const item of fullList) {
-            if (hasCollegeFilter && item.student.college !== filterValues.college) continue;
-            if (hasBranchFilter && item.student.branch !== filterValues.branch) continue;
+            if (hasCollegeFilter && COLLEGE_NAME[item.student.college] !== filterValues.college) continue;
+            if (hasBranchFilter && BRANCH_NAME[item.student.branch] !== filterValues.branch) continue;
             if (hasSemesterFilter && item.student.roll.charAt(0) !== filterValues.semester) continue;
             if (hasSessionFilter && getSessionFromRoll(item.student.roll) !== filterValues.admissionYear) continue;
 

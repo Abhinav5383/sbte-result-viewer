@@ -1,4 +1,4 @@
-import { BRANCH_NAME, COLLEGE_NAME, PAPER_TYPE, type ParsedResult, type SubjectResult } from "@app/shared/types";
+import { BRANCH, COLLEGE, PAPER_TYPE, type ParsedResult, type SubjectResult } from "@app/shared/types";
 import { getCollegeFromRoll } from "@app/shared/utils";
 
 export function parseTxtToJson(txt: string): ParsedResult {
@@ -8,8 +8,8 @@ export function parseTxtToJson(txt: string): ParsedResult {
         student: {
             name: "",
             roll: "",
-            branch: BRANCH_NAME.UNKNOWN,
-            college: COLLEGE_NAME.UNKNOWN,
+            branch: BRANCH.UNKNOWN,
+            college: COLLEGE.UNKNOWN,
         },
         grandTotal: {
             maximum: 0,
@@ -204,14 +204,14 @@ function parseMarks(marks: string) {
 function mapBranchStrToEnum(_str: string) {
     const str = _str.toLowerCase().trim();
 
-    if (str.includes("civil")) return BRANCH_NAME.CIVIL;
-    if (str.includes("computer")) return BRANCH_NAME.CSE;
-    if (str.includes("electrical")) return BRANCH_NAME.ELECTRICAL;
-    if (str.includes("electronics")) return BRANCH_NAME.ELECTRONICS;
-    if (str.includes("automobile")) return BRANCH_NAME.AUTOMOBILE;
-    if (str.includes("mechanical")) return BRANCH_NAME.MECHANICAL;
+    if (str.includes("civil")) return BRANCH.CIVIL;
+    if (str.includes("computer")) return BRANCH.CSE;
+    if (str.includes("electrical")) return BRANCH.ELECTRICAL;
+    if (str.includes("electronics")) return BRANCH.ELECTRONICS;
+    if (str.includes("automobile")) return BRANCH.AUTOMOBILE;
+    if (str.includes("mechanical")) return BRANCH.MECHANICAL;
 
-    return BRANCH_NAME.UNKNOWN;
+    return BRANCH.UNKNOWN;
 }
 
 function getGradePoint(grade: string): number {
