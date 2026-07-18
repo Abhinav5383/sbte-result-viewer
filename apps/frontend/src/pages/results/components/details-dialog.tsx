@@ -34,7 +34,6 @@ export function DetailsDialog(props: DetailsDialogProps) {
     const [previewOpen, setPreviewOpen] = createSignal(false);
 
     function closeDialog() {
-        console.log(props.result);
         props.onClose();
     }
 

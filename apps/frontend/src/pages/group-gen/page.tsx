@@ -28,7 +28,5 @@ export default function GroupGeneratorPage() {
         return list;
     });
 
-    console.log(studentsList.length);
-
     return <p>Group Generator</p>;
 }
