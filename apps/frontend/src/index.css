@@ -28,6 +28,7 @@
 html,
 body {
     @apply font-body;
+    scrollbar-width: thin;
     scrollbar-gutter: stable;
     background-color: var(--color-zinc-50);
 }

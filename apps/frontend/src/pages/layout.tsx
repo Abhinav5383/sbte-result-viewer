@@ -2,7 +2,7 @@ import Navbar from "~/components/navbar";
 
 export default function RootLayout(props: { children: Element }) {
     return (
-        <div class="grid grid-rows-[min-content_1fr_min-content]">
+        <div class=" min-h-screen grid grid-rows-[min-content_1fr_min-content]">
             <Navbar />
             {props.children}
             <Footer />
