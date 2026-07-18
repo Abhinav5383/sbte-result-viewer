@@ -27,3 +27,7 @@ export function getBranchFromRoll(code: string): BRANCH_NAME {
 export function getSessionFromRoll(code: string): string {
     return code.substring(7, 9);
 }
+
+export function getRegNoFromRoll(roll: string) {
+    return roll.slice(2);
+}

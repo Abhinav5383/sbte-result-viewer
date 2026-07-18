@@ -1,3 +1,4 @@
+import { A } from "@solidjs/router";
 import GithubIcon from "~/components/icons/github";
 
 import "./styles.css";
@@ -22,15 +23,27 @@ export default function Navbar() {
     return (
         <header class="page-header grid py-4" ref={(el) => (headerRef = el)}>
             <nav class="flex items-center justify-between gap-x-4 flex-wrap px-8 text-accent-bg-text">
-                <span class="font-extrabold text-2xl">SBTE Exam Results</span>
+                <A
+                    href="/"
+                    style="color: unset; text-decoration: unset;"
+                    onMouseEnter={handleMouseEnter}
+                    onFocus={handleMouseEnter}
+                >
+                    <span class="font-extrabold text-2xl">SBTE Exam Results</span>
+                </A>
 
                 <div class="links flex flex-wrap justify-center items-center">
-                    <a href="#results" class="nav-target" onMouseEnter={handleMouseEnter} onFocus={handleMouseEnter}>
-                        Results
-                    </a>
-                    <a href="#about" class="nav-target" onMouseEnter={handleMouseEnter} onFocus={handleMouseEnter}>
+                    <A
+                        href="/group-creator"
+                        class="nav-target"
+                        onMouseEnter={handleMouseEnter}
+                        onFocus={handleMouseEnter}
+                    >
+                        Group Creator
+                    </A>
+                    <A href="/#about" class="nav-target" onMouseEnter={handleMouseEnter} onFocus={handleMouseEnter}>
                         About
-                    </a>
+                    </A>
 
                     <a
                         target="_blank"

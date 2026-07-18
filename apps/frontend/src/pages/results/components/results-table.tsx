@@ -3,13 +3,14 @@ import { useSearchParams } from "@solidjs/router";
 import ArrowDownWideNarrow from "lucide-solid/icons/arrow-down-wide-narrow";
 import ArrowUpWideNarrow from "lucide-solid/icons/arrow-up-wide-narrow";
 import ChevronUpIcon from "lucide-solid/icons/chevron-up";
-import { batch, createEffect, createMemo, createSignal, For, onCleanup, onMount, Show } from "solid-js";
+import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { ChevronRightIcon } from "~/components/icons/chevron-right";
+import { cn, OrdinalSuffix } from "~/components/utils";
 import { marksClass, sgpaClass } from "~/lib/grade-utils";
 import { SortBy, SortOrder } from "~/lib/types";
-import { cn, OrdinalSuffix } from "../utils";
 import { DetailsDialog } from "./details-dialog";
 import "./results-table.css";
+import VirtualList from "~/components/misc/virtual-list";
 
 interface ResultsListTableProps {
     allResults: ParsedResult[];
@@ -224,112 +225,45 @@ interface ResultTableContentsProps {
     showCollege: boolean;
 }
 
+const DEFAULT_ROW_HEIGHT = 52;
 function ResultTableContents(props: ResultTableContentsProps) {
-    const DEFAULT_ROW_HEIGHT = 52;
-
     const [scrollToTopVisible, setScrollToTopVisible] = createSignal(false);
-    const [rowHeight, setRowHeight] = createSignal<number>(DEFAULT_ROW_HEIGHT);
-    const [containerRef, setContainerRef] = createSignal<HTMLDivElement | undefined>();
-    const [visibleIndices, setVisibleIndices] = createSignal({
-        start: 0,
-        end: 0,
-    });
 
-    function handleResize(parent: HTMLDivElement) {
-        const row = parent.querySelector<HTMLDivElement>(".result-row");
-        if (!row) return;
-
-        const height = row.getBoundingClientRect().height;
-        if (height && height !== rowHeight()) {
-            setRowHeight(height);
-            handleScroll(undefined, height);
+    function handleScroll() {
+        if (
+            window.scrollY > window.innerHeight * 4 &&
+            document.body.scrollHeight - window.scrollY > 3 * window.innerHeight
+        ) {
+            setScrollToTopVisible(true);
+        } else {
+            setScrollToTopVisible(false);
         }
-    }
-
-    function handleScroll(_e?: Event, rHeight = rowHeight()) {
-        const scrollContainer = containerRef();
-
-        const containerTop = scrollContainer?.getBoundingClientRect().top ?? 0;
-        const containerYScroll = Math.max(0, -containerTop);
-
-        const startIndex = Math.floor(containerYScroll / rHeight);
-        const endIndex = Math.ceil((containerYScroll + window.innerHeight) / rHeight);
-
-        const overscan = Math.max(30, endIndex - startIndex); // overscan by one viewport height
-        const adjustedStartIndex = Math.max(0, startIndex - overscan);
-        const adjustedEndIndex = Math.min(props.sortedResults.results.length - 1, endIndex + overscan);
-
-        batch(() => {
-            setVisibleIndices({ start: adjustedStartIndex, end: adjustedEndIndex });
-
-            if (
-                window.scrollY > window.innerHeight * 4 &&
-                document.body.scrollHeight - window.scrollY > 3 * window.innerHeight
-            ) {
-                setScrollToTopVisible(true);
-            } else {
-                setScrollToTopVisible(false);
-            }
-        });
     }
 
     onMount(() => {
+        handleScroll();
         window.addEventListener("scroll", handleScroll, { passive: true });
-
-        const container = containerRef();
-        let observer: ResizeObserver | null = null;
-        if (container) {
-            observer = new ResizeObserver(() => handleResize(container));
-            observer.observe(container);
-            handleResize(container);
-        }
 
         onCleanup(() => {
             window.removeEventListener("scroll", handleScroll);
-            if (observer) observer.disconnect();
         });
-    });
-
-    createEffect(() => {
-        const paddingTop = visibleIndices().start * rowHeight();
-        const paddingBottom = (props.sortedResults.results.length - (visibleIndices().end + 1)) * rowHeight();
-
-        const el = containerRef();
-        if (el) {
-            el.style.paddingTop = `${paddingTop}px`;
-            el.style.paddingBottom = `${paddingBottom}px`;
-        }
-    });
-
-    createEffect(() => {
-        props.sortedResults.results;
-        handleScroll();
-    });
-
-    // computed values
-    const visibleItems = createMemo(() => {
-        const items = [];
-        for (let i = visibleIndices().start; i <= visibleIndices().end; i++) {
-            const item = props.sortedResults.results[i];
-            if (item) items.push(item);
-        }
-        return items;
     });
 
     return (
         <>
-            <div ref={setContainerRef} class="grid col-span-full grid-cols-subgrid">
-                <For each={visibleItems()}>
-                    {(item, index) => (
-                        <ResultRow
-                            item={item}
-                            index={visibleIndices().start + index()}
-                            onSelect={() => props.onSelect(item.student.roll)}
-                            showCollege={props.showCollege}
-                        />
-                    )}
-                </For>
-            </div>
+            <VirtualList
+                defaultRowHeight={DEFAULT_ROW_HEIGHT}
+                items={props.sortedResults.results}
+                containerProps={{ class: "grid col-span-full grid-cols-subgrid" }}
+                RowComponent={(args) => (
+                    <ResultRow
+                        item={args.item}
+                        index={args.index}
+                        onSelect={() => props.onSelect(args.item.student.roll)}
+                        showCollege={props.showCollege}
+                    />
+                )}
+            />
 
             <div
                 class="fixed bottom-4 inset-e-4 z-50"
