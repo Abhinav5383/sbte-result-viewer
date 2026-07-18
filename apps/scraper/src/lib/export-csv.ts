@@ -1,4 +1,4 @@
-import { decodeResults, type EncodedResult } from "@app/shared/encoder";
+import { decodeResults, type EncodedData } from "@app/shared/encoder";
 import { BRANCH, COLLEGE, PAPER_TYPE, type ParsedResult } from "@app/shared/types";
 
 interface Props {
@@ -66,7 +66,7 @@ process.exit(0);
 
 async function getParsedResults() {
     const results = Bun.file("./generated/saved-results.json");
-    return decodeResults(JSON.parse(await results.text()) as EncodedResult[]);
+    return decodeResults(JSON.parse(await results.text()) as EncodedData);
 }
 
 function escapeStr(str: string) {

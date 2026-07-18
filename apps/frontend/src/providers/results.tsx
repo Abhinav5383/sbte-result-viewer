@@ -1,9 +1,8 @@
-import { decodeResults, type EncodedResult } from "@app/shared/encoder";
-import type { ParsedResult } from "@app/shared/types";
+import type { EncodedData } from "@app/shared/encoder";
 import { createContext, createResource, type JSX, type Resource, useContext } from "solid-js";
 
 interface ResultsContext {
-    results: Resource<ParsedResult[]>;
+    data: Resource<EncodedData>;
     refetch: () => void;
 }
 const resultsContext = createContext<ResultsContext>();
@@ -18,7 +17,7 @@ export function useResults(): ResultsContext {
 }
 
 export function ResultsProvider(props: { children: JSX.Element }) {
-    const [results, { refetch }] = createResource(async (): Promise<ParsedResult[]> => {
+    const [results, { refetch }] = createResource(async (): Promise<EncodedData> => {
         if (typeof __EMBEDDED_RESULTS__ !== "undefined") {
             return decodeEmbeddedResults(__EMBEDDED_RESULTS__);
         }
@@ -27,14 +26,14 @@ export function ResultsProvider(props: { children: JSX.Element }) {
         if (!res.ok) {
             throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
         }
-        const data = (await res.json()) as EncodedResult[];
-        return decodeResults(data);
+        const data = (await res.json()) as EncodedData;
+        return data;
     });
 
     return (
         <resultsContext.Provider
             value={{
-                results,
+                data: results,
                 refetch,
             }}
         >
@@ -46,7 +45,7 @@ export function ResultsProvider(props: { children: JSX.Element }) {
 // Declare the global embedded data (injected at build time) - gzip+base64 encoded string
 declare const __EMBEDDED_RESULTS__: string | undefined;
 
-async function decodeEmbeddedResults(base64: string): Promise<ParsedResult[]> {
+async function decodeEmbeddedResults(base64: string): Promise<EncodedData> {
     if (typeof DecompressionStream === "undefined") {
         throw new Error("DecompressionStream is not supported in this browser");
     }
@@ -66,6 +65,6 @@ async function decodeEmbeddedResults(base64: string): Promise<ParsedResult[]> {
     await writer.write(bytes);
     await writer.close();
 
-    const encoded = JSON.parse(await decompressed) as EncodedResult[];
-    return decodeResults(encoded);
+    const encoded = JSON.parse(await decompressed) as EncodedData;
+    return encoded;
 }

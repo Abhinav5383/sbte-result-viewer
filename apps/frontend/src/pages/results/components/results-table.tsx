@@ -1,3 +1,4 @@
+import { decodeResult, type EncodedData, EncodedResult, type EncodedResultT } from "@app/shared/encoder";
 import { BRANCH_NAME, COLLEGE_NAME, type ParsedResult } from "@app/shared/types";
 import { useSearchParams } from "@solidjs/router";
 import ArrowDownWideNarrow from "lucide-solid/icons/arrow-down-wide-narrow";
@@ -5,15 +6,17 @@ import ArrowUpWideNarrow from "lucide-solid/icons/arrow-up-wide-narrow";
 import ChevronUpIcon from "lucide-solid/icons/chevron-up";
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { ChevronRightIcon } from "~/components/icons/chevron-right";
+import VirtualList from "~/components/misc/virtual-list";
 import { cn, OrdinalSuffix } from "~/components/utils";
 import { marksClass, sgpaClass } from "~/lib/grade-utils";
 import { SortBy, SortOrder } from "~/lib/types";
 import { DetailsDialog } from "./details-dialog";
+
 import "./results-table.css";
-import VirtualList from "~/components/misc/virtual-list";
+import { getVal } from "@app/shared/encoder/helpers";
 
 interface ResultsListTableProps {
-    allResults: ParsedResult[];
+    resultsData: EncodedData;
     sortedResults: SortedResults;
     setSortFilter: (by: SortBy, order: SortOrder) => void;
     clearFilters: () => void;
@@ -29,7 +32,7 @@ interface ResultsListTableProps {
 }
 
 interface SortedResults {
-    results: ParsedResult[];
+    results: EncodedResultT[];
     sortedBy: SortBy;
     sortOrder: SortOrder;
 }
@@ -54,7 +57,11 @@ export function ResultsListTable(props: ResultsListTableProps) {
     function dialogData() {
         const roll = selectedRoll();
         if (!roll) return undefined;
-        return props.allResults.find((r) => r.student.roll === roll);
+
+        const r = props.resultsData.results.find((r) => getVal(r, "roll") === roll);
+        if (!r) return undefined;
+
+        return decodeResult(r, props.resultsData);
     }
 
     return (
@@ -79,7 +86,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                 <div class="flex items-center text-sm text-dim-fg px-6 py-3 gap-4 border-be border-border">
                     <p>
                         Showing <span class="font-medium">{props.sortedResults.results.length}</span> of{" "}
-                        <span class="font-medium">{props.allResults.length} </span>
+                        <span class="font-medium">{props.resultsData.results.length} </span>
                         {props.sortedResults.results.length !== 1 ? "results" : "result"}
                     </p>
                     <Show when={props.anyFilterActive}>
@@ -156,11 +163,12 @@ export function ResultsListTable(props: ResultsListTableProps) {
                         sortedResults={props.sortedResults}
                         onSelect={setSelectedRoll}
                         showCollege={props.showCollegeColumn}
+                        resultsData={props.resultsData}
                     />
                 </div>
             </Show>
 
-            <DetailsDialog open={dialogOpen()} onClose={closeDialog} data={dialogData()} />
+            <DetailsDialog open={dialogOpen()} onClose={closeDialog} result={dialogData()} />
         </div>
     );
 }
@@ -223,6 +231,7 @@ interface ResultTableContentsProps {
     sortedResults: SortedResults;
     onSelect: (roll: string) => void;
     showCollege: boolean;
+    resultsData: EncodedData;
 }
 
 const DEFAULT_ROW_HEIGHT = 52;
@@ -257,9 +266,9 @@ function ResultTableContents(props: ResultTableContentsProps) {
                 containerProps={{ class: "grid col-span-full grid-cols-subgrid" }}
                 RowComponent={(args) => (
                     <ResultRow
-                        item={args.item}
+                        item={decodeResult(args.item, props.resultsData)}
                         index={args.index}
-                        onSelect={() => props.onSelect(args.item.student.roll)}
+                        onSelect={() => props.onSelect(decodeResult(args.item, props.resultsData).student.roll)}
                         showCollege={props.showCollege}
                     />
                 )}

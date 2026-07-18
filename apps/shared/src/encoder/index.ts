@@ -1,71 +1,76 @@
-import type { PAPER_TYPE, ParsedResult, SubjectResult } from "../types";
+import type { ParsedResult, SubjectResult } from "../types";
 import { getBranchFromRoll, getCollegeFromRoll } from "../utils";
-import type { SchemaToTuple } from "./helpers";
+import { getVal, getValSub, mapToArray } from "./helpers";
+import { type EncodedResultT, EncodedSubject, type EncodedSubjectT } from "./schema";
 
-export type EncodedResult = SchemaToTuple<typeof EncodedResult>;
-export const EncodedResult = {
-    name: { loc: 0, _type: 0 as unknown as string },
-    roll: { loc: 1, _type: 0 as unknown as string },
-    grandTotalMax: { loc: 2, _type: 0 as unknown as number },
-    grandTotalPassing: { loc: 3, _type: 0 as unknown as number },
-    grandTotalObtained: { loc: 4, _type: 0 as unknown as number },
-    subjects: { loc: 5, _type: 0 as unknown as EncodedSubject[] },
-    sgpa: { loc: 6, _type: 0 as unknown as number },
-    cgpa: { loc: 7, _type: 0 as unknown as null | number },
-    remarks: { loc: 8, _type: 0 as unknown as string },
-} as const;
+export * from "./schema";
 
-export function encodeResults(results: ParsedResult[]): EncodedResult[] {
-    const encoded: EncodedResult[] = [];
+export type EncodedData = ReturnType<typeof encodeResults>;
+
+export function encodeResults(results: ParsedResult[]) {
+    const encoded: EncodedResultT[] = [];
+    const subNames: EncodeDict = {
+        strToIdx: new Map(),
+        idxToStr: new Map(),
+        index: 0,
+    };
+    const remarksTables: EncodeDict = {
+        strToIdx: new Map(),
+        idxToStr: new Map(),
+        index: 0,
+    };
 
     for (const result of results) {
+        let currRemarkId = remarksTables.strToIdx.get(result.remarks);
+        if (currRemarkId === undefined) {
+            currRemarkId = remarksTables.index;
+
+            remarksTables.strToIdx.set(result.remarks, remarksTables.index);
+            remarksTables.idxToStr.set(remarksTables.index, result.remarks);
+            remarksTables.index++;
+        }
+
         encoded.push([
             result.student.name,
             result.student.roll,
             result.grandTotal.maximum,
             result.grandTotal.passing,
             result.grandTotal.obtained,
-            encodeSubjects(result.subjects),
+            encodeSubjects(result.subjects, subNames),
             result.sgpa,
             result.cgpa,
-            result.remarks,
+            currRemarkId,
         ]);
     }
 
-    return encoded;
+    return {
+        results: encoded,
+        subjects: mapToArray(subNames.idxToStr),
+        remarks: mapToArray(remarksTables.idxToStr),
+    };
 }
 
-export type EncodedSubject = SchemaToTuple<typeof EncodedSubject>;
-export const EncodedSubject = {
-    name: { loc: 0, _type: 0 as unknown as string },
-    type: { loc: 1, _type: 0 as unknown as PAPER_TYPE },
-    credits: { loc: 2, _type: 0 as unknown as number },
-
-    internalMax: { loc: 3, _type: 0 as unknown as number },
-    internalObtained: { loc: 4, _type: 0 as unknown as number },
-
-    externalMax: { loc: 5, _type: 0 as unknown as number },
-    externalPassing: { loc: 6, _type: 0 as unknown as number },
-    externalObtained: { loc: 7, _type: 0 as unknown as number },
-
-    totalMax: { loc: 8, _type: 0 as unknown as number },
-    totalPassing: { loc: 9, _type: 0 as unknown as number },
-    totalObtained: { loc: 10, _type: 0 as unknown as number },
-
-    grade: { loc: 11, _type: 0 as unknown as string },
-} as const;
-
-export interface SubjectDataDicts {
-    subName: Map<number, string>;
-    subType: Map<number, PAPER_TYPE>;
+interface EncodeDict {
+    strToIdx: Map<string, number>;
+    idxToStr: Map<number, string>;
+    index: number;
 }
 
-function encodeSubjects(subjects: SubjectResult[]): EncodedSubject[] {
-    const encoded: EncodedSubject[] = [];
+function encodeSubjects(subjects: SubjectResult[], tables: EncodeDict): EncodedSubjectT[] {
+    const encoded: EncodedSubjectT[] = [];
 
     for (const subject of subjects) {
+        let currSubId = tables.strToIdx.get(subject.name);
+        if (currSubId === undefined) {
+            currSubId = tables.index;
+
+            tables.strToIdx.set(subject.name, tables.index);
+            tables.idxToStr.set(tables.index, subject.name);
+            tables.index++;
+        }
+
         encoded.push([
-            subject.name,
+            currSubId,
             subject.type,
             subject.credits,
 
@@ -89,58 +94,68 @@ function encodeSubjects(subjects: SubjectResult[]): EncodedSubject[] {
 
 // ================ DECODERS ================
 
-export function decodeResults(results: EncodedResult[]) {
+export function decodeResults(data: EncodedData) {
     const decoded: ParsedResult[] = [];
-    const schema = EncodedResult;
 
-    for (const res of results) {
-        const roll = res[schema.roll.loc];
+    for (const res of data.results) {
+        const roll = getVal(res, "roll");
+
         decoded.push({
             student: {
-                name: res[schema.name.loc],
+                name: getVal(res, "name"),
                 roll: roll,
                 branch: getBranchFromRoll(roll),
                 college: getCollegeFromRoll(roll),
             },
             grandTotal: {
-                maximum: res[schema.grandTotalMax.loc],
-                passing: res[schema.grandTotalPassing.loc],
-                obtained: res[schema.grandTotalObtained.loc],
+                maximum: getVal(res, "grandTotalMax"),
+                passing: getVal(res, "grandTotalPassing"),
+                obtained: getVal(res, "grandTotalObtained"),
             },
-            subjects: decodeSubjects(res[schema.subjects.loc]),
-            sgpa: res[schema.sgpa.loc],
-            cgpa: res[schema.cgpa.loc],
-            remarks: res[schema.remarks.loc],
+            subjects: decodeSubjects(getVal(res, "subjects"), data.subjects),
+            sgpa: getVal(res, "sgpa"),
+            cgpa: getVal(res, "cgpa"),
+            remarks: data.remarks[getVal(res, "remarks")] ?? "Unknown Remark",
         });
     }
 
     return decoded;
 }
 
-function decodeSubjects(subjects: EncodedSubject[]): SubjectResult[] {
+export function decodeResult(
+    encodedResult: EncodedResultT,
+    dicts: { subjects: EncodedData["subjects"]; remarks: EncodedData["remarks"] },
+): ParsedResult {
+    return decodeResults({
+        ...dicts,
+        results: [encodedResult],
+    })[0];
+}
+
+function decodeSubjects(subjects: EncodedSubjectT[], subNames: EncodedData["subjects"]): SubjectResult[] {
     const decoded: SubjectResult[] = [];
     const schema = EncodedSubject;
 
     for (const sub of subjects) {
         decoded.push({
-            name: sub[schema.name.loc],
-            type: sub[schema.type.loc],
-            credits: sub[schema.credits.loc],
+            name: subNames[getValSub(sub, "name")] ?? "Unknown Subject",
+            type: getValSub(sub, "type"),
+            credits: getValSub(sub, "credits"),
             internal: {
-                max: sub[schema.internalMax.loc],
-                obtained: sub[schema.internalObtained.loc],
+                max: getValSub(sub, "internalMax"),
+                obtained: getValSub(sub, "internalObtained"),
             },
             external: {
-                max: sub[schema.externalMax.loc],
-                passing: sub[schema.externalPassing.loc],
-                obtained: sub[schema.externalObtained.loc],
+                max: getValSub(sub, "externalMax"),
+                passing: getValSub(sub, "externalPassing"),
+                obtained: getValSub(sub, "externalObtained"),
             },
             total: {
-                max: sub[schema.totalMax.loc],
-                passing: sub[schema.totalPassing.loc],
-                obtained: sub[schema.totalObtained.loc],
+                max: getValSub(sub, "totalMax"),
+                passing: getValSub(sub, "totalPassing"),
+                obtained: getValSub(sub, "totalObtained"),
             },
-            grade: sub[schema.grade.loc],
+            grade: getValSub(sub, "grade"),
         });
     }
 

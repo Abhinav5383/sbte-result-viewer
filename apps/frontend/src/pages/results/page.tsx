@@ -1,16 +1,16 @@
-import type { ParsedResult } from "@app/shared/types";
+import type { EncodedData } from "@app/shared/encoder";
 import { ResultsFilter } from "~/components/misc/results-filter/component";
 import { useResultsFilter } from "~/components/misc/results-filter/hook";
 import { useIndexedResults } from "~/lib/hooks/index-results";
 import { ResultsListTable } from "./components/results-table";
 
 interface ResultListPageProps {
-    studentResultList: ParsedResult[];
+    encodedData: EncodedData;
 }
 
 export function ResultListPage(props: ResultListPageProps) {
-    const indexedData = useIndexedResults(props.studentResultList);
-    const res = useResultsFilter(props.studentResultList);
+    const indexedData = useIndexedResults(props.encodedData);
+    const res = useResultsFilter(props.encodedData);
 
     return (
         <div id="results">
@@ -23,7 +23,7 @@ export function ResultListPage(props: ResultListPageProps) {
                 clearFilters={res.clearFilters}
                 anyFilterActive={res.anyFilterActive()}
                 sortedResults={res.sortedResults()}
-                allResults={props.studentResultList}
+                resultsData={props.encodedData}
                 maxStrSizes={indexedData().maxStrSizes}
                 showCollegeColumn={!res.college()}
             />

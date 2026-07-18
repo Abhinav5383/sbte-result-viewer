@@ -9,17 +9,15 @@ export default function HomePage() {
         <>
             <main class="min-h-screen">
                 <HeroSection
-                    total={ctx.results()?.length ?? 0}
-                    loading={ctx.results.loading}
-                    error={ctx.results.error?.message}
+                    total={ctx.data()?.results.length ?? 0}
+                    loading={ctx.data.loading}
+                    error={ctx.data.error?.message}
                 />
 
-                <Show when={ctx.results.error}>
+                <Show when={ctx.data.error}>
                     <div class="flex flex-col items-center justify-center gap-4 p-8">
                         <span class="text-lg text-red-600 font-semibold">Failed to load results</span>
-                        <span class="text-dim-fg text-sm">
-                            {ctx.results.error?.message || "Unknown error occurred"}
-                        </span>
+                        <span class="text-dim-fg text-sm">{ctx.data.error?.message || "Unknown error occurred"}</span>
                         <button
                             type="button"
                             class="bg-accent-bg text-white px-4 py-2 rounded-md hover:opacity-90"
@@ -30,14 +28,14 @@ export default function HomePage() {
                     </div>
                 </Show>
 
-                <Show when={ctx.results.loading}>
+                <Show when={ctx.data.loading}>
                     <div class="flex items-center justify-center p-8">
                         <span class="text-lg text-dim-fg font-semibold">Loading results...</span>
                     </div>
                 </Show>
 
-                <Show keyed when={!ctx.results.loading && !ctx.results.error && ctx.results()}>
-                    {(list) => <ResultListPage studentResultList={list} />}
+                <Show keyed when={!ctx.data.loading && !ctx.data.error && ctx.data()}>
+                    {(data) => <ResultListPage encodedData={data} />}
                 </Show>
             </main>
 

@@ -1,3 +1,5 @@
+import { EncodedResult, type EncodedResultT } from "@app/shared/encoder";
+import { getVal } from "@app/shared/encoder/helpers";
 import { getRegNoFromRoll } from "@app/shared/utils";
 import { createMemo } from "solid-js";
 import { useResults } from "~/providers/results";
@@ -7,22 +9,20 @@ export default function GroupGeneratorPage() {
     const ctx = useResults();
 
     const studentsList = createMemo(() => {
-        const results = ctx.results();
-        if (!results?.length) return [];
+        const data = ctx.data();
+        const results = data?.results;
+        if (!data || !results?.length) return [];
 
         const added = new Set<string>();
-        const list: StudentItem[] = [];
+        const list: EncodedResultT[] = [];
 
         for (let i = 0; i < results.length; i++) {
             const result = results[i];
-            const regNo = getRegNoFromRoll(result.student.roll);
+            const regNo = getRegNoFromRoll(getVal(result, "roll"));
             if (added.has(regNo)) continue;
 
             added.add(regNo);
-            list.push({
-                name: result.student.name,
-                regNo,
-            });
+            list.push(result);
         }
 
         return list;

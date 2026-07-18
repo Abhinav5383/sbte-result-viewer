@@ -22,7 +22,7 @@ import "./details-dialog.css";
 interface DetailsDialogProps {
     open: boolean;
     onClose: () => void;
-    data: ParsedResult | undefined;
+    result: ParsedResult | undefined;
 }
 
 export function DetailsDialog(props: DetailsDialogProps) {
@@ -34,13 +34,13 @@ export function DetailsDialog(props: DetailsDialogProps) {
     const [previewOpen, setPreviewOpen] = createSignal(false);
 
     function closeDialog() {
-        console.log(props.data);
+        console.log(props.result);
         props.onClose();
     }
 
     async function saveAsImage() {
         const content = contentRef();
-        if (!content || !props.data) return;
+        if (!content || !props.result) return;
 
         setSaving(true);
         try {
@@ -88,7 +88,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
         >
             <Show
                 keyed
-                when={props.data}
+                when={props.result}
                 fallback={
                     <div class="flex flex-col items-center justify-center gap-4 p-6">
                         <span class="text-lg font-semibold text-dim-fg">Result not found</span>
@@ -236,7 +236,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                 open={previewOpen()}
                 onClose={() => setPreviewOpen(false)}
                 imageUrl={previewImage()}
-                filename={`${props.data?.student.name.replace(" ", "_")}-${props.data?.student.roll}-result.png`}
+                filename={`${props.result?.student.name.replace(" ", "_")}-${props.result?.student.roll}-result.png`}
             />
         </dialog>
     );

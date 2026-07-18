@@ -1,19 +1,24 @@
-import { branchNamesList, collegeNamesList, type ParsedResult } from "@app/shared/types";
+import { type EncodedData, EncodedResult } from "@app/shared/encoder";
+import { getVal } from "@app/shared/encoder/helpers";
+import { branchNamesList, collegeNamesList } from "@app/shared/types";
 import { getSessionFromRoll } from "@app/shared/utils";
 import { createMemo } from "solid-js";
 import type { FilterOptions } from "~/components/misc/results-filter/types";
 
-export function useIndexedResults(results: ParsedResult[]) {
+export function useIndexedResults(data: EncodedData) {
     const indexedData = createMemo(() => {
+        const results = data.results;
+
         const semesters = new Set<string>();
         const admissionYear = new Set<string>();
 
         for (let i = 0; i < results.length; i++) {
             const item = results[i];
-            const semester = item.student.roll.charAt(0);
+            const roll = getVal(item, "roll");
+            const semester = roll.charAt(0);
 
             semesters.add(semester);
-            admissionYear.add(getSessionFromRoll(item.student.roll));
+            admissionYear.add(getSessionFromRoll(roll));
         }
 
         let maxBranchLen = 0;

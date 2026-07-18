@@ -1,5 +1,7 @@
-import { BRANCH_NAME, COLLEGE_NAME, type ParsedResult } from "@app/shared/types";
-import { getSessionFromRoll } from "@app/shared/utils";
+import type { EncodedData, EncodedResultT } from "@app/shared/encoder";
+import { getVal } from "@app/shared/encoder/helpers";
+import { BRANCH_NAME, COLLEGE_NAME } from "@app/shared/types";
+import { getBranchFromRoll, getCollegeFromRoll, getSessionFromRoll } from "@app/shared/utils";
 import { useSearchParams } from "@solidjs/router";
 import { createEffect, createMemo } from "solid-js";
 import { getValidEntry } from "~/lib/enum";
@@ -12,7 +14,7 @@ const _defaults = {
     sortOrder: SortOrder.Descending,
 };
 
-export function useResultsFilter(results: ParsedResult[], defaultOps?: Partial<typeof _defaults>) {
+export function useResultsFilter(data: EncodedData, defaultOps?: Partial<typeof _defaults>) {
     const DEFAULTS = { ..._defaults, ...defaultOps };
     const [searchParams, _setSearchParams] = useSearchParams();
 
@@ -102,7 +104,7 @@ export function useResultsFilter(results: ParsedResult[], defaultOps?: Partial<t
     }
 
     const filteredResults = createMemo(() => {
-        const fullList = results;
+        const fullList = data.results;
         const filterValues: Filters = {
             college: college(),
             branch: branch(),
@@ -124,19 +126,23 @@ export function useResultsFilter(results: ParsedResult[], defaultOps?: Partial<t
             return fullList.slice();
         }
 
-        const filtered: ParsedResult[] = [];
+        const filtered: EncodedResultT[] = [];
 
-        for (const item of fullList) {
-            if (hasCollegeFilter && COLLEGE_NAME[item.student.college] !== filterValues.college) continue;
-            if (hasBranchFilter && BRANCH_NAME[item.student.branch] !== filterValues.branch) continue;
-            if (hasSemesterFilter && item.student.roll.charAt(0) !== filterValues.semester) continue;
-            if (hasSessionFilter && getSessionFromRoll(item.student.roll) !== filterValues.admissionYear) continue;
+        for (let i = 0; i < fullList.length; i++) {
+            const item = data.results[i];
+
+            const roll = getVal(item, "roll");
+
+            if (hasCollegeFilter && COLLEGE_NAME[getCollegeFromRoll(roll)] !== filterValues.college) continue;
+            if (hasBranchFilter && BRANCH_NAME[getBranchFromRoll(roll)] !== filterValues.branch) continue;
+            if (hasSemesterFilter && roll.charAt(0) !== filterValues.semester) continue;
+            if (hasSessionFilter && getSessionFromRoll(roll) !== filterValues.admissionYear) continue;
 
             if (hasSearch) {
                 if (searchMode === SearchBy.Roll) {
-                    if (!item.student.roll.includes(searchQ)) continue;
+                    if (!roll.includes(searchQ)) continue;
                 } else {
-                    if (!item.student.name.toLowerCase().includes(searchLower)) continue;
+                    if (!getVal(item, "name").toLowerCase().includes(searchLower)) continue;
                 }
             }
 
@@ -154,25 +160,35 @@ export function useResultsFilter(results: ParsedResult[], defaultOps?: Partial<t
         const asc = _sortOrder === SortOrder.Ascending;
 
         sorted.sort((a, b) => {
+            const rollA = getVal(a, "roll");
+            const rollB = getVal(b, "roll");
+            const nameA = getVal(a, "name");
+            const nameB = getVal(b, "name");
+
             switch (_sortBy) {
                 case SortBy.Roll:
-                    if (a.student.roll < b.student.roll) return asc ? -1 : 1;
-                    if (a.student.roll > b.student.roll) return asc ? 1 : -1;
+                    if (rollA < rollB) return asc ? -1 : 1;
+                    if (rollA > rollB) return asc ? 1 : -1;
                     return 0;
                 case SortBy.Name:
-                    if (a.student.name < b.student.name) return asc ? -1 : 1;
-                    if (a.student.name > b.student.name) return asc ? 1 : -1;
+                    if (nameA < nameB) return asc ? -1 : 1;
+                    if (nameA > nameB) return asc ? 1 : -1;
                     return 0;
                 case SortBy.Marks: {
                     const obtainedPercentA =
-                        a.grandTotal.maximum > 0 ? a.grandTotal.obtained / a.grandTotal.maximum : 0;
+                        getVal(a, "grandTotalMax") > 0
+                            ? getVal(a, "grandTotalObtained") / getVal(a, "grandTotalMax")
+                            : 0;
+
                     const obtainedPercentB =
-                        b.grandTotal.maximum > 0 ? b.grandTotal.obtained / b.grandTotal.maximum : 0;
+                        getVal(b, "grandTotalMax") > 0
+                            ? getVal(b, "grandTotalObtained") / getVal(b, "grandTotalMax")
+                            : 0;
 
                     return asc ? obtainedPercentA - obtainedPercentB : obtainedPercentB - obtainedPercentA;
                 }
                 case SortBy.sgpa:
-                    return asc ? a.sgpa - b.sgpa : b.sgpa - a.sgpa;
+                    return asc ? getVal(a, "sgpa") - getVal(b, "sgpa") : getVal(b, "sgpa") - getVal(a, "sgpa");
                 default:
                     return 0;
             }
