@@ -7,7 +7,15 @@ import { viteSingleFile } from "vite-plugin-singlefile";
 import solid from "vite-plugin-solid";
 
 export default defineConfig({
-    plugins: [tailwindcss(), solid(), viteSingleFile()],
+    plugins: [
+        tailwindcss(),
+        solid(),
+        viteSingleFile({
+            overrideConfig: {
+                base: process.env.BASE_PATH,
+            },
+        }),
+    ],
     base: process.env.BASE_PATH,
 
     resolve: {
@@ -19,6 +27,7 @@ export default defineConfig({
 
     define: {
         __EMBEDDED_RESULTS__: await getEmbeddedResults(),
+        __BASE_URL__: process.env.BASE_PATH,
     },
 });
 

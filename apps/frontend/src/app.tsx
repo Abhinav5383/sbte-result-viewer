@@ -1,8 +1,8 @@
 import { Route, Router } from "@solidjs/router";
 import RootLayout from "./pages/layout";
 import HomePage from "./pages/page";
-import "./app.css";
 import { ResultsProvider } from "./providers/results";
+import "./app.css";
 
 export default function App() {
     return (

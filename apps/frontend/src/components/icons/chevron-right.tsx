@@ -1,6 +1,6 @@
 import type { ComponentProps } from "solid-js";
 
-export function ChevronRightIcon(props: ComponentProps<'svg'>) {
+export function ChevronRightIcon(props: ComponentProps<"svg">) {
     return (
         // biome-ignore lint/a11y/noSvgWithoutTitle: _-_
         <svg
