@@ -1,4 +1,4 @@
-import { Route, Router } from "@solidjs/router";
+import { HashRouter, Route } from "@solidjs/router";
 import RootLayout from "./pages/layout";
 import HomePage from "./pages/page";
 import { ResultsProvider } from "./providers/results";
@@ -8,13 +8,13 @@ import GroupGeneratorPage from "./pages/group-gen/page";
 export default function App() {
     return (
         <ResultsProvider>
-            <Router base={import.meta.env.BASE_URL}>
+            <HashRouter>
                 {/* @ts-expect-error */}
                 <Route path="/" component={RootLayout}>
                     <Route path="/" component={HomePage} />
                     <Route path="/group-creator" component={GroupGeneratorPage} />
                 </Route>
-            </Router>
+            </HashRouter>
         </ResultsProvider>
     );
 }
