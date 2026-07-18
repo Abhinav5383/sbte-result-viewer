@@ -1,12 +1,12 @@
-import tailwindcss from "@tailwindcss/vite";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { gzipSync } from "node:zlib";
+import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 import { viteSingleFile } from "vite-plugin-singlefile";
 import solid from "vite-plugin-solid";
 
-export default defineConfig(async (ctx) => ({
+export default defineConfig({
     plugins: [tailwindcss(), solid(), viteSingleFile()],
     base: process.env.BASE_PATH,
 
@@ -18,9 +18,9 @@ export default defineConfig(async (ctx) => ({
     },
 
     define: {
-        __EMBEDDED_RESULTS__: ctx.command === "build" ? await getEmbeddedResults() : undefined,
+        __EMBEDDED_RESULTS__: await getEmbeddedResults(),
     },
-}));
+});
 
 async function getEmbeddedResults(): Promise<string> {
     const file = await readFile("./../../generated/saved-results.json");
