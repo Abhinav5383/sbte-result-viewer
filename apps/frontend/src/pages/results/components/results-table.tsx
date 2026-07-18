@@ -270,6 +270,7 @@ function ResultTableContents(props: ResultTableContentsProps) {
                         index={args.index}
                         onSelect={() => props.onSelect(decodeResult(args.item, props.resultsData).student.roll)}
                         showCollege={props.showCollege}
+                        class={args.class}
                     />
                 )}
             />
@@ -297,6 +298,7 @@ interface ResultRowProps {
     index: number;
     onSelect: () => void;
     showCollege: boolean;
+    class?: string;
 }
 
 function calcPercentObtained(obtained: number, maximum: number) {
@@ -306,7 +308,7 @@ function calcPercentObtained(obtained: number, maximum: number) {
 
 function ResultRow(props: ResultRowProps) {
     return (
-        <div class="result-row grid col-span-full grid-cols-subgrid">
+        <div class={`${props.class} grid col-span-full grid-cols-subgrid`}>
             <For each={[DesktopResultRow, MobileResultRow]}>
                 {(Row) => (
                     <Row

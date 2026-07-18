@@ -7,9 +7,9 @@ interface ResultTableContentsProps<T> {
     containerProps?: JSX.HTMLAttributes<HTMLDivElement>;
 }
 
+const DEFAULT_ROW_HEIGHT = 52;
+const ROW_CLASS = "virt-list-row";
 export default function VirtualList<T>(props: ResultTableContentsProps<T>) {
-    const DEFAULT_ROW_HEIGHT = 52;
-
     const [rowHeight, setRowHeight] = createSignal<number>(DEFAULT_ROW_HEIGHT);
     const [containerRef, setContainerRef] = createSignal<HTMLDivElement | undefined>();
     const [visibleIndices, setVisibleIndices] = createSignal({
@@ -18,7 +18,7 @@ export default function VirtualList<T>(props: ResultTableContentsProps<T>) {
     });
 
     function handleResize(parent: HTMLDivElement) {
-        const row = parent.querySelector<HTMLDivElement>(".virt-list-row");
+        const row = parent.querySelector<HTMLDivElement>(`.${ROW_CLASS}`);
         if (!row) return;
 
         const height = row.getBoundingClientRect().height;
@@ -91,7 +91,7 @@ export default function VirtualList<T>(props: ResultTableContentsProps<T>) {
         <div {...props.containerProps} ref={setContainerRef}>
             <For each={visibleItems()}>
                 {(item, index) => (
-                    <props.RowComponent item={item} index={visibleIndices().start + index()} class="virt-list-row" />
+                    <props.RowComponent item={item} index={visibleIndices().start + index()} class={ROW_CLASS} />
                 )}
             </For>
         </div>
