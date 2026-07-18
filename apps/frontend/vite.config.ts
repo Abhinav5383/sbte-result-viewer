@@ -27,7 +27,6 @@ export default defineConfig({
 
     define: {
         __EMBEDDED_RESULTS__: await getEmbeddedResults(),
-        __BASE_URL__: process.env.BASE_PATH,
     },
 });
 
