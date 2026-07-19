@@ -1,0 +1,25 @@
+.tool-link {
+    text-decoration: none;
+    transition:
+        scale 0.2s,
+        opacity 0.2s;
+
+    &:focus-visible,
+    &:hover {
+        z-index: 5;
+        opacity: 1;
+        scale: 1.03;
+    }
+
+    &:hover h2,
+    &:focus-visible h2 {
+        text-decoration-line: underline;
+    }
+}
+
+.tools-list:has(.tool-link:hover),
+.tools-list:has(.tool-link:focus-visible) {
+    .tool-link:not(:focus-visible):not(:hover) {
+        opacity: 0.65;
+    }
+}

@@ -39,13 +39,13 @@ body {
     }
 }
 
-@layer base {
-    svg {
-        width: 1.2em;
-        height: 1.2em;
-        color: currentColor;
-    }
+svg {
+    width: 1.1em;
+    height: 1.1em;
+    color: currentColor;
+}
 
+@layer base {
     a {
         @apply text-accent-fg underline-offset-2 hover:underline;
     }

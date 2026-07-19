@@ -8,6 +8,7 @@ import type { ResultsFilterHook } from "./hook";
 interface Props {
     hook: ResultsFilterHook;
     indexedData: IndexedResultsData;
+    alwaysShowSort?: boolean;
 }
 
 export function ResultsFilter(props: Props) {
@@ -144,7 +145,7 @@ export function ResultsFilter(props: Props) {
                 />
             </div>
 
-            <div class="xl:hidden">
+            <div class={props.alwaysShowSort ? "" : "xl:hidden"}>
                 <div>
                     <label for="mb-sort">Sort By</label>
                     <div class="grid gap-y-3 grid-cols-1 xs:grid-cols-[3fr_max-content]">

@@ -29,17 +29,17 @@ export default function Navbar() {
                     onMouseEnter={handleMouseEnter}
                     onFocus={handleMouseEnter}
                 >
-                    <span class="font-extrabold text-2xl">SBTE Exam Results</span>
+                    <span class="block py-1 px-2 font-extrabold text-2xl">SBTE Exam Results</span>
                 </A>
 
                 <div class="links flex flex-wrap justify-center items-center">
                     <A
-                        href="/group-creator"
+                        href="/tools"
                         class="nav-target"
                         onMouseEnter={handleMouseEnter}
                         onFocus={handleMouseEnter}
                     >
-                        Group Creator
+                        Tools
                     </A>
                     <A href="/#about" class="nav-target" onMouseEnter={handleMouseEnter} onFocus={handleMouseEnter}>
                         About

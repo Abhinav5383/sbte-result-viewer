@@ -3,7 +3,6 @@ import { getVal } from "@app/shared/encoder/helpers";
 import { getRegNoFromRoll } from "@app/shared/utils";
 import { createMemo } from "solid-js";
 import { useResults } from "~/providers/results";
-import type { StudentItem } from "./types";
 
 export default function GroupGeneratorPage() {
     const ctx = useResults();

@@ -1,9 +1,12 @@
 import { HashRouter, Route } from "@solidjs/router";
 import RootLayout from "./pages/layout";
 import HomePage from "./pages/page";
+import CsvExportPage from "./pages/tools/csv-export/page";
+import GroupGeneratorPage from "./pages/tools/group-gen/page";
+import { ToolsPage } from "./pages/tools/page";
 import { ResultsProvider } from "./providers/results";
+
 import "./app.css";
-import GroupGeneratorPage from "./pages/group-gen/page";
 
 export default function App() {
     return (
@@ -12,7 +15,11 @@ export default function App() {
                 {/* @ts-expect-error */}
                 <Route path="/" component={RootLayout}>
                     <Route path="/" component={HomePage} />
-                    <Route path="/group-creator" component={GroupGeneratorPage} />
+                    <Route path="/tools">
+                        <Route component={ToolsPage} />
+                        <Route path="/csv-export" component={CsvExportPage} />
+                        <Route path="/group-creator" component={GroupGeneratorPage} />
+                    </Route>
                 </Route>
             </HashRouter>
         </ResultsProvider>
