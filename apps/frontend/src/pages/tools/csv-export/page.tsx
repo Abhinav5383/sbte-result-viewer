@@ -12,6 +12,7 @@ import Trash2Icon from "lucide-solid/icons/trash-2";
 import { createEffect, createMemo, createSignal, For, onMount, Show } from "solid-js";
 import { ResultsFilter } from "~/components/misc/results-filter/component";
 import { useResultsFilter } from "~/components/misc/results-filter/hook";
+import VirtualList from "~/components/misc/virtual-list";
 import { Select } from "~/components/ui/select";
 import { cn } from "~/components/utils";
 import { useIndexedResults } from "~/lib/hooks/index-results";
@@ -307,7 +308,6 @@ interface PreviewCsvProps {
     setSelectedFields: (fields: ValidKeys[]) => void;
 }
 
-const PREVIEW_CSV_LIMIT = 100;
 function PreviewCsv(props: PreviewCsvProps) {
     function removeField(field: ValidKeys) {
         const newFields = props.selectedFields.filter((f) => f !== field);
@@ -364,36 +364,33 @@ function PreviewCsv(props: PreviewCsvProps) {
                         </div>
                     </div>
 
-                    {/* Tbody equivalent */}
-                    <div role="rowgroup" class="contents text-normal-fg">
-                        <For each={props.results.slice(0, PREVIEW_CSV_LIMIT)}>
-                            {(res) => (
-                                <div role="row" class="grid grid-cols-subgrid col-span-full">
-                                    <For each={props.selectedFields}>
-                                        {(field) => {
-                                            const fieldDef = CSV_FIELDS.find((f) => f.key === field);
-                                            if (!fieldDef) return null;
+                    <VirtualList
+                        items={props.results}
+                        defaultRowHeight={32}
+                        containerProps={{
+                            role: "rowgroup",
+                            class: "grid grid-cols-subgrid col-span-full text-normal-fg",
+                        }}
+                        RowComponent={(args) => (
+                            <div role="row" class={cn(args.class, "grid grid-cols-subgrid col-span-full")}>
+                                <For each={props.selectedFields}>
+                                    {(field) => {
+                                        const fieldDef = CSV_FIELDS.find((f) => f.key === field);
+                                        if (!fieldDef) return null;
 
-                                            const value = fieldDef.extract(res, props.encodedData);
+                                        const value = fieldDef.extract(args.item, props.encodedData);
 
-                                            return (
-                                                <div role="cell" class="border-be border-e border-border px-3 py-2">
-                                                    <span class="inline-block w-max max-w-[42ch]">{value}</span>
-                                                </div>
-                                            );
-                                        }}
-                                    </For>
-                                </div>
-                            )}
-                        </For>
-                    </div>
+                                        return (
+                                            <div role="cell" class="border-be border-e border-border px-3 py-2">
+                                                <span class="inline-block w-max">{value}</span>
+                                            </div>
+                                        );
+                                    }}
+                                </For>
+                            </div>
+                        )}
+                    />
                 </div>
-
-                <Show when={props.results.length > PREVIEW_CSV_LIMIT}>
-                    <p class="text-sm text-dim-fg mt-2">
-                        Showing first {PREVIEW_CSV_LIMIT} results of {props.results.length} total results.
-                    </p>
-                </Show>
             </div>
         </Show>
     );

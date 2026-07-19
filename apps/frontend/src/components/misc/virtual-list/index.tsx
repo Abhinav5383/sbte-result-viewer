@@ -5,6 +5,7 @@ interface ResultTableContentsProps<T> {
     items: T[];
     RowComponent: (props: { item: T; index: number; class: string }) => JSX.Element;
     containerProps?: JSX.HTMLAttributes<HTMLDivElement>;
+    scrollContainer?: HTMLElement;
 }
 
 const DEFAULT_ROW_HEIGHT = 52;
@@ -45,7 +46,8 @@ export default function VirtualList<T>(props: ResultTableContentsProps<T>) {
     }
 
     onMount(() => {
-        window.addEventListener("scroll", handleScroll, { passive: true });
+        const scroller = props.scrollContainer ?? window;
+        scroller.addEventListener("scroll", handleScroll, { passive: true });
 
         const container = containerRef();
         let observer: ResizeObserver | null = null;
@@ -56,7 +58,7 @@ export default function VirtualList<T>(props: ResultTableContentsProps<T>) {
         }
 
         onCleanup(() => {
-            window.removeEventListener("scroll", handleScroll);
+            scroller.removeEventListener("scroll", handleScroll);
             if (observer) observer.disconnect();
         });
     });
