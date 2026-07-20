@@ -126,7 +126,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
 
                         <SortableHeaderItem
                             title="Roll No"
-                            value={SortBy.Roll}
+                            value={SortBy.RegNo}
                             sortBy={props.sortedResults.sortedBy}
                             sortOrder={props.sortedResults.sortOrder}
                             setSortFilter={props.setSortFilter}
@@ -200,7 +200,8 @@ function SortableHeaderItem(props: SortableHeaderItemProps) {
                     let order = SortOrder.Descending;
                     switch (props.value) {
                         case SortBy.Name:
-                        case SortBy.Roll: {
+                        case SortBy.Roll:
+                        case SortBy.RegNo: {
                             order = SortOrder.Ascending;
                             break;
                         }

@@ -8,6 +8,7 @@ export enum SortBy {
     sgpa = "SGPA",
     Name = "Name",
     Roll = "Roll No",
+    RegNo = "Reg No",
 }
 
 export enum SortOrder {

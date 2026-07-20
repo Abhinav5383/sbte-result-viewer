@@ -152,8 +152,8 @@ export function useResultsFilter(data: EncodedData, defaultOps?: Partial<typeof 
         const asc = _sortOrder === SortOrder.Ascending;
 
         sorted.sort((a, b) => {
-            const rollA = getVal(a, "roll").slice(2);
-            const rollB = getVal(b, "roll").slice(2);
+            const rollA = getVal(a, "roll");
+            const rollB = getVal(b, "roll");
             const nameA = getVal(a, "name");
             const nameB = getVal(b, "name");
 
@@ -161,6 +161,10 @@ export function useResultsFilter(data: EncodedData, defaultOps?: Partial<typeof 
                 case SortBy.Roll:
                     if (rollA < rollB) return asc ? -1 : 1;
                     if (rollA > rollB) return asc ? 1 : -1;
+                    return 0;
+                case SortBy.RegNo:
+                    if (rollA.slice(2) < rollB.slice(2)) return asc ? -1 : 1;
+                    if (rollA.slice(2) > rollB.slice(2)) return asc ? 1 : -1;
                     return 0;
                 case SortBy.Name:
                     if (nameA < nameB) return asc ? -1 : 1;
