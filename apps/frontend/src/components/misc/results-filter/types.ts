@@ -6,7 +6,7 @@ export interface Filters {
 }
 
 export type FilterOptions = {
-    [K in keyof Filters]: Filters[K][];
+    [K in keyof Filters]: Filters[K];
 };
 
 export enum FilterParams {

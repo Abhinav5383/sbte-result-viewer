@@ -1,4 +1,4 @@
-import { type EncodedData, EncodedResult } from "@app/shared/encoder";
+import type { EncodedData } from "@app/shared/encoder";
 import { getVal } from "@app/shared/encoder/helpers";
 import { branchNamesList, collegeNamesList } from "@app/shared/types";
 import { getSessionFromRoll } from "@app/shared/utils";
