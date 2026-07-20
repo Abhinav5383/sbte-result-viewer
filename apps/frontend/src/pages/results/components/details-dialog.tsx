@@ -15,9 +15,9 @@ import ExternalLinkIcon from "lucide-solid/icons/external-link";
 import ImageIcon from "lucide-solid/icons/image";
 import XIcon from "lucide-solid/icons/x";
 import { createEffect, createSignal, For, onCleanup, Show } from "solid-js";
+import { Dialog } from "~/components/ui/dialog";
 import { cn, OrdinalSuffix } from "~/components/utils";
 import { alphabeticalGradeClass, marksClass, sgpaClass } from "~/lib/grade-utils";
-import "./details-dialog.css";
 
 interface DetailsDialogProps {
     open: boolean;
@@ -26,8 +26,6 @@ interface DetailsDialogProps {
 }
 
 export function DetailsDialog(props: DetailsDialogProps) {
-    const [dialogRef, setDialogRef] = createSignal<HTMLDialogElement | null>(null);
-
     const [contentRef, setContentRef] = createSignal<HTMLDivElement | null>(null);
     const [saving, setSaving] = createSignal(false);
     const [previewImage, setPreviewImage] = createSignal<string | null>(null);
@@ -59,32 +57,8 @@ export function DetailsDialog(props: DetailsDialogProps) {
         }
     }
 
-    createEffect(() => {
-        const dialog = dialogRef();
-        if (dialog) {
-            if (props.open && !dialog.open) dialog.showModal();
-            if (!props.open && dialog.open) dialog.close();
-        }
-    });
-
     return (
-        <dialog
-            ref={setDialogRef}
-            onClose={(e) => {
-                e.preventDefault();
-                props.onClose();
-            }}
-            onKeyDown={(e) => {
-                if (e.key === "Escape") props.onClose();
-            }}
-            onClick={(e) => {
-                if (e.target === e.currentTarget) {
-                    e.stopPropagation();
-                    props.onClose();
-                }
-            }}
-            class="rounded-xl overflow-x-clip"
-        >
+        <Dialog open={props.open} onClose={closeDialog} dialogProps={{ class: "rounded-xl overflow-x-clip" }}>
             <Show
                 keyed
                 when={props.result}
@@ -237,7 +211,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                 imageUrl={previewImage()}
                 filename={`${props.result?.student.name.replace(" ", "_")}-${props.result?.student.roll}-result.png`}
             />
-        </dialog>
+        </Dialog>
     );
 }
 
@@ -249,16 +223,7 @@ interface ImagePreviewDialogProps {
 }
 
 function ImagePreviewDialog(props: ImagePreviewDialogProps) {
-    const [dialogRef, setDialogRef] = createSignal<HTMLDialogElement | null>(null);
     const [copied, setCopied] = createSignal(false);
-
-    createEffect(() => {
-        const dialog = dialogRef();
-        if (dialog) {
-            if (props.open && !dialog.open) dialog.showModal();
-            if (!props.open && dialog.open) dialog.close();
-        }
-    });
 
     function download() {
         if (!props.imageUrl) return;
@@ -297,15 +262,14 @@ function ImagePreviewDialog(props: ImagePreviewDialogProps) {
     }
 
     return (
-        <dialog
-            ref={setDialogRef}
-            closedby="any"
-            onClose={(e) => {
-                e.preventDefault();
-                props.onClose();
+        <Dialog
+            open={props.open}
+            onClose={props.onClose}
+            dialogProps={{
+                closedby: "any",
+                onKeyDown: (e) => e.stopPropagation(),
+                class: "rounded-xl overflow-clip",
             }}
-            onKeyDown={(e) => e.stopPropagation()}
-            class="rounded-xl overflow-clip"
         >
             <Show when={props.imageUrl}>
                 <div class="flex flex-col max-h-[90vh] gap-4 p-4">
@@ -353,7 +317,7 @@ function ImagePreviewDialog(props: ImagePreviewDialogProps) {
                     </div>
                 </div>
             </Show>
-        </dialog>
+        </Dialog>
     );
 }
 
