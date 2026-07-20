@@ -1,4 +1,5 @@
 import { decodeResult, type EncodedData, type EncodedResultT } from "@app/shared/encoder";
+import { getVal } from "@app/shared/encoder/helpers";
 import { BRANCH_NAME, COLLEGE_NAME, type ParsedResult } from "@app/shared/types";
 import { useSearchParams } from "@solidjs/router";
 import ArrowDownWideNarrow from "lucide-solid/icons/arrow-down-wide-narrow";
@@ -6,14 +7,14 @@ import ArrowUpWideNarrow from "lucide-solid/icons/arrow-up-wide-narrow";
 import ChevronUpIcon from "lucide-solid/icons/chevron-up";
 import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
 import { ChevronRightIcon } from "~/components/icons/chevron-right";
+import { BranchBadge, PercentageBadge } from "~/components/misc/badges";
 import VirtualList from "~/components/misc/virtual-list";
-import { cn, OrdinalSuffix } from "~/components/utils";
+import { cn } from "~/components/utils";
 import { marksClass, sgpaClass } from "~/lib/grade-utils";
 import { SortBy, SortOrder } from "~/lib/types";
 import { DetailsDialog } from "./details-dialog";
 
 import "./results-table.css";
-import { getVal } from "@app/shared/encoder/helpers";
 
 interface ResultsListTableProps {
     resultsData: EncodedData;
@@ -439,33 +440,6 @@ function DesktopResultRow(props: RowVariantProps) {
                 <span class="text-dim-fg text-sm truncate">{COLLEGE_NAME[props.item.student.college]}</span>
             </Show>
         </div>
-    );
-}
-
-function BranchBadge(props: { branch: BRANCH_NAME; semester: string; class?: string }) {
-    return (
-        <span
-            class={cn(
-                "branch-badge inline-block ps-2 pe-0.5 rounded-lg text-sm text-nowrap",
-                props.branch.toLowerCase(),
-                props.class,
-            )}
-        >
-            {props.branch}
-            <em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 rounded-md">
-                {props.semester}
-                {OrdinalSuffix(props.semester)} sem
-            </em>
-        </span>
-    );
-}
-
-function PercentageBadge(props: { percentObtained: number; class?: string }) {
-    return (
-        <span class={cn("bg-(--clr)/10 px-1.5 rounded-lg w-fit text-[0.83rem]", props.class)}>
-            <span>{props.percentObtained.toFixed(2)}</span>
-            <span class="text-xs opacity-80 saturate-50">{" %"}</span>
-        </span>
     );
 }
 

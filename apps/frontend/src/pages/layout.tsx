@@ -16,10 +16,7 @@ export default function RootLayout(props: { children: Element }) {
         if (query) url += `?${query}`;
         if (loc.hash) url += loc.hash;
 
-        // most likely dev env
-        if (window.location.protocol === "http") return;
-
-        if (window.location.hostname !== "sbte-result-viewer.vercel.app") {
+        if (window.location.hostname === "abhinav5383.github.io") {
             window.location.href = url;
             console.log("Redirecting to: ", url);
         }

@@ -5,7 +5,7 @@ interface ResultTableContentsProps<T> {
     items: T[];
     RowComponent: (props: { item: T; index: number; class: string }) => JSX.Element;
     containerProps?: JSX.HTMLAttributes<HTMLDivElement>;
-    scrollContainer?: HTMLElement;
+    scrollElement?: HTMLElement;
 }
 
 const DEFAULT_ROW_HEIGHT = 52;
@@ -46,7 +46,7 @@ export default function VirtualList<T>(props: ResultTableContentsProps<T>) {
     }
 
     onMount(() => {
-        const scroller = props.scrollContainer ?? window;
+        const scroller = props.scrollElement ?? window;
         scroller.addEventListener("scroll", handleScroll, { passive: true });
 
         const container = containerRef();
