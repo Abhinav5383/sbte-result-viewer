@@ -1,4 +1,4 @@
-import { decodeResult, type EncodedData, EncodedResult, type EncodedResultT } from "@app/shared/encoder";
+import { decodeResult, type EncodedData, type EncodedResultT } from "@app/shared/encoder";
 import { BRANCH_NAME, COLLEGE_NAME, type ParsedResult } from "@app/shared/types";
 import { useSearchParams } from "@solidjs/router";
 import ArrowDownWideNarrow from "lucide-solid/icons/arrow-down-wide-narrow";
@@ -363,9 +363,11 @@ function MobileResultRow(props: RowVariantProps) {
                 </div>
 
                 <div class="flex items-center gap-2">
-                    <span class="text-sm text-dim-fg">{props.item.student.roll}</span>
+                    <span class="text-sm text-dim-fg tabular-nums">{props.item.student.roll.slice(2)}</span>
                     <span class="text-xs opacity-50">•</span>
                     <span class="text-sm text-dim-fg">{COLLEGE_NAME[props.item.student.college]}</span>
+                    <span class="text-xs opacity-50">•</span>
+                    <PercentageBadge percentObtained={props.percentObtained} class={props.marksClassName} />
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -411,12 +413,12 @@ function DesktopResultRow(props: RowVariantProps) {
         >
             <span class="text-dim-fg text-sm">{props.index + 1}</span>
             <span class="truncate">{props.item.student.name}</span>
-            <span class="text-dim-fg">
-                <span class="opacity-90">{props.item.student.roll.slice(0, -3)}</span>
-                <span class="italic">{props.item.student.roll.slice(-3)}</span>
+            <span class="text-dim-fg tabular-nums flex gap-[0.07em]">
+                <span class="opacity-90">{props.item.student.roll.slice(2, -3)}</span>
+                <span class="text-normal-fg">{props.item.student.roll.slice(-3)}</span>
             </span>
 
-            <div class="grid grid-cols-2 gap-2 items-center pe-8">
+            <div class="grid grid-cols-2 gap-2 items-center pe-8 tabular-nums">
                 <div class="text-dim-fg text-xs">
                     <span class="text-base font-medium">{props.item.grandTotal.obtained}</span>{" "}
                     <span class="text-xs opacity-50">/</span>{" "}
@@ -460,7 +462,7 @@ function BranchBadge(props: { branch: BRANCH_NAME; semester: string; class?: str
 function PercentageBadge(props: { percentObtained: number; class?: string }) {
     return (
         <span class={cn("bg-(--clr)/10 px-1.5 rounded-lg w-fit text-[0.83rem]", props.class)}>
-            <span>{props.percentObtained}</span>
+            <span>{props.percentObtained.toFixed(2)}</span>
             <span class="text-xs opacity-80 saturate-50">{" %"}</span>
         </span>
     );

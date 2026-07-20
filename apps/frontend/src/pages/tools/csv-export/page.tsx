@@ -40,7 +40,7 @@ export default function CsvExportPage() {
 const CSV_FIELDS = [
     {
         key: "roll",
-        label: "Roll Number",
+        label: "Roll No.",
         extract(result: EncodedResultT) {
             return getVal(result, "roll");
         },
@@ -95,7 +95,7 @@ const CSV_FIELDS = [
         key: "sgpa",
         label: "SGPA",
         extract(result: EncodedResultT) {
-            return getVal(result, "sgpa").toString();
+            return getVal(result, "sgpa").toFixed(2).toString();
         },
     },
     {
@@ -110,6 +110,13 @@ const CSV_FIELDS = [
         label: "Remarks",
         extract(result: EncodedResultT, data: EncodedData) {
             return data.remarks[getVal(result, "remarks")];
+        },
+    },
+    {
+        key: "regNo",
+        label: "Registration No.",
+        extract(result: EncodedResultT) {
+            return getVal(result, "roll").slice(2);
         },
     },
     {
@@ -394,7 +401,7 @@ function PreviewCsv(props: PreviewCsvProps) {
 
                                         return (
                                             <div role="cell" class="border-be border-e border-border px-3 py-2">
-                                                <span class="inline-block w-max">{value}</span>
+                                                <span class="inline-block w-max tabular-nums">{value}</span>
                                             </div>
                                         );
                                     }}

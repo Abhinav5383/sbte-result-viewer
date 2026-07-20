@@ -1,4 +1,4 @@
-import { EncodedResult, type EncodedResultT } from "@app/shared/encoder";
+import type { EncodedResultT } from "@app/shared/encoder";
 import { getVal } from "@app/shared/encoder/helpers";
 import { getRegNoFromRoll } from "@app/shared/utils";
 import { createMemo } from "solid-js";

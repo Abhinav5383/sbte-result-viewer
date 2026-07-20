@@ -14,7 +14,7 @@ import DownloadIcon from "lucide-solid/icons/download";
 import ExternalLinkIcon from "lucide-solid/icons/external-link";
 import ImageIcon from "lucide-solid/icons/image";
 import XIcon from "lucide-solid/icons/x";
-import { createEffect, createSignal, For, onCleanup, Show } from "solid-js";
+import { createSignal, For, onCleanup, Show } from "solid-js";
 import { Dialog } from "~/components/ui/dialog";
 import { cn, OrdinalSuffix } from "~/components/utils";
 import { alphabeticalGradeClass, marksClass, sgpaClass } from "~/lib/grade-utils";
@@ -132,7 +132,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
                                 </span>
 
                                 <div class="flex items-center gap-3">
-                                    <span class="font-semibold py-1">{data.student.roll}</span>
+                                    <span class="font-semibold py-1 tabular-nums">{data.student.roll}</span>
                                     <a
                                         href={apiUrl(data.student.roll)}
                                         target="_blank"
@@ -339,7 +339,7 @@ function SubjectCategory(props: SubjectCategoryProps) {
 
 function SubjectMarksDetails(props: { sub: SubjectResult }) {
     return (
-        <div class="grid gap-3 bg-zinc-100 rounded-lg px-4 py-3 border border-zinc-200">
+        <div class="grid gap-3 bg-zinc-100 rounded-lg px-4 py-3 border border-zinc-200 tabular-nums">
             <div class="h-fit flex gap-3 items-center">
                 <span class="text-lg leading-tight font-medium">{props.sub.name}</span>
                 <span

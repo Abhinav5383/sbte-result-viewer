@@ -152,8 +152,8 @@ export function useResultsFilter(data: EncodedData, defaultOps?: Partial<typeof 
         const asc = _sortOrder === SortOrder.Ascending;
 
         sorted.sort((a, b) => {
-            const rollA = getVal(a, "roll");
-            const rollB = getVal(b, "roll");
+            const rollA = getVal(a, "roll").slice(2);
+            const rollB = getVal(b, "roll").slice(2);
             const nameA = getVal(a, "name");
             const nameB = getVal(b, "name");
 
