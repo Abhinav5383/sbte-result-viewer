@@ -53,8 +53,4 @@
     &:where(:focus-visible, :hover) {
         text-decoration: none;
     }
-
-    span {
-        text-box: trim-both cap alphabetic;
-    }
 }

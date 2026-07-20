@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 @layer utilities {
-    body:has(select:open) {
+    body:has(.select:open) {
         overflow: hidden;
     }
 
-    select {
+    .select {
         width: 100%;
         padding: 0.4rem 0.6rem;
         transition: all 0.2s ease;
@@ -13,28 +13,28 @@
         cursor: pointer;
         border-radius: var(--radius-md);
 
-        &:where(:focus, :hover) {
+        &:is(:focus-visible, :hover) {
             border-color: var(--color-accent-bg);
         }
     }
 
     @supports (appearance: base-select) {
-        select {
+        .select {
             padding: 0 0;
             appearance: base-select;
         }
 
-        select::picker-icon {
+        .select::picker-icon {
             display: none;
         }
 
-        .arrow {
+        .select .arrow {
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        svg {
+        .select svg {
             color: var(--gh-text-secondary);
             width: 1.3em;
             height: 1.3em;
@@ -43,11 +43,11 @@
             transition: rotate 0.2s ease-in-out;
         }
 
-        select:open .arrow svg {
+        .select:open .arrow svg {
             rotate: 180deg;
         }
 
-        .select-trigger {
+        .select .select-trigger {
             width: stretch;
             display: grid;
             align-items: center;
@@ -55,7 +55,7 @@
             gap: 0.7em;
         }
 
-        select::picker(select) {
+        .select::picker(select) {
             appearance: base-select;
             max-height: calc(100% - 3rem);
             padding: 0.3rem;
@@ -80,7 +80,7 @@
             }
         }
 
-        select::picker(select)::backdrop {
+        .select::picker(select)::backdrop {
             background-color: #00000022;
             opacity: 1;
             transition: opacity 0.5s ease-in-out;
@@ -90,7 +90,7 @@
             }
         }
 
-        option {
+        .select option {
             font-size: 0.93em;
             display: flex;
             flex-direction: row-reverse;
@@ -139,7 +139,7 @@
             }
         }
 
-        selectedcontent {
+        .select selectedcontent {
             .opt-desc {
                 display: none;
             }

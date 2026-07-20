@@ -1,8 +1,8 @@
 export interface Filters {
-    college: string;
-    branch: string;
-    semester: string;
-    admissionYear: string;
+    college: string[];
+    branch: string[];
+    semester: string[];
+    admissionYear: string[];
 }
 
 export type FilterOptions = {

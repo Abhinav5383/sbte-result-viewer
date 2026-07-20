@@ -39,12 +39,6 @@ body {
     }
 }
 
-svg {
-    width: 1.1em;
-    height: 1.1em;
-    color: currentColor;
-}
-
 @layer base {
     a {
         @apply text-accent-fg underline-offset-2 hover:underline;
@@ -73,6 +67,12 @@ svg {
         &.no-focus-ring {
             @apply ring-transparent;
         }
+    }
+
+    svg {
+        width: 1.1em;
+        height: 1.1em;
+        color: currentColor;
     }
 
     button,

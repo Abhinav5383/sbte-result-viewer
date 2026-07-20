@@ -50,31 +50,23 @@ export function useResultsFilter(data: EncodedData, defaultOps?: Partial<typeof 
         }
     });
 
-    const college = () => getValidEntry(searchParams[FilterParams.COLLEGE], COLLEGE_NAME, "");
-    function setCollege(clg: string) {
+    const college = () => getValidMultiSelectFilter(searchParams[FilterParams.COLLEGE], COLLEGE_NAME, []);
+    function setCollege(clg: string[]) {
         setSearchParams({ [FilterParams.COLLEGE]: clg });
     }
 
-    const branch = () => getValidEntry(searchParams[FilterParams.BRANCH], BRANCH_NAME, "");
-    function setBranch(br: string) {
+    const branch = () => getValidMultiSelectFilter(searchParams[FilterParams.BRANCH], BRANCH_NAME, []);
+    function setBranch(br: string[]) {
         setSearchParams({ [FilterParams.BRANCH]: br });
     }
 
-    const semester = () => {
-        const sem = searchParams[FilterParams.SEMESTER];
-        if (typeof sem === "string") return sem;
-        return "";
-    };
-    function setSemester(sem: string) {
+    const semester = () => getMultiSelectFilter(searchParams[FilterParams.SEMESTER]);
+    function setSemester(sem: string[]) {
         setSearchParams({ [FilterParams.SEMESTER]: sem });
     }
 
-    const session = () => {
-        const sess = searchParams[FilterParams.SESSION];
-        if (typeof sess === "string") return sess;
-        return "";
-    };
-    function setSession(sess: string) {
+    const session = () => getMultiSelectFilter(searchParams[FilterParams.SESSION]);
+    function setSession(sess: string[]) {
         setSearchParams({ [FilterParams.SESSION]: sess });
     }
 
@@ -133,10 +125,10 @@ export function useResultsFilter(data: EncodedData, defaultOps?: Partial<typeof 
 
             const roll = getVal(item, "roll");
 
-            if (hasCollegeFilter && COLLEGE_NAME[getCollegeFromRoll(roll)] !== filterValues.college) continue;
-            if (hasBranchFilter && BRANCH_NAME[getBranchFromRoll(roll)] !== filterValues.branch) continue;
-            if (hasSemesterFilter && roll.charAt(0) !== filterValues.semester) continue;
-            if (hasSessionFilter && getSessionFromRoll(roll) !== filterValues.admissionYear) continue;
+            if (hasCollegeFilter && !filterValues.college.includes(COLLEGE_NAME[getCollegeFromRoll(roll)])) continue;
+            if (hasBranchFilter && !filterValues.branch.includes(BRANCH_NAME[getBranchFromRoll(roll)])) continue;
+            if (hasSemesterFilter && !filterValues.semester.includes(roll.charAt(0))) continue;
+            if (hasSessionFilter && !filterValues.admissionYear.includes(getSessionFromRoll(roll))) continue;
 
             if (hasSearch) {
                 if (searchMode === SearchBy.Roll) {
@@ -233,3 +225,25 @@ export function useResultsFilter(data: EncodedData, defaultOps?: Partial<typeof 
 }
 
 export type ResultsFilterHook = ReturnType<typeof useResultsFilter>;
+
+function getValidMultiSelectFilter<T, F>(
+    val: string | string[] | undefined,
+    enumObj: Record<string, T>,
+    fallback: F[],
+) {
+    if (!val) return fallback as unknown as T[];
+    const inpVals = typeof val === "string" ? [val] : val;
+
+    const valid: T[] = [];
+    for (const val of Object.values(enumObj)) {
+        if (inpVals.includes(val as string)) valid.push(val);
+    }
+
+    return valid.length > 0 ? valid : (fallback as unknown as T[]);
+}
+
+function getMultiSelectFilter(val: string | string[] | undefined) {
+    if (typeof val === "string") return [val];
+    if (Array.isArray(val)) return val;
+    return [];
+}

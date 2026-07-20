@@ -1,4 +1,6 @@
+import { COLLEGE, COLLEGE_NAME } from "@app/shared/types";
 import SearchIcon from "lucide-solid/icons/search";
+import MultiSelect from "~/components/ui/multi-select";
 import { Select } from "~/components/ui/select";
 import { OrdinalSuffix } from "~/components/utils";
 import type { IndexedResultsData } from "~/lib/hooks/index-results";
@@ -14,6 +16,24 @@ interface Props {
 export function ResultsFilter(props: Props) {
     const res = props.hook;
     const indexedData = props.indexedData;
+
+    const collegeOptions = () => {
+        const ngp = COLLEGE_NAME[COLLEGE.NGP_PATNA_13];
+        const all = indexedData.filters.college
+            .filter((c) => c !== ngp)
+            .map((college) => ({
+                value: college,
+                label: college,
+            }));
+
+        return [
+            {
+                value: ngp,
+                label: ngp,
+            },
+            ...all,
+        ];
+    };
 
     return (
         <>
@@ -71,77 +91,54 @@ export function ResultsFilter(props: Props) {
 
             <div>
                 <label for="college-filter">College</label>
-                <Select
+                <MultiSelect
                     id="college-filter"
-                    value={res.college()}
+                    selected={res.college()}
                     onChange={res.setCollege}
-                    options={[
-                        {
-                            value: "",
-                            label: "All Colleges",
-                        },
-                        ...indexedData.filters.college.map((college) => ({
-                            value: college,
-                            label: college,
-                        })),
-                    ]}
+                    options={collegeOptions()}
+                    placeholder="All Colleges"
                 />
             </div>
 
             <div>
                 <label for="branch-filter">Branch</label>
-                <Select
+                <MultiSelect
                     id="branch-filter"
-                    value={res.branch()}
+                    selected={res.branch()}
                     onChange={res.setBranch}
-                    options={[
-                        {
-                            value: "",
-                            label: "All Branches",
-                        },
-                        ...indexedData.filters.branch.map((branch) => ({
-                            value: branch,
-                            label: branch,
-                        })),
-                    ]}
+                    options={indexedData.filters.branch.map((branch) => ({
+                        value: branch,
+                        label: branch,
+                    }))}
+                    placeholder="All Branches"
                 />
             </div>
 
             <div>
                 <label for="semester-filter">Semester</label>
-                <Select
+                <MultiSelect
                     id="semester-filter"
-                    value={res.semester()}
+                    selected={res.semester()}
                     onChange={res.setSemester}
-                    options={[
-                        {
-                            value: "",
-                            label: "All Semesters",
-                        },
-                        ...indexedData.filters.semester.map((sem) => ({
-                            value: sem,
-                            label: SemesterLabel(sem),
-                        })),
-                    ]}
+                    options={indexedData.filters.semester.map((sem) => ({
+                        value: sem,
+                        label: SemesterLabel(sem),
+                    }))}
+                    placeholder="All Semesters"
                 />
             </div>
 
             <div>
                 <label for="session-filter">Session</label>
-                <Select
+                <MultiSelect
                     id="session-filter"
-                    value={res.session()}
+                    selected={res.session()}
                     onChange={res.setSession}
-                    options={[
-                        {
-                            value: "",
-                            label: "All Sessions",
-                        },
-                        ...indexedData.filters.admissionYear.map((year) => ({
-                            value: year,
-                            label: `20${year}`,
-                        })),
-                    ]}
+                    options={indexedData.filters.admissionYear.map((year) => ({
+                        value: year,
+                        label: `20${year}`,
+                    }))}
+                    placeholder="All Sessions"
                 />
             </div>
 

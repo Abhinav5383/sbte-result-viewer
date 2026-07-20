@@ -1,5 +1,6 @@
 import { For, Show } from "solid-js";
 import ChevronDown from "~/components/icons/chevron-down";
+
 import "./styles.css";
 
 interface SelectProps {
@@ -43,33 +44,13 @@ export function Select(props: SelectProps) {
     );
 }
 
-function RegularSelect(props: SelectProps) {
-    return (
-        <select
-            id={props.id}
-            class={props.class}
-            onChange={(e) => {
-                props.onChange(e.currentTarget.value);
-            }}
-        >
-            <For each={props.options}>
-                {(option) => (
-                    <option value={option.value} selected={option.value === props.value}>
-                        {option.description || option.label || option.value}
-                    </option>
-                )}
-            </For>
-        </select>
-    );
-}
-
 function FancySelect(props: SelectProps) {
     let ignoreClick = false;
 
     return (
         <select
             id={props.id}
-            class={props.class}
+            class={`select ${props.class}`}
             onChange={(e) => {
                 props.onChange(e.currentTarget.value);
             }}
@@ -102,6 +83,26 @@ function FancySelect(props: SelectProps) {
                                 <span class="opt-desc">{option.description}</span>
                             </Show>
                         </div>
+                    </option>
+                )}
+            </For>
+        </select>
+    );
+}
+
+function RegularSelect(props: SelectProps) {
+    return (
+        <select
+            id={props.id}
+            class={`select ${props.class}`}
+            onChange={(e) => {
+                props.onChange(e.currentTarget.value);
+            }}
+        >
+            <For each={props.options}>
+                {(option) => (
+                    <option value={option.value} selected={option.value === props.value}>
+                        {option.description || option.label || option.value}
                     </option>
                 )}
             </For>
