@@ -233,11 +233,23 @@ function PageContents(props: { encodedData: EncodedData }) {
                 </div>
 
                 <div class="flex items-center justify-between flex-wrap gap-4 pbs-6">
-                    <p class="text-dim-fg text-sm">
-                        Includes <span class="font-medium">{res.sortedResults().results.length}</span> of{" "}
-                        <span class="font-medium">{props.encodedData.results.length} </span>
-                        {res.sortedResults().results.length !== 1 ? "results" : "result"}
-                    </p>
+                    <div class="flex gap-4 items-center">
+                        <p class="text-dim-fg text-sm">
+                            Includes <span class="font-medium">{res.sortedResults().results.length}</span> of{" "}
+                            <span class="font-medium">{props.encodedData.results.length} </span>
+                            {res.sortedResults().results.length !== 1 ? "results" : "result"}
+                        </p>
+                        <Show when={res.anyFilterActive()}>
+                            <span class="text-border">|</span>
+                            <button
+                                type="button"
+                                class="text-inherit text-sm min-h-0 px-0 py-0 hover:text-accent-fg underline underline-offset-[0.1lh]"
+                                onclick={res.clearFilters}
+                            >
+                                Clear Filters
+                            </button>
+                        </Show>
+                    </div>
 
                     <Show
                         when={availableAddOptions().length > 0}
