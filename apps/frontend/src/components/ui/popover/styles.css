@@ -46,6 +46,8 @@
         align-self: center;
         justify-self: center;
         border-radius: var(--radius-md);
+        max-height: calc(100% - 2rem);
+        min-width: min(calc(100% - 2rem), 24rem);
 
         opacity: 1;
         translate: 0 0;
@@ -61,8 +63,7 @@
     }
 
     .__popover::backdrop {
-        background-image: linear-gradient(0deg, #0008, lch(from var(--color-accent-fg-dark) calc(l - 90) c h / 0.8));
-        backdrop-filter: blur(3px);
+        background-image: linear-gradient(180deg, #0004, lch(from var(--color-accent-fg-dark) calc(l / 4) c h / 0.6));
         opacity: 1;
         transition: opacity 0.3s ease-in-out;
 
@@ -81,7 +82,7 @@
             align-self: start;
 
             min-width: anchor-size(inline);
-            max-height: calc(100% - 1rem);
+            max-height: calc(100% - 2rem);
             overflow-y: auto;
 
             position-try: flip-block;
@@ -90,7 +91,7 @@
         }
 
         .__popover::backdrop {
-            background: #0003;
+            background: #0002;
             backdrop-filter: revert;
         }
     }
