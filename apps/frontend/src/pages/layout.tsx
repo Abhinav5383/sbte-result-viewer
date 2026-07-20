@@ -1,6 +1,30 @@
+import { useLocation } from "@solidjs/router";
+import { createEffect } from "solid-js";
 import Navbar from "~/components/navbar";
 
 export default function RootLayout(props: { children: Element }) {
+    const loc = useLocation();
+
+    createEffect(() => {
+        let query = "";
+        for (const [key, val] of Object.entries(loc.query)) {
+            query += `${key}=${val}&`;
+        }
+        if (query) query = query.slice(0, -1);
+
+        let url = `https://sbte-result-viewer.vercel.app/#${loc.pathname}`;
+        if (query) url += `?${query}`;
+        if (loc.hash) url += loc.hash;
+
+        // most likely dev env
+        if (window.location.protocol === "http") return;
+
+        if (window.location.hostname !== "sbte-result-viewer.vercel.app") {
+            window.location.href = url;
+            console.log("Redirecting to: ", url);
+        }
+    });
+
     return (
         <div class=" min-h-screen grid grid-rows-[min-content_1fr_min-content]">
             <Navbar />
