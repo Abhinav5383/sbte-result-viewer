@@ -20,25 +20,6 @@
         &:where(:focus-visible, :hover) {
             border-color: var(--color-accent-bg);
         }
-
-        .arrow {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        svg {
-            color: var(--gh-text-secondary);
-            width: 1.3em;
-            height: 1.3em;
-            transform-origin: center center;
-            translate: 0 5%;
-            transition: rotate 0.2s ease-in-out;
-        }
-
-        &:has(+ .__popover:popover-open) .arrow svg {
-            rotate: 180deg;
-        }
     }
 
     .__popover {
@@ -87,11 +68,12 @@
 
             position-try: flip-block;
             position-try-fallbacks: flip-block;
+            position-try-order: most-block-size;
             position-try-options: flip-block;
         }
 
         .__popover::backdrop {
-            background: #0002;
+            background: revert;
             backdrop-filter: revert;
         }
     }

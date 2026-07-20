@@ -1,37 +1,45 @@
-import type { JSX } from "solid-js";
-import "./styles.css";
-import ChevronDown from "~/components/icons/chevron-down";
+import { createEffect, type JSX } from "solid-js";
 import { cn } from "~/components/utils";
+
+import "./styles.css";
 
 interface PopoverProps {
     id: string;
+    isOpen: boolean;
+    setIsOpen: (isOpen: boolean) => void;
     trigger: (props: JSX.ButtonHTMLAttributes<HTMLButtonElement>) => JSX.Element;
-    children: JSX.Element;
     class?: string;
-    onChange?: (open: boolean) => void;
+    children: JSX.Element;
 }
 
 export default function Popover(props: PopoverProps) {
+    let popoverRef: HTMLDivElement | undefined;
+
+    createEffect(() => {
+        if (!popoverRef) return;
+        if (props.isOpen) {
+            popoverRef.showPopover();
+        } else {
+            popoverRef.hidePopover();
+        }
+    });
+
     return (
         <>
             <props.trigger
                 popovertarget={props.id}
                 class="__popover-trigger"
                 style={{ "anchor-name": `--popover-${props.id}` }}
-            >
-                <span class="arrow">
-                    <ChevronDown />
-                </span>
-            </props.trigger>
+            />
 
             <div
                 id={props.id}
                 popover
+                ref={popoverRef}
                 class={cn(props.class, "__popover")}
                 style={{ "position-anchor": `--popover-${props.id}` }}
                 onToggle={(e) => {
-                    if (!props.onChange) return;
-                    props.onChange(e.newState === "open");
+                    props.setIsOpen(e.newState === "open");
                 }}
             >
                 {props.children}

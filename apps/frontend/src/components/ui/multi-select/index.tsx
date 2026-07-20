@@ -3,6 +3,7 @@ import { cn } from "~/components/utils";
 import Popover from "../popover";
 
 import "./styles.css";
+import ChevronDown from "~/components/icons/chevron-down";
 
 interface SelectOption {
     value: string;
@@ -21,7 +22,9 @@ interface SelectProps {
 }
 
 export default function MultiSelect(props: SelectProps) {
+    const [isOpen, setIsOpen] = createSignal(false);
     const [selectedItems, setSelectedItems] = createSignal(props.selected);
+    let contentRef: HTMLDivElement | undefined;
 
     const selectedLabels = () => {
         const list: string[] = [];
@@ -48,9 +51,67 @@ export default function MultiSelect(props: SelectProps) {
     }
 
     function handlePopoverChange(isOpen: boolean) {
-        if (isOpen) return;
-        if (!props.immediate) {
+        if (isOpen) {
+            requestAnimationFrame(() => {
+                const firstOption = contentRef?.querySelector<HTMLElement>(".multi-select-option");
+                firstOption?.focus();
+            });
+        }
+
+        if (!isOpen && !props.immediate) {
             props.onChange(selectedItems());
+        }
+    }
+    createEffect(() => {
+        handlePopoverChange(isOpen());
+    });
+
+    function handleKeyDown(e: KeyboardEvent) {
+        if (!contentRef) return;
+
+        const options = Array.from(contentRef.querySelectorAll<HTMLElement>(".multi-select-option"));
+        if (!options.length) return;
+
+        const currentIndex = options.indexOf(document.activeElement as HTMLElement);
+
+        switch (e.key) {
+            case "ArrowDown":
+                e.preventDefault();
+                if (currentIndex < options.length - 1) {
+                    options[currentIndex + 1]?.focus();
+                }
+                break;
+
+            case "ArrowUp": {
+                e.preventDefault();
+                if (currentIndex > 0) {
+                    options[currentIndex - 1]?.focus();
+                }
+                break;
+            }
+
+            case "Home":
+                e.preventDefault();
+                options[0]?.focus();
+                break;
+
+            case "End":
+                e.preventDefault();
+                options[options.length - 1]?.focus();
+                break;
+
+            case "Tab":
+                e.preventDefault();
+                setIsOpen(false);
+                break;
+
+            case "Enter":
+            case " ":
+                if (currentIndex !== -1) {
+                    e.preventDefault();
+                    options[currentIndex].click();
+                }
+                break;
         }
     }
 
@@ -72,12 +133,17 @@ export default function MultiSelect(props: SelectProps) {
                             {selectedLabels().join(", ")}
                         </Show>
                     </span>
-                    {args.children}
+
+                    <span class="arrow">
+                        <ChevronDown />
+                    </span>
                 </button>
             )}
-            onChange={handlePopoverChange}
+            isOpen={isOpen()}
+            setIsOpen={setIsOpen}
         >
-            <div class="multi-select-content">
+            {/** biome-ignore lint/a11y/noStaticElementInteractions: meh */}
+            <div class="multi-select-content" ref={contentRef} onKeyDown={handleKeyDown}>
                 <For each={props.options}>
                     {(option) => (
                         <Option
@@ -104,7 +170,7 @@ function Option(props: OptionProps) {
     const checked = () => props.selected.includes(props.value);
 
     return (
-        <label class="multi-select-option select-none">
+        <label class="multi-select-option select-none" tabindex={0}>
             <span>{props.label ?? props.value}</span>
             <input role="option" type="checkbox" checked={checked()} onInput={() => props.onChange(!checked())} />
 

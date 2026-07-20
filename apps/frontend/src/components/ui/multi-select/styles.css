@@ -1,6 +1,25 @@
 @import "tailwindcss";
 
 @layer utilities {
+    .arrow {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        svg {
+            color: var(--gh-text-secondary);
+            width: 1.3em;
+            height: 1.3em;
+            transform-origin: center center;
+            translate: 0 5%;
+            transition: rotate 0.2s ease-in-out;
+        }
+    }
+
+    :has(> :popover-open) .arrow svg {
+        rotate: 180deg;
+    }
+
     .multi-select-popover:popover-open {
         display: grid;
 
@@ -45,15 +64,20 @@
             color: lch(from var(--color-accent-bg) calc(l * 0.7) c h);
         }
 
-        &:has(.checkmark),
-        &:focus {
+        &:has(.checkmark) {
             color: var(--color-black);
             background-color: lch(from var(--color-accent-bg) l c h / 0.3);
         }
 
+        &:focus,
         &:hover {
             color: var(--color-zinc-900);
             background-color: lch(from var(--color-accent-bg) l c h / 0.17);
+        }
+
+        &:has(.checkmark):focus,
+        &:has(.checkmark):hover {
+            outline: 2px solid var(--color-accent-bg);
         }
     }
 }
