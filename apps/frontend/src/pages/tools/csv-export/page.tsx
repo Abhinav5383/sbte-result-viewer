@@ -13,7 +13,7 @@ import { createEffect, createMemo, createSignal, For, onMount, Show } from "soli
 import { ResultsFilter } from "~/components/misc/results-filter/component";
 import { useResultsFilter } from "~/components/misc/results-filter/hook";
 import VirtualList from "~/components/misc/virtual-list";
-import { Select } from "~/components/ui/select";
+import MultiSelect from "~/components/ui/multi-select";
 import { cn } from "~/components/utils";
 import { useIndexedResults } from "~/lib/hooks/index-results";
 import { useResults } from "~/providers/results";
@@ -168,18 +168,6 @@ function PageContents(props: { encodedData: EncodedData }) {
         }
     });
 
-    const availableAddOptions = createMemo(() => {
-        const selected = selectedFields();
-        return CSV_FIELDS.filter((f) => !selected.includes(f.key));
-    });
-    const [addField, setAddField] = createSignal(availableAddOptions()[0]?.key || "");
-    createEffect(() => {
-        const addF = addField();
-        if (!availableAddOptions().some((opt) => opt.key === addF)) {
-            setAddField(availableAddOptions()[0]?.key || "");
-        }
-    });
-
     function handleCSVExport() {
         const headers = selectedFields().map((key) => {
             const fieldDef = CSV_FIELDS.find((f) => f.key === key);
@@ -239,7 +227,7 @@ function PageContents(props: { encodedData: EncodedData }) {
                     <ResultsFilter hook={res} indexedData={indexedData()} alwaysShowSort />
                 </div>
 
-                <div class="flex items-center justify-between flex-wrap gap-4 pbs-6">
+                <div class="flex items-center justify-between flex-wrap gap-x-8 gap-y-4 pbs-6">
                     <div class="flex gap-4 items-center">
                         <p class="text-dim-fg text-sm">
                             Includes <span class="font-medium">{res.sortedResults().results.length}</span> of{" "}
@@ -258,44 +246,28 @@ function PageContents(props: { encodedData: EncodedData }) {
                         </Show>
                     </div>
 
-                    <Show
-                        when={availableAddOptions().length > 0}
-                        fallback={
-                            <button
-                                type="button"
-                                class={cn(
-                                    "flex shrink-0 items-center gap-2 font-medium text-sm text-dim-fg transition-all",
-                                    "hover:bg-rose-500 hover:text-white focus-visible:bg-rose-500 focus-visible:text-white",
-                                )}
-                                onClick={() => setSelectedFields([])}
-                            >
-                                <Trash2Icon />
-                                <span style="text-box: trim-both cap alphabetic;">Clear All Fields</span>
-                            </button>
-                        }
-                    >
-                        <div class="flex items-center gap-2 flex-wrap">
-                            <Select
-                                value={addField()}
-                                onChange={setAddField}
-                                options={availableAddOptions().map((f) => ({
-                                    label: f.label,
-                                    value: f.key,
-                                }))}
-                                class="w-fit border-2 min-w-[10ch] border-border focus:border-accent-bg"
-                            />
-                            <button
-                                type="button"
-                                class="flex items-center gap-2 font-medium rounded-md px-4 transition-all bg-accent-bg text-accent-bg-text hover:brightness-90"
-                                onClick={() => {
-                                    setSelectedFields([...selectedFields(), addField()]);
-                                }}
-                            >
-                                <PlusIcon />
-                                <span style="text-box: trim-both cap alphabetic;">Add</span>
-                            </button>
-                        </div>
-                    </Show>
+                    <div class="grow grid grid-cols-[1fr_auto] gap-4 justify-items-end">
+                        <MultiSelect
+                            selected={selectedFields()}
+                            onChange={(list) => setSelectedFields(list as ValidKeys[])}
+                            options={CSV_FIELDS.map((f) => ({
+                                label: f.label,
+                                value: f.key,
+                            })).sort((a, b) => a.label.localeCompare(b.label))}
+                            class="border-2 w-stretch xl:w-[42ch] border-border focus:border-accent-bg"
+                        />
+
+                        <button
+                            type="button"
+                            class={cn(
+                                "flex shrink-0 items-center gap-2 font-medium text-sm transition-all",
+                                "bg-rose-500 text-white hover:bg-rose-500/80 focus-visible:bg-rose-500/80",
+                            )}
+                            onClick={() => setSelectedFields([])}
+                        >
+                            <Trash2Icon />
+                        </button>
+                    </div>
                 </div>
 
                 <PreviewCsv

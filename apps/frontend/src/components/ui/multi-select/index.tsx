@@ -53,8 +53,9 @@ export default function MultiSelect(props: SelectProps) {
     function handlePopoverChange(isOpen: boolean) {
         if (isOpen) {
             requestAnimationFrame(() => {
-                const firstOption = contentRef?.querySelector<HTMLElement>(".multi-select-option");
-                firstOption?.focus();
+                // const firstOption = contentRef?.querySelector<HTMLElement>(".multi-select-option");
+                // firstOption?.focus();
+                contentRef?.focus();
             });
         }
 
@@ -143,7 +144,7 @@ export default function MultiSelect(props: SelectProps) {
             setIsOpen={setIsOpen}
         >
             {/** biome-ignore lint/a11y/noStaticElementInteractions: meh */}
-            <div class="multi-select-content" ref={contentRef} onKeyDown={handleKeyDown}>
+            <div class="multi-select-content" ref={contentRef} onKeyDown={handleKeyDown} tabindex={0}>
                 <For each={props.options}>
                     {(option) => (
                         <Option

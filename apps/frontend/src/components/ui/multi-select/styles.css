@@ -33,7 +33,16 @@
         border: 2px solid var(--color-border);
     }
 
+    .multi-select-content:focus-visible {
+        outline-color: transparent;
+    }
+
+    .multi-select-popover:has(.multi-select-content:focus-visible) {
+        border-color: var(--color-accent-bg);
+    }
+
     .multi-select-option {
+        min-width: max-content;
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -69,14 +78,13 @@
             background-color: lch(from var(--color-accent-bg) l c h / 0.3);
         }
 
-        &:focus,
+        &:focus-visible,
         &:hover {
             color: var(--color-zinc-900);
             background-color: lch(from var(--color-accent-bg) l c h / 0.17);
         }
 
-        &:has(.checkmark):focus,
-        &:has(.checkmark):hover {
+        &:has(.checkmark):focus-visible {
             outline: 2px solid var(--color-accent-bg);
         }
     }
