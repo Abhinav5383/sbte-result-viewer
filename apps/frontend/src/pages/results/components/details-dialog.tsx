@@ -15,6 +15,7 @@ import ExternalLinkIcon from "lucide-solid/icons/external-link";
 import ImageIcon from "lucide-solid/icons/image";
 import XIcon from "lucide-solid/icons/x";
 import { createSignal, For, onCleanup, Show } from "solid-js";
+import { Button } from "~/components/ui/button";
 import { Dialog } from "~/components/ui/dialog";
 import { cn, OrdinalSuffix } from "~/components/utils";
 import { alphabeticalGradeClass, marksClass, sgpaClass } from "~/lib/grade-utils";
@@ -108,22 +109,14 @@ export function DetailsDialog(props: DetailsDialogProps) {
 
                                     {/* dummy buttons to reserve space for the absolute positioned actual buttons */}
                                     <div class="invisible flex items-center gap-2">
-                                        <button
-                                            type="button"
-                                            class="flex items-center justify-center gap-2 bg-zinc-50 text-normal-fg rounded-full ring-zinc-600 hover:scale-105 transition-transform duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                                            disabled
-                                        >
+                                        <Button variant="secondary" class="rounded-full" disabled>
                                             <ImageIcon />
                                             Save Image
-                                        </button>
+                                        </Button>
 
-                                        <button
-                                            type="button"
-                                            class="bg-zinc-50 text-normal-fg rounded-full ring-zinc-600 hover:scale-105 transition-transform duration-500"
-                                            disabled
-                                        >
+                                        <Button variant="secondary" size="icon" class="rounded-full" disabled>
                                             <XIcon />
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
 
@@ -183,23 +176,24 @@ export function DetailsDialog(props: DetailsDialogProps) {
                         </div>
 
                         <div class="absolute top-6 inset-e-4 flex items-center gap-2">
-                            <button
-                                type="button"
-                                class="flex items-center justify-center gap-2 bg-zinc-50 text-normal-fg rounded-full ring-zinc-600 hover:scale-105 transition-transform duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                            <Button
+                                variant="secondary"
+                                class="rounded-full bg-zinc-50 hover:text-accent-fg"
                                 disabled={saving()}
                                 onClick={saveAsImage}
                             >
                                 <ImageIcon />
                                 {saving() ? "Saving..." : "Save Image"}
-                            </button>
+                            </Button>
 
-                            <button
-                                type="button"
-                                class="bg-zinc-50 text-normal-fg rounded-full ring-zinc-600 hover:scale-105 transition-transform duration-500"
+                            <Button
+                                variant="secondary"
+                                size="icon"
+                                class="rounded-full bg-zinc-50 hover:text-accent-fg"
                                 onClick={closeDialog}
                             >
                                 <XIcon />
-                            </button>
+                            </Button>
                         </div>
                     </div>
                 )}
@@ -275,13 +269,10 @@ function ImagePreviewDialog(props: ImagePreviewDialogProps) {
                 <div class="flex flex-col max-h-[90vh] gap-4 p-4">
                     <div class="flex items-center justify-between">
                         <h2 class="text-lg font-semibold">Image Preview</h2>
-                        <button
-                            type="button"
-                            class="p-2 aspect-square flex items-center justify-center rounded-full bg-zinc-800 text-white hover:bg-zinc-600 transition-colors"
-                            onClick={props.onClose}
-                        >
+
+                        <Button variant="secondary" size="icon" onClick={props.onClose} class="rounded-full">
                             <XIcon />
-                        </button>
+                        </Button>
                     </div>
 
                     <div class="flex-1 min-h-0 overflow-auto flex items-center justify-center p-6 bg-zinc-100 rounded-lg">
@@ -295,25 +286,17 @@ function ImagePreviewDialog(props: ImagePreviewDialogProps) {
                     </div>
 
                     <div class="flex gap-3 justify-end">
-                        <button
-                            type="button"
-                            class="flex items-center gap-2 px-4 py-2 rounded-lg border text-dim-fg border-zinc-300 hover:bg-zinc-100 transition-colors"
-                            onClick={copyToClipboard}
-                        >
+                        <Button variant="secondary" onClick={copyToClipboard}>
                             <Show when={copied()} fallback={<ClipboardIcon />}>
                                 <CheckIcon class="text-accent-fg" />
                             </Show>
                             {copied() ? "Copied!" : "Copy to Clipboard"}
-                        </button>
+                        </Button>
 
-                        <button
-                            type="button"
-                            class="flex items-center gap-2 px-4 py-2 rounded-lg bg-accent-bg text-white font-bold hover:bg-accent-bg/90 transition-colors"
-                            onClick={download}
-                        >
+                        <Button variant="primary-alt" onClick={download}>
                             <DownloadIcon />
                             Download
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </Show>

@@ -1,7 +1,7 @@
 import { BRANCH, COLLEGE } from "./types";
 
-export function getCollegeFromRoll(code: string): COLLEGE {
-    const collegeCode = Number.parseInt(code.substring(2, 5), 10);
+export function getCollegeFromRoll(roll: string): COLLEGE {
+    const collegeCode = Number.parseInt(getCollegeCodeStrFromRoll(roll), 10);
 
     for (const ccode of Object.values(COLLEGE)) {
         if (ccode === collegeCode) {
@@ -12,8 +12,12 @@ export function getCollegeFromRoll(code: string): COLLEGE {
     return COLLEGE.UNKNOWN;
 }
 
-export function getBranchFromRoll(code: string): BRANCH {
-    const branchCode = Number.parseInt(code.substring(5, 7), 10);
+export function getCollegeCodeStrFromRoll(roll: string): string {
+    return roll.substring(2, 5);
+}
+
+export function getBranchFromRoll(roll: string): BRANCH {
+    const branchCode = Number.parseInt(getBranchCodeStrFromRoll(roll), 10);
 
     for (const bcode of Object.values(BRANCH)) {
         if (bcode === branchCode) {
@@ -24,8 +28,12 @@ export function getBranchFromRoll(code: string): BRANCH {
     return BRANCH.UNKNOWN;
 }
 
-export function getSessionFromRoll(code: string): string {
-    return code.substring(7, 9);
+export function getBranchCodeStrFromRoll(roll: string): string {
+    return roll.substring(5, 7);
+}
+
+export function getSessionFromRoll(roll: string): string {
+    return roll.substring(7, 9);
 }
 
 export function getRegNoFromRoll(roll: string) {

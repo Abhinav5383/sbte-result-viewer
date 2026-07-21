@@ -13,7 +13,7 @@ export function ToolsPage() {
         },
         {
             name: "Group Generator",
-            path: "/tools/group-creator",
+            path: "/tools/group-generator",
             desc: "Generate randomized class groups of students and export the groups as CSV files.",
         },
     ];

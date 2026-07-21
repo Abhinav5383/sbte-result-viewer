@@ -6,11 +6,13 @@ import { OrdinalSuffix } from "~/components/utils";
 import type { IndexedResultsData } from "~/lib/hooks/index-results";
 import { SearchBy, SortBy, SortOrder } from "~/lib/types";
 import type { ResultsFilterHook } from "./hook";
+import { FilterParams } from "./types";
 
 interface Props {
     hook: ResultsFilterHook;
     indexedData: IndexedResultsData;
     alwaysShowSort?: boolean;
+    hideFilters?: FilterParams[];
 }
 
 export function ResultsFilter(props: Props) {
@@ -37,7 +39,7 @@ export function ResultsFilter(props: Props) {
 
     return (
         <>
-            <div>
+            <div hidden={props.hideFilters?.includes(FilterParams.QUERY)}>
                 <label for="searchBy" class="w-fit">
                     Search
                 </label>
@@ -89,7 +91,7 @@ export function ResultsFilter(props: Props) {
                 </div>
             </div>
 
-            <div>
+            <div hidden={props.hideFilters?.includes(FilterParams.COLLEGE)}>
                 <label for="college-filter">College</label>
                 <MultiSelect
                     id="college-filter"
@@ -100,7 +102,7 @@ export function ResultsFilter(props: Props) {
                 />
             </div>
 
-            <div>
+            <div hidden={props.hideFilters?.includes(FilterParams.BRANCH)}>
                 <label for="branch-filter">Branch</label>
                 <MultiSelect
                     id="branch-filter"
@@ -114,7 +116,7 @@ export function ResultsFilter(props: Props) {
                 />
             </div>
 
-            <div>
+            <div hidden={props.hideFilters?.includes(FilterParams.SEMESTER)}>
                 <label for="semester-filter">Semester</label>
                 <MultiSelect
                     id="semester-filter"
@@ -128,7 +130,7 @@ export function ResultsFilter(props: Props) {
                 />
             </div>
 
-            <div>
+            <div hidden={props.hideFilters?.includes(FilterParams.SESSION)}>
                 <label for="session-filter">Session</label>
                 <MultiSelect
                     id="session-filter"
@@ -143,31 +145,29 @@ export function ResultsFilter(props: Props) {
             </div>
 
             <div class={props.alwaysShowSort ? "" : "xl:hidden"}>
-                <div>
-                    <label for="mb-sort">Sort By</label>
-                    <div class="grid gap-y-3 grid-cols-1 xs:grid-cols-[3fr_max-content]">
-                        <Select
-                            id="mb-sort"
-                            value={res.sortBy()}
-                            onChange={(v) => res.setSortFilter(v as SortBy, res.sortOrder())}
-                            options={Object.values(SortBy).map((sortBy) => ({
-                                value: sortBy,
-                                label: sortBy,
-                            }))}
-                            class="xs:rounded-e-none"
-                        />
+                <label for="mb-sort">Sort By</label>
+                <div class="grid gap-y-3 grid-cols-1 sm:grid-cols-[3fr_max-content]">
+                    <Select
+                        id="mb-sort"
+                        value={res.sortBy()}
+                        onChange={(v) => res.setSortFilter(v as SortBy, res.sortOrder())}
+                        options={Object.values(SortBy).map((sortBy) => ({
+                            value: sortBy,
+                            label: sortBy,
+                        }))}
+                        class="sm:rounded-e-none"
+                    />
 
-                        <Select
-                            id="mb-order"
-                            value={res.sortOrder()}
-                            onChange={(v) => res.setSortFilter(res.sortBy(), v as SortOrder)}
-                            options={[
-                                { value: SortOrder.Descending, label: SortOrder.Descending },
-                                { value: SortOrder.Ascending, label: SortOrder.Ascending },
-                            ]}
-                            class="xs:rounded-s-none xs:border-s-0"
-                        />
-                    </div>
+                    <Select
+                        id="mb-order"
+                        value={res.sortOrder()}
+                        onChange={(v) => res.setSortFilter(res.sortBy(), v as SortOrder)}
+                        options={[
+                            { value: SortOrder.Descending, label: SortOrder.Descending },
+                            { value: SortOrder.Ascending, label: SortOrder.Ascending },
+                        ]}
+                        class="sm:rounded-s-none sm:border-s-0"
+                    />
                 </div>
             </div>
         </>

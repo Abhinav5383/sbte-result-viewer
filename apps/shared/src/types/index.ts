@@ -20,7 +20,10 @@ export interface ParsedResult {
     };
     subjects: SubjectResult[];
     sgpa: number;
-    cgpa: number | null; // only for 6th semester results
+    /*
+     * Only available on 6th sem results
+     */
+    cgpa: number | null;
     remarks: string;
 }
 

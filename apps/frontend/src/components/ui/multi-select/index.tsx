@@ -113,6 +113,10 @@ export default function MultiSelect(props: SelectProps) {
                     options[currentIndex].click();
                 }
                 break;
+
+            case "Escape":
+                e.stopImmediatePropagation();
+                break;
         }
     }
 

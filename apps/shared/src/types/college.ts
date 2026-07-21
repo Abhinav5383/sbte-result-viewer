@@ -49,7 +49,7 @@ export const COLLEGE = {
     GP_BARH: 155,
     GPTT_BHAGALPUR: 156,
     UNKNOWN: -1,
-};
+} as const;
 
 export type COLLEGE_NAME = Enumify<typeof COLLEGE_NAME>;
 export const COLLEGE_NAME = {

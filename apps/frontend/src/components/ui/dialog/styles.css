@@ -1,8 +1,8 @@
-@layer utility {
-    body:has(dialog[open]) {
-        overflow: hidden;
-    }
+body:has(dialog[open]) {
+    overflow: hidden;
+}
 
+@layer base {
     .__dialog {
         margin: 0;
         padding: 0;

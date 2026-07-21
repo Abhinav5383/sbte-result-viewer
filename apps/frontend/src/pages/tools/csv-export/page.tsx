@@ -12,6 +12,7 @@ import { For, onMount, Show } from "solid-js";
 import { ResultsFilter } from "~/components/misc/results-filter/component";
 import { useResultsFilter } from "~/components/misc/results-filter/hook";
 import VirtualList from "~/components/misc/virtual-list";
+import { Button } from "~/components/ui/button";
 import MultiSelect from "~/components/ui/multi-select";
 import { cn } from "~/components/utils";
 import { useIndexedResults } from "~/lib/hooks/index-results";
@@ -200,6 +201,8 @@ function PageContents(props: { encodedData: EncodedData }) {
         link.setAttribute("href", url);
         link.setAttribute("download", "results.csv");
         link.click();
+
+        setTimeout(() => URL.revokeObjectURL(url), 5000);
     }
 
     return (
@@ -207,18 +210,10 @@ function PageContents(props: { encodedData: EncodedData }) {
             <div class="py-4 flex justify-between items-center">
                 <h1 class="text-3xl font-bold text-normal-fg">CSV Export</h1>
 
-                <button
-                    type="button"
-                    class={cn(
-                        "flex items-center gap-2 shrink-0 font-medium rounded-full px-4 transition-all",
-                        "border-2 border-transparent bg-accent-bg text-accent-bg-text hover:bg-transparent hover:border-border hover:text-normal-fg",
-                        "focus-visible:bg-transparent focus-visible:border-border focus-visible:text-normal-fg",
-                    )}
-                    onClick={handleCSVExport}
-                >
+                <Button variant="primary-alt" onClick={handleCSVExport}>
                     <FileSpreadsheetIcon class="w-[1.2em] h-[1.2em] mbs-[-0.15em]" />
                     <span style="text-box: trim-both cap alphabetic;">Export CSV</span>
-                </button>
+                </Button>
             </div>
 
             <div id="results" class="grid">
@@ -256,16 +251,10 @@ function PageContents(props: { encodedData: EncodedData }) {
                             class="border-2 w-stretch xl:w-[42ch] border-border focus:border-accent-bg"
                         />
 
-                        <button
-                            type="button"
-                            class={cn(
-                                "flex shrink-0 items-center gap-2 font-medium text-sm transition-all",
-                                "bg-rose-500 text-white hover:bg-rose-500/80 focus-visible:bg-rose-500/80",
-                            )}
-                            onClick={() => setSelectedFields([])}
-                        >
+                        <Button variant="danger-alt-hover" size="sm" onClick={() => setSelectedFields([])}>
                             <Trash2Icon />
-                        </button>
+                            Clear All
+                        </Button>
                     </div>
                 </div>
 
@@ -331,22 +320,20 @@ function PreviewCsv(props: PreviewCsvProps) {
                                     return (
                                         <div
                                             role="columnheader"
-                                            class="flex items-center justify-between gap-4 ps-3 pe-2 py-2 border-be border-e border-border bg-accent-bg text-accent-bg-text"
+                                            class="flex items-center justify-between bg-zinc-700 text-zinc-200 gap-4 px-3 py-2 border-be border-e border-current/25"
                                         >
                                             <span class="inline-block w-max max-w-[24ch] font-semibold">
                                                 {fieldDef.label}
                                             </span>
 
-                                            <button
-                                                type="button"
-                                                class={cn(
-                                                    "flex items-center justify-center w-fit min-h-0 p-0 h-8 aspect-square transition-all",
-                                                    "hover:bg-white focus-visible:bg-white hover:text-rose-500 focus-visible:text-rose-500",
-                                                )}
+                                            <Button
+                                                variant="danger-muted"
+                                                size="icon-sm"
                                                 onClick={() => removeField(fieldDef.key)}
+                                                class="text-rose-300"
                                             >
-                                                <Trash2Icon class="w-4 h-4" />
-                                            </button>
+                                                <Trash2Icon />
+                                            </Button>
                                         </div>
                                     );
                                 }}
