@@ -1,8 +1,8 @@
 import { useLocation } from "@solidjs/router";
-import { createEffect } from "solid-js";
+import { createEffect, type JSX } from "solid-js";
 import Navbar from "~/components/navbar";
 
-export default function RootLayout(props: { children: Element }) {
+export default function RootLayout(props: { children: JSX.Element }) {
     const loc = useLocation();
 
     createEffect(() => {
@@ -23,7 +23,7 @@ export default function RootLayout(props: { children: Element }) {
     });
 
     return (
-        <div class=" min-h-screen grid grid-rows-[min-content_1fr_min-content]">
+        <div class="min-h-screen min-h-lvh grid grid-cols-1 grid-rows-[auto_1fr_auto]">
             <Navbar />
             {props.children}
             <Footer />

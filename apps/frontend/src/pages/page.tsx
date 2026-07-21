@@ -6,8 +6,8 @@ export default function HomePage() {
     const ctx = useResults();
 
     return (
-        <>
-            <main class="min-h-screen">
+        <div class="grid">
+            <main>
                 <HeroSection
                     total={ctx.data()?.results.length ?? 0}
                     loading={ctx.data.loading}
@@ -40,7 +40,7 @@ export default function HomePage() {
             </main>
 
             <AboutSection />
-        </>
+        </div>
     );
 }
 
