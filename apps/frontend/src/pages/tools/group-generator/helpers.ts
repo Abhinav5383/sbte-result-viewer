@@ -1,7 +1,11 @@
 import type { EncodedResultT } from "@app/shared/encoder";
 import { getVal } from "@app/shared/encoder/helpers";
-import type { ParsedResult } from "@app/shared/types";
-import { getBranchFromRoll, getCollegeFromRoll, getRegNoFromRoll, getSessionFromRoll } from "@app/shared/utils";
+import {
+    getBranchCodeStrFromRoll,
+    getCollegeCodeStrFromRoll,
+    getRegNoFromRoll,
+    getSessionFromRoll,
+} from "@app/shared/utils";
 import type { GeneratedGroup, GroupStudent } from "./types";
 
 export function getUniqueResults(results: EncodedResultT[]) {
@@ -87,23 +91,44 @@ export interface DynamicField {
 }
 
 export function getDynamicCsvFields(students: GroupStudent[]): DynamicField[] {
-    const fields: DynamicField[] = [];
+    const branches = new Set<string>();
+    const colleges = new Set<string>();
+    const sessions = new Set<string>();
 
-    if (hasVariation(students, "branch")) {
+    for (const result of students) {
+        const roll = result.roll;
+
+        if (branches.size <= 1) {
+            branches.add(getBranchCodeStrFromRoll(roll));
+        }
+
+        if (colleges.size <= 1) {
+            colleges.add(getCollegeCodeStrFromRoll(roll));
+        }
+
+        if (sessions.size <= 1) {
+            sessions.add(getSessionFromRoll(roll));
+        }
+
+        if (branches.size > 1 && colleges.size > 1 && sessions.size > 1) {
+            break;
+        }
+    }
+
+    const fields: DynamicField[] = [];
+    if (branches.size > 1) {
         fields.push({
             key: "branch",
             label: "Branch",
         });
     }
-
-    if (hasVariation(students, "college")) {
+    if (colleges.size > 1) {
         fields.push({
             key: "college",
             label: "College",
         });
     }
-
-    if (hasVariation(students, "session")) {
+    if (sessions.size > 1) {
         fields.push({
             key: "session",
             label: "Session",
@@ -111,35 +136,6 @@ export function getDynamicCsvFields(students: GroupStudent[]): DynamicField[] {
     }
 
     return fields;
-}
-
-function hasVariation<T extends GroupStudent, K extends DynamicField["key"]>(items: T[], key: K) {
-    if (items.length === 0) return false;
-
-    const values = new Set<ReturnType<typeof getDynamicFieldVal<K>>>();
-    for (const item of items) {
-        values.add(getDynamicFieldVal(item, key));
-        if (values.size > 1) return true;
-    }
-
-    return false;
-}
-
-type _ReturnType<T> = T extends keyof ParsedResult["student"] ? ParsedResult["student"][T] : string;
-export function getDynamicFieldVal<T extends DynamicField["key"]>(student: GroupStudent, key: T) {
-    switch (key) {
-        case "branch":
-            return getBranchFromRoll(student.roll) as _ReturnType<T>;
-
-        case "college":
-            return getCollegeFromRoll(student.roll) as _ReturnType<T>;
-
-        case "session":
-            return getSessionFromRoll(student.roll) as _ReturnType<T>;
-
-        default:
-            throw new Error(`Invalid dynamic field key: ${key}`);
-    }
 }
 
 export function getStudentId(result: EncodedResultT) {

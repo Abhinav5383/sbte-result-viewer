@@ -1,4 +1,4 @@
-import { EncodedResult, type EncodedResultT, EncodedSubject, type EncodedSubjectT } from "./schema";
+import { EncodedResult, EncodedSubject } from "./schema";
 
 type FindByLoc<Schema, Loc extends number> = {
     [Key in keyof Schema]: Schema[Key] extends { loc: Loc; _type: infer T } ? T : never;

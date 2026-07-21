@@ -5,18 +5,10 @@ import { createSignal, Show } from "solid-js";
 import { Dice5Icon } from "~/components/icons/dice-5";
 import { useResultsFilter } from "~/components/misc/results-filter/hook";
 import { Button } from "~/components/ui/button";
-import { cn } from "~/components/utils";
 import { useIndexedResults } from "~/lib/hooks/index-results";
 import { useResults } from "~/providers/results";
 import GeneratedGroupsDialog from "./groups-dialog";
-import {
-    generateGroups,
-    getStudentId,
-    getUniqueResults,
-    makeGroupStudents,
-    mergeResults,
-    shuffleStudents,
-} from "./helpers";
+import { generateGroups, getStudentId, getUniqueResults, makeGroupStudents, mergeResults } from "./helpers";
 import { StudentPickerDialog } from "./student-picker";
 import { PreviewTable } from "./table";
 import type { GeneratedGroup } from "./types";

@@ -1,7 +1,7 @@
 import type { ParsedResult, SubjectResult } from "../types";
 import { getBranchFromRoll, getCollegeFromRoll } from "../utils";
 import { getVal, getValSub, mapToArray } from "./helpers";
-import { type EncodedResultT, EncodedSubject, type EncodedSubjectT } from "./schema";
+import type { EncodedResultT, EncodedSubjectT } from "./schema";
 
 export * from "./schema";
 
@@ -134,7 +134,6 @@ export function decodeResult(
 
 function decodeSubjects(subjects: EncodedSubjectT[], subNames: EncodedData["subjects"]): SubjectResult[] {
     const decoded: SubjectResult[] = [];
-    const schema = EncodedSubject;
 
     for (const sub of subjects) {
         decoded.push({

@@ -15,7 +15,7 @@ import { Button } from "~/components/ui/button";
 import { Dialog } from "~/components/ui/dialog";
 import { cn } from "~/components/utils";
 import { generateCSV } from "~/pages/tools/csv-export/gen-csv";
-import { getDynamicCsvFields, getDynamicFieldVal, getStudentId } from "./helpers";
+import { getDynamicCsvFields } from "./helpers";
 import type { GeneratedGroup } from "./types";
 
 interface Props {
@@ -42,10 +42,19 @@ export default function GeneratedGroupsDialog(props: Props) {
                     student.name,
                     student.roll,
                     ...csvFields.map((field) => {
-                        const value = getDynamicFieldVal(student, field.key);
-                        if (typeof value === "string") return value;
-                        if (typeof value === "number") return value.toString();
-                        return "";
+                        switch (field.key) {
+                            case "branch":
+                                return BRANCH_NAME[getBranchFromRoll(student.roll)];
+
+                            case "college":
+                                return COLLEGE_NAME[getCollegeFromRoll(student.roll)];
+
+                            case "session":
+                                return `20${getSessionFromRoll(student.roll)}`;
+
+                            default:
+                                throw new Error(`Invalid Dynamic CSV field: ${field.key}`);
+                        }
                     }),
                 ]);
             }

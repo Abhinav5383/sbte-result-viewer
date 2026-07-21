@@ -33,12 +33,7 @@ export default function Navbar() {
                 </A>
 
                 <div class="links flex flex-wrap justify-center items-center">
-                    <A
-                        href="/tools"
-                        class="nav-target"
-                        onMouseEnter={handleMouseEnter}
-                        onFocus={handleMouseEnter}
-                    >
+                    <A href="/tools" class="nav-target" onMouseEnter={handleMouseEnter} onFocus={handleMouseEnter}>
                         Tools
                     </A>
                     <A href="/#about" class="nav-target" onMouseEnter={handleMouseEnter} onFocus={handleMouseEnter}>
