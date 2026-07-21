@@ -6,7 +6,7 @@ import "./styles.css";
 interface PopoverProps {
     id: string;
     isOpen: boolean;
-    setIsOpen: (isOpen: boolean) => void;
+    onChange: (isOpen: boolean) => void;
     trigger: (props: JSX.ButtonHTMLAttributes<HTMLButtonElement>) => JSX.Element;
     class?: string;
     children: JSX.Element;
@@ -39,7 +39,7 @@ export default function Popover(props: PopoverProps) {
                 class={cn(props.class, "__popover")}
                 style={{ "position-anchor": `--popover-${props.id}` }}
                 onToggle={(e) => {
-                    props.setIsOpen(e.newState === "open");
+                    props.onChange(e.newState === "open");
                 }}
             >
                 {props.children}

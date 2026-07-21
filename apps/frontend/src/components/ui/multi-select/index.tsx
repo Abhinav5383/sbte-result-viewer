@@ -50,11 +50,11 @@ export default function MultiSelect(props: SelectProps) {
         }
     }
 
-    function handlePopoverChange(isOpen: boolean) {
+    function setPopoverState(isOpen: boolean) {
+        setIsOpen(isOpen);
+
         if (isOpen) {
             requestAnimationFrame(() => {
-                // const firstOption = contentRef?.querySelector<HTMLElement>(".multi-select-option");
-                // firstOption?.focus();
                 contentRef?.focus();
             });
         }
@@ -63,9 +63,6 @@ export default function MultiSelect(props: SelectProps) {
             props.onChange(selectedItems());
         }
     }
-    createEffect(() => {
-        handlePopoverChange(isOpen());
-    });
 
     function handleKeyDown(e: KeyboardEvent) {
         if (!contentRef) return;
@@ -103,7 +100,7 @@ export default function MultiSelect(props: SelectProps) {
 
             case "Tab":
                 e.preventDefault();
-                setIsOpen(false);
+                setPopoverState(false);
                 break;
 
             case "Enter":
@@ -145,7 +142,7 @@ export default function MultiSelect(props: SelectProps) {
                 </button>
             )}
             isOpen={isOpen()}
-            setIsOpen={setIsOpen}
+            onChange={setPopoverState}
         >
             {/** biome-ignore lint/a11y/noStaticElementInteractions: meh */}
             <div class="multi-select-content" ref={contentRef} onKeyDown={handleKeyDown} tabindex={0}>
