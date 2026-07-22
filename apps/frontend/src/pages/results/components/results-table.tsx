@@ -355,7 +355,7 @@ function MobileResultRow(props: RowVariantProps) {
             </div>
 
             <div class="grid gap-2">
-                <div class="flex items-center gap-x-2">
+                <div class="flex items-center gap-x-2 overflow-x-auto whitespace-nowrap">
                     <span class="font-semibold text-lg leading-tight truncate">{props.item.student.name}</span>
                     <BranchBadge
                         branch={BRANCH_NAME[props.item.student.branch]}
@@ -364,17 +364,17 @@ function MobileResultRow(props: RowVariantProps) {
                     />
                 </div>
 
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-x-2 overflow-x-auto whitespace-nowrap">
                     <span class="text-sm text-dim-fg tabular-nums">{props.item.student.roll.slice(2)}</span>
                     <span class="text-xs opacity-50">•</span>
-                    <span class="text-sm text-dim-fg">{COLLEGE_NAME[props.item.student.college]}</span>
+                    <span class="text-sm text-dim-fg truncate">{COLLEGE_NAME[props.item.student.college]}</span>
                     <span class="text-xs opacity-50">•</span>
                     <PercentageBadge percentObtained={props.percentObtained} class={props.marksClassName} />
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="flex items-center justify-center flex-col bg-zinc-50/50 p-3 rounded-lg border border-zinc-200">
-                        <span class="text-dim-fg font-medium uppercase text-xs opacity-70">Marks Obtained</span>
+                    <div class="grid place-items-center bg-zinc-50/50 p-3 rounded-lg border border-zinc-200">
+                        <span class="text-dim-fg font-medium uppercase text-xs opacity-70 whitespace-nowrap">Marks Obtained</span>
 
                         <div class="text-dim-fg text-xs">
                             <span class={cn(props.marksClassName, "text-lg font-medium")}>
@@ -385,7 +385,7 @@ function MobileResultRow(props: RowVariantProps) {
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-center flex-col bg-zinc-50/50 p-3 rounded-lg border border-zinc-200">
+                    <div class="grid place-items-center bg-zinc-50/50 p-3 rounded-lg border border-zinc-200">
                         <span class="text-dim-fg font-medium uppercase text-xs opacity-70">SGPA</span>
                         <span class={cn(props.sgpaClassName, "font-semibold text-lg")}>{props.item.sgpa}</span>
                     </div>
