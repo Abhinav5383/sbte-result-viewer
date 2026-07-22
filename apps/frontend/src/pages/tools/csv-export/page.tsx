@@ -206,7 +206,7 @@ function PageContents(props: { encodedData: EncodedData }) {
     }
 
     return (
-        <main class="grid gap-4 content-start px-6">
+        <main class="@container grid gap-4 content-start px-6">
             <div class="py-4 flex justify-between items-center">
                 <h1 class="text-3xl font-bold text-normal-fg">CSV Export</h1>
 
@@ -216,7 +216,7 @@ function PageContents(props: { encodedData: EncodedData }) {
                 </Button>
             </div>
 
-            <div id="results" class="grid @container">
+            <div id="results" class="grid">
                 <div class="grid grid-cols-1 @min-desktop:grid-cols-[4fr_3fr_3fr_3fr_4fr] gap-x-2.5 gap-y-4 py-4 pbe-6 *:first:col-span-full">
                     <ResultsFilter hook={res} indexedData={indexedData()} alwaysShowSort />
                 </div>
