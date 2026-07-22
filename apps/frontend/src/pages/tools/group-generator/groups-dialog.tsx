@@ -26,6 +26,7 @@ interface Props {
 
 export default function GeneratedGroupsDialog(props: Props) {
     const [dialogRef, setDialogRef] = createSignal<HTMLDialogElement | undefined>();
+    const maxGroupSize = () => props.groups[0]?.students?.length ?? 1;
 
     function downloadGroupsCsv() {
         const groups = props.groups;
@@ -144,12 +145,9 @@ export default function GeneratedGroupsDialog(props: Props) {
                     </div>
                 }
             >
-                <div
-                    class="grid overflow-x-auto"
-                    style={{ "grid-template-columns": gridCols() }}
-                >
+                <div class="grid overflow-x-auto" style={{ "grid-template-columns": gridCols() }}>
                     <div class="grid grid-cols-subgrid col-span-full bg-zinc-700 text-zinc-200 font-semibold *:px-4 *:py-3">
-                        <div class="text-end ps-10">Group</div>
+                        <div class="text-end ps-10 border-e-[0.07rem] border-current/35">Group</div>
                         <div>Name</div>
                         <div>Roll No.</div>
                         <Show when={hasMultiple().branch}>
@@ -180,18 +178,19 @@ export default function GeneratedGroupsDialog(props: Props) {
                                         args.class,
                                         "px-4 py-3 font-semibold border-e-[0.07rem] border-border text-lg flex items-center justify-end tabular-nums",
                                     )}
-                                    style={{ "grid-row": `span ${args.item.students.length}` }}
+                                    style={{ "grid-row": `span ${maxGroupSize()}` }}
                                 >
                                     <span class="opacity-50">#</span>
                                     {args.item.groupId}
                                 </div>
 
                                 <For each={args.item.students}>
-                                    {(student) => {
+                                    {(student, index) => {
                                         return (
                                             <div
                                                 class={cn(
-                                                    "contents *:py-2 *:px-4 *:min-w-max *:border-be-[0.07rem] *:border-border/50 last:border-none",
+                                                    "contents *:py-2 *:px-4 *:min-w-max *:border-be-[0.07rem] *:border-border/50",
+                                                    index() === args.item.students.length - 1 && "*:border-transparent",
                                                 )}
                                             >
                                                 <div class="font-medium text-normal-fg">{student.name}</div>
@@ -218,6 +217,16 @@ export default function GeneratedGroupsDialog(props: Props) {
                                         );
                                     }}
                                 </For>
+
+                                <Show when={args.item.students.length < maxGroupSize()}>
+                                    <For each={new Array(maxGroupSize() - args.item.students.length)}>
+                                        {() => (
+                                            <div class="grid col-start-2 -col-end-1 text-current/50 border-bs-[0.07rem] border-border/50 px-4 py-2 italic">
+                                                Empty
+                                            </div>
+                                        )}
+                                    </For>
+                                </Show>
                             </div>
                         )}
                     />

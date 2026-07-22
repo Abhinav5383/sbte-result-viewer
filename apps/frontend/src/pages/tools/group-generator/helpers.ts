@@ -58,14 +58,19 @@ export function mergeResults(current: EncodedResultT[], incoming: EncodedResultT
 }
 
 export function generateGroups(students: GroupStudent[], groupSize: number) {
-    const groups: GeneratedGroup[] = [];
     const shuffled = shuffleStudents(students);
+    const numGroups = Math.ceil(shuffled.length / groupSize);
 
-    for (let i = 0; i < shuffled.length; i += groupSize) {
+    const groups: GeneratedGroup[] = [];
+    for (let i = 0; i < numGroups; i++) {
         groups.push({
-            groupId: groups.length + 1,
-            students: shuffled.slice(i, i + groupSize),
+            groupId: i + 1,
+            students: [],
         });
+    }
+
+    for (let i = 0; i < shuffled.length; i++) {
+        groups[i % numGroups].students.push(shuffled[i]);
     }
 
     return groups;
