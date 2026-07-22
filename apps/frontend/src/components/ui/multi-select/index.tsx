@@ -1,9 +1,10 @@
+import CheckIcon from "lucide-solid/icons/check";
 import { createEffect, createSignal, For, Show } from "solid-js";
+import ChevronDown from "~/components/icons/chevron-down";
 import { cn } from "~/components/utils";
 import Popover from "../popover";
 
 import "./styles.css";
-import ChevronDown from "~/components/icons/chevron-down";
 
 interface SelectOption {
     value: string;
@@ -172,13 +173,12 @@ function Option(props: OptionProps) {
     const checked = () => props.selected.includes(props.value);
 
     return (
-        <label class="multi-select-option select-none" tabindex={0}>
-            <span>{props.label ?? props.value}</span>
+        <label class="multi-select-option" tabindex={0} data-checked={checked()}>
             <input role="option" type="checkbox" checked={checked()} onInput={() => props.onChange(!checked())} />
 
-            <Show when={checked()}>
-                <span class="checkmark">✓</span>
-            </Show>
+            <CheckIcon class="checkmark" stroke-width="3" />
+
+            <span>{props.label ?? props.value}</span>
         </label>
     );
 }
