@@ -2,6 +2,7 @@
 @import "tailwindcss";
 
 @layer base;
+@custom-variant hover (&:hover);
 
 @theme {
     /* text colors */
