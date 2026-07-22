@@ -25,9 +25,9 @@
     --breakpoint-xs: 26rem;
     --breakpoint-lg: 58rem;
 
-    --container-extra-sm: 26rem;
+    --container-extra-sm: 20rem;
     --container-mobile: 40rem;
-    --container-desktop: 80rem;
+    --container-desktop: 78rem;
 }
 
 html,
