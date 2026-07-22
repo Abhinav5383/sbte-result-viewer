@@ -1,3 +1,4 @@
+import CheckIcon from "lucide-solid/icons/check";
 import { For, Show } from "solid-js";
 import ChevronDown from "~/components/icons/chevron-down";
 
@@ -14,7 +15,6 @@ interface SelectProps {
 interface SelectOption {
     value: string;
     label?: string;
-    description?: string;
 }
 
 export function Select(props: SelectProps) {
@@ -77,12 +77,8 @@ function FancySelect(props: SelectProps) {
             <For each={props.options}>
                 {(option) => (
                     <option value={option.value} selected={option.value === props.value}>
-                        <div class="opt-content">
-                            <span class="opt-label">{option.label ?? option.value}</span>
-                            <Show when={option.description}>
-                                <span class="opt-desc">{option.description}</span>
-                            </Show>
-                        </div>
+                        <CheckIcon class="checkmark" stroke-width="3" />
+                        <span class="opt-content">{option.label ?? option.value}</span>
                     </option>
                 )}
             </For>
@@ -102,7 +98,7 @@ function RegularSelect(props: SelectProps) {
             <For each={props.options}>
                 {(option) => (
                     <option value={option.value} selected={option.value === props.value}>
-                        {option.description || option.label || option.value}
+                        {option.label || option.value}
                     </option>
                 )}
             </For>
