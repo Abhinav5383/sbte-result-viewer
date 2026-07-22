@@ -61,7 +61,7 @@ function HeroSection(props: { total: number; loading: boolean; error?: string })
                 </header>
 
                 <div class="grid place-content-center">
-                    <div class="inline-flex items-baseline gap-3 px-5 py-3 border-2 border-border rounded-md bg-white">
+                    <div class="inline-flex flex-wrap items-baseline justify-center gap-3 px-5 py-3 border-[0.13rem] border-border rounded-md bg-white">
                         <div class="text-3xl font-semibold text-bright-fg tabular-nums">
                             {props.loading ? "—" : props.total.toLocaleString()}
                         </div>
@@ -70,7 +70,7 @@ function HeroSection(props: { total: number; loading: boolean; error?: string })
                 </div>
 
                 {props.error ? (
-                    <div class="border-2 border-border rounded-md p-4 text-left bg-white">
+                    <div class="border-[0.13rem] border-border rounded-md p-4 text-left bg-white">
                         <div class="text-sm font-semibold text-pink-600">Failed to load results</div>
                         <div class="text-sm text-dim-fg">{props.error}</div>
                     </div>
@@ -95,7 +95,7 @@ function AboutSection() {
                 </header>
 
                 <div class="grid gap-3 text-normal-fg leading-relaxed">
-                    <div class="border-2 border-border rounded-md p-4 bg-white">
+                    <div class="border-[0.13rem] border-border rounded-md p-4 bg-white">
                         <p>
                             <span class="font-semibold">Data source & availability:</span> For past exams, results are
                             parsed from PDFs and stored as JSON during the build process, then embedded directly into
@@ -103,7 +103,7 @@ function AboutSection() {
                         </p>
                     </div>
 
-                    <div class="border-2 border-border rounded-md p-4 bg-white">
+                    <div class="border-[0.13rem] border-border rounded-md p-4 bg-white">
                         <p>
                             <span class="font-semibold">Privacy:</span> Results are loaded from the page itself
                             (embedded data). No API request is made to any third-party results server for normal usage.

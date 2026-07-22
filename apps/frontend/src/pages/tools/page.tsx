@@ -21,7 +21,7 @@ export function ToolsPage() {
     return (
         <main class="p-8 grid gap-4 content-start bg-zinc-100">
             <h1 class="text-5xl font-bold text-normal-fg">Tools</h1>
-            <ul class="tools-list grid grid-cols-[repeat(auto-fit,minmax(20rem,1fr))]">
+            <ul class="tools-list grid grid-cols-[repeat(auto-fit,minmax(min(100%,20rem),1fr))]">
                 <For each={tools}>
                     {(tool) => (
                         <li class="grid">
