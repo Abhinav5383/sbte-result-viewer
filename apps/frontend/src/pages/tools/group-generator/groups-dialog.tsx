@@ -118,7 +118,7 @@ export default function GeneratedGroupsDialog(props: Props) {
             open={props.isOpen}
             onClose={props.onClose}
             dialogProps={{
-                class: "rounded-lg max-w-[calc(100vw-4rem)]",
+                class: "rounded-lg max-w-[calc(100vw_-_1rem)] sm:max-w-[calc(100vw_-_4rem)]",
                 ref: (el) => setDialogRef(el),
             }}
         >
