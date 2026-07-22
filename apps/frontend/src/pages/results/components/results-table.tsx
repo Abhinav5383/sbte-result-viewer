@@ -66,7 +66,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
     }
 
     return (
-        <div>
+        <div class="@container/table">
             <Show
                 when={props.sortedResults.results.length > 0}
                 fallback={
@@ -77,14 +77,14 @@ export function ResultsListTable(props: ResultsListTableProps) {
                         <button
                             type="button"
                             onClick={props.clearFilters}
-                            class="font-medium rounded-full px-4 border-2 border-border hover:bg-accent-bg hover:text-accent-bg-text hover:border-accent-bg transition-all"
+                            class="font-medium rounded-full px-4 border-[0.07rem] border-border hover:bg-accent-bg hover:text-accent-bg-text hover:border-accent-bg transition-all"
                         >
                             Clear Filters
                         </button>
                     </div>
                 }
             >
-                <div class="flex items-center text-sm text-dim-fg px-6 py-3 gap-4 border-be border-border">
+                <div class="flex items-center text-sm text-dim-fg px-6 py-3 gap-4 border-be-[0.07rem] border-border">
                     <p>
                         Showing <span class="font-medium">{props.sortedResults.results.length}</span> of{" "}
                         <span class="font-medium">{props.resultsData.results.length} </span>
@@ -103,7 +103,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                 </div>
 
                 <div
-                    class="block xl:grid gap-x-8 relative justify-between"
+                    class="block @min-desktop:grid gap-x-8 relative justify-between"
                     style={{
                         // adding extra for the semester suffix + spacing
                         "--max-branch-len": `${props.maxStrSizes.branch + 10}ch`,
@@ -112,7 +112,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                         }`,
                     }}
                 >
-                    <div class="hidden xl:grid z-10 sticky top-0 col-span-full grid-cols-subgrid gap-x-0 *:px-4 *:py-3 border-b border-border bg-zinc-700 text-zinc-200">
+                    <div class="hidden @min-desktop:grid z-10 sticky top-0 col-span-full grid-cols-subgrid gap-x-0 *:px-4 *:py-3 border-be-[0.07rem] border-border bg-zinc-700 text-zinc-200">
                         <div>
                             <strong>#</strong>
                         </div>
@@ -345,7 +345,7 @@ function MobileResultRow(props: RowVariantProps) {
     return (
         // biome-ignore lint/a11y/noStaticElementInteractions: --
         <div
-            class="group/row xl:hidden grid grid-cols-[max-content_1fr] gap-3 px-3 py-5 border-b border-border hover:bg-zinc-100/50 active:bg-zinc-100 cursor-pointer focus-ring"
+            class="group/row @min-desktop:hidden grid grid-cols-[max-content_1fr] gap-3 px-3 py-5 border-be-[0.07rem] border-border hover:bg-zinc-100/50 active:bg-zinc-100 cursor-pointer focus-ring"
             onClick={props.onSelect}
             onKeyDown={(e) => handleRowKbEvent(e, props.onSelect)}
             tabindex={0}
@@ -373,7 +373,7 @@ function MobileResultRow(props: RowVariantProps) {
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="grid place-items-center bg-zinc-50/50 p-3 rounded-lg border border-zinc-200">
+                    <div class="grid place-items-center bg-zinc-50/50 p-3 rounded-lg border-[0.07rem] border-zinc-200">
                         <span class="text-dim-fg font-medium uppercase text-xs opacity-70 whitespace-nowrap">Marks Obtained</span>
 
                         <div class="text-dim-fg text-xs">
@@ -385,7 +385,7 @@ function MobileResultRow(props: RowVariantProps) {
                         </div>
                     </div>
 
-                    <div class="grid place-items-center bg-zinc-50/50 p-3 rounded-lg border border-zinc-200">
+                    <div class="grid place-items-center bg-zinc-50/50 p-3 rounded-lg border-[0.07rem] border-zinc-200">
                         <span class="text-dim-fg font-medium uppercase text-xs opacity-70">SGPA</span>
                         <span class={cn(props.sgpaClassName, "font-semibold text-lg")}>{props.item.sgpa}</span>
                     </div>
@@ -405,8 +405,8 @@ function DesktopResultRow(props: RowVariantProps) {
         // biome-ignore lint/a11y/noStaticElementInteractions: __
         <div
             class={cn(
-                "hidden xl:grid",
-                "items-center col-span-full grid-cols-subgrid py-3 border-b border-border hover:bg-zinc-100 cursor-pointer px-6",
+                "hidden @min-desktop:grid",
+                "items-center col-span-full grid-cols-subgrid py-3 border-be-[0.07rem] border-border hover:bg-zinc-100 cursor-pointer px-6",
                 "focus-ring",
             )}
             onClick={props.onSelect}

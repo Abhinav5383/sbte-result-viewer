@@ -13,8 +13,8 @@ export function ResultListPage(props: ResultListPageProps) {
     const res = useResultsFilter(props.encodedData);
 
     return (
-        <div id="results">
-            <div class="grid grid-cols-1 xl:grid-cols-[4fr_3fr_2fr_2fr_2fr] gap-x-2.5 gap-y-4 py-4 px-6">
+        <div id="results" class="@container">
+            <div class="grid grid-cols-1 @min-desktop:grid-cols-[4fr_3fr_2fr_2fr_2fr] gap-x-2.5 gap-y-4 py-4 px-6">
                 <ResultsFilter hook={res} indexedData={indexedData()} />
             </div>
 

@@ -24,6 +24,10 @@
 
     --breakpoint-xs: 26rem;
     --breakpoint-lg: 58rem;
+
+    --container-extra-sm: 26rem;
+    --container-mobile: 40rem;
+    --container-desktop: 80rem;
 }
 
 html,
@@ -57,16 +61,16 @@ body {
     .focus-ring {
         outline: none;
 
+        &.no-focus-ring {
+            @apply ring-transparent;
+        }
+
         &:focus-visible {
-            @apply ring-2 ring-accent-fg-light;
+            @apply ring-[0.07rem] ring-accent-fg-light;
 
             &.no-focus-ring {
                 @apply ring-transparent;
             }
-        }
-
-        &.no-focus-ring {
-            @apply ring-transparent;
         }
     }
 
@@ -85,7 +89,7 @@ body {
 
     select,
     input {
-        @apply text-normal-fg border-2 border-border;
+        @apply text-normal-fg border-[0.13rem] border-border;
     }
 
     label {

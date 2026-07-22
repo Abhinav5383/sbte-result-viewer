@@ -43,7 +43,7 @@ export function StudentPickerDialog(props: StudentPickerDialogProps) {
                 ref: (el) => setDialogRef(el),
             }}
         >
-            <div class="flex items-center justify-between p-4 border-b border-border">
+            <div class="flex items-center justify-between p-4 border-be-[0.07rem] border-border">
                 <h2 class="text-xl font-bold text-normal-fg">Select Students</h2>
 
                 <Button variant="secondary" size="icon" class="rounded-full" onClick={props.onClose}>
@@ -52,7 +52,7 @@ export function StudentPickerDialog(props: StudentPickerDialogProps) {
             </div>
 
             <div class="grid gap-4">
-                <div class="grid gap-4 p-6">
+                <div class="@container grid gap-4 p-6">
                     <div class="flex flex-wrap items-center justify-between gap-4">
                         <div class="grid gap-1">
                             <h3 class="font-semibold text-normal-fg">Add From Results</h3>
@@ -65,7 +65,7 @@ export function StudentPickerDialog(props: StudentPickerDialogProps) {
                         </Button>
                     </div>
 
-                    <div class="grid grid-cols-1 xl:grid-cols-[4fr_3fr_2fr_3fr] gap-x-2.5 gap-y-4 py-2 *:first:col-span-full">
+                    <div class="grid grid-cols-1 @min-desktop:grid-cols-[4fr_3fr_2fr_3fr] gap-x-2.5 gap-y-4 py-2 *:first:col-span-full">
                         <ResultsFilter
                             hook={props.resultsFilter}
                             indexedData={props.indexedData}

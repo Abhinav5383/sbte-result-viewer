@@ -126,7 +126,7 @@ export default function MultiSelect(props: SelectProps) {
             id={`"multi-select-popover-${props.id}`}
             class="multi-select-popover"
             trigger={(args) => (
-                <button type="button" {...args} class={cn(props.class, args.class)}>
+                <button type="button" {...args} class={cn(props.class, args.class, "no-focus-ring")}>
                     <span class="text-start text-ellipsis overflow-hidden whitespace-nowrap">
                         <Show when={selectedLabels().length === 0}>{props.placeholder || "Select..."}</Show>
                         <Show when={selectedLabels().length === 1}>{selectedLabels()[0]}</Show>

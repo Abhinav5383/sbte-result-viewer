@@ -7,6 +7,7 @@ import type { IndexedResultsData } from "~/lib/hooks/index-results";
 import { SearchBy, SortBy, SortOrder } from "~/lib/types";
 import type { ResultsFilterHook } from "./hook";
 import { FilterParams } from "./types";
+import { Button } from "~/components/ui/button";
 
 interface Props {
     hook: ResultsFilterHook;
@@ -43,7 +44,7 @@ export function ResultsFilter(props: Props) {
                 <label for="searchBy" class="w-fit">
                     Search
                 </label>
-                <div class="grid gap-y-3 grid-cols-1 xs:grid-cols-[12ch_1fr] gap-0">
+                <div class="grid gap-y-3 grid-cols-1 @min-extra-sm:grid-cols-[12ch_1fr] gap-0">
                     <Select
                         value={res.searchBy()}
                         onChange={(val) => res.setSearchBy(val as SearchBy)}
@@ -57,7 +58,7 @@ export function ResultsFilter(props: Props) {
                                 label: "Name",
                             },
                         ]}
-                        class="xs:rounded-e-none xs:border-e-0 border-2 min-w-[10ch] border-border focus:border-accent-bg"
+                        class="@min-extra-sm:rounded-e-none @min-extra-sm:border-e-0 min-w-[10ch] border-border focus:border-accent-bg"
                     />
 
                     <div class="relative">
@@ -69,7 +70,7 @@ export function ResultsFilter(props: Props) {
                             spellcheck={false}
                             enterkeyhint="search"
                             placeholder={`Enter ${res.searchBy()} to search`}
-                            class="no-focus-ring xs:rounded-s-none border-2 border-border focus:border-accent-bg w-full"
+                            class="no-focus-ring @min-extra-sm:rounded-s-none border-border focus:border-accent-bg w-full"
                             ref={res.setQueryInputRef}
                             onChange={(e) => {
                                 res.setSearchQuery(e.currentTarget.value);
@@ -81,12 +82,13 @@ export function ResultsFilter(props: Props) {
                             onBlur={(e) => res.setSearchQuery(e.currentTarget.value)}
                         />
 
-                        <button
-                            type="button"
-                            class="grid place-content-center absolute rounded-md text-dim-fg transition-all min-h-0 py-0 px-0 aspect-square inset-y-0 inset-e-0 hover:text-accent-fg focus-visible:text-accent-fg"
+                        <Button
+                            variant="primary-alt"
+                            size="icon-sm"
+                            class="grid place-content-center absolute rounded aspect-square inset-y-1 inset-e-1"
                         >
                             <SearchIcon />
-                        </button>
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -144,9 +146,9 @@ export function ResultsFilter(props: Props) {
                 />
             </div>
 
-            <div class={props.alwaysShowSort ? "" : "xl:hidden"}>
+            <div class={props.alwaysShowSort ? "" : "@min-desktop:hidden"}>
                 <label for="mb-sort">Sort By</label>
-                <div class="grid gap-y-3 grid-cols-1 sm:grid-cols-[3fr_max-content]">
+                <div class="grid gap-y-3 grid-cols-1 @min-mobile:grid-cols-[3fr_max-content]">
                     <Select
                         id="mb-sort"
                         value={res.sortBy()}
@@ -155,7 +157,7 @@ export function ResultsFilter(props: Props) {
                             value: sortBy,
                             label: sortBy,
                         }))}
-                        class="sm:rounded-e-none"
+                        class="@min-mobile:rounded-e-none"
                     />
 
                     <Select
@@ -166,7 +168,7 @@ export function ResultsFilter(props: Props) {
                             { value: SortOrder.Descending, label: SortOrder.Descending },
                             { value: SortOrder.Ascending, label: SortOrder.Ascending },
                         ]}
-                        class="sm:rounded-s-none sm:border-s-0"
+                        class="@min-mobile:rounded-s-none @min-mobile:border-s-0"
                     />
                 </div>
             </div>

@@ -73,8 +73,8 @@ export function PreviewTable(props: PreviewTableProps) {
     });
 
     return (
-        <div class="grid border-t border-border overflow-x-auto" style={{ "grid-template-columns": gridCols() }}>
-            <div class="grid grid-cols-subgrid col-span-full bg-zinc-700 text-zinc-200 border-b border-border font-semibold  *:px-4 *:py-3">
+        <div class="grid overflow-x-auto" style={{ "grid-template-columns": gridCols() }}>
+            <div class="grid grid-cols-subgrid col-span-full bg-zinc-700 text-zinc-200 font-semibold *:px-4 *:py-3">
                 <div class="text-end">#</div>
                 <div>Name</div>
                 <div>Roll No.</div>
@@ -104,22 +104,22 @@ export function PreviewTable(props: PreviewTableProps) {
                         <div
                             class={cn(
                                 args.class,
-                                "grid grid-cols-subgrid col-span-full items-center text-dim-fg border-b border-border py-2 *:px-4 *:min-w-max",
+                                "grid grid-cols-subgrid col-span-full items-center text-sm text-dim-fg border-be-[0.07rem] border-border py-2 *:px-4 *:min-w-max",
                             )}
                         >
-                            <div class="tabular-nums text-sm text-end min-w-[7ch]">{args.index + 1}</div>
-                            <div class="font-medium text-normal-fg">{getVal(result, "name")}</div>
-                            <div class="text-sm tabular-nums">{studentId}</div>
+                            <div class="tabular-nums text-end min-w-[7ch] text-current/50">{args.index + 1}</div>
+                            <div class="font-medium text-base text-normal-fg">{getVal(result, "name")}</div>
+                            <div class="tabular-nums">{studentId}</div>
                             <Show when={hasMultiple().branch}>
                                 <div>
                                     <BranchBadge branch={BRANCH_NAME[getBranchFromRoll(roll)]} />
                                 </div>
                             </Show>
                             <Show when={hasMultiple().college}>
-                                <div class="text-sm">{COLLEGE_NAME[getCollegeFromRoll(roll)]}</div>
+                                <div>{COLLEGE_NAME[getCollegeFromRoll(roll)]}</div>
                             </Show>
                             <Show when={hasMultiple().session}>
-                                <div class="text-sm tabular-nums">
+                                <div class="tabular-nums">
                                     <span class="opacity-75">20</span>
                                     {getSessionFromRoll(roll)}
                                 </div>

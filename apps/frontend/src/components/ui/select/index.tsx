@@ -26,7 +26,7 @@ export function Select(props: SelectProps) {
             fallback={
                 <RegularSelect
                     id={props.id}
-                    class={`no-focus-ring border-2 border-border focus-within:border-accent-bg ${props.class}`}
+                    class={`no-focus-ring border-border focus-within:border-accent-bg ${props.class}`}
                     options={props.options}
                     value={props.value}
                     onChange={props.onChange}
@@ -35,7 +35,7 @@ export function Select(props: SelectProps) {
         >
             <FancySelect
                 id={props.id}
-                class={`no-focus-ring border-2 border-border focus-within:border-accent-bg ${props.class}`}
+                class={`no-focus-ring border-border focus-within:border-accent-bg ${props.class}`}
                 options={props.options}
                 value={props.value}
                 onChange={props.onChange}

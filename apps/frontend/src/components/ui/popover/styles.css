@@ -14,7 +14,7 @@
         transition: all 0.2s ease;
         font-family: inherit;
         cursor: pointer;
-        border: 2px solid var(--color-border);
+        border: 0.13rem solid var(--color-border);
         border-radius: var(--radius-md);
 
         &:where(:focus-visible, :hover) {

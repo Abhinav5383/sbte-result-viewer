@@ -88,7 +88,7 @@ function PageContents(props: { encodedData: EncodedData }) {
                 <Show
                     when={selectedStudents().length > 0}
                     fallback={
-                        <div class="mx-6 grid place-content-center justify-items-center gap-4 rounded-xl border border-dashed border-border bg-white py-10">
+                        <div class="mx-6 grid place-content-center justify-items-center gap-4 rounded-xl border-[0.07rem] border-dashed border-border bg-white py-10">
                             <p class="text-dim-fg">No students added yet.</p>
                             <Button variant="primary-alt" class="rounded-full" onClick={() => setPickerOpen(true)}>
                                 <PlusIcon />

@@ -139,16 +139,16 @@ export default function GeneratedGroupsDialog(props: Props) {
             <Show
                 when={props.groups.length > 0}
                 fallback={
-                    <div class="p-8 text-center mt-10 mx-6 border border-dashed border-border rounded-xl bg-white">
+                    <div class="p-8 text-center mt-10 mx-6 border-[0.07rem] border-dashed  border-border rounded-xl bg-white">
                         <p class="text-dim-fg">No groups generated yet.</p>
                     </div>
                 }
             >
                 <div
-                    class="grid border-t border-border overflow-x-auto"
+                    class="grid overflow-x-auto"
                     style={{ "grid-template-columns": gridCols() }}
                 >
-                    <div class="grid grid-cols-subgrid col-span-full bg-zinc-700 text-zinc-200 border-b border-border font-semibold  *:px-4 *:py-3">
+                    <div class="grid grid-cols-subgrid col-span-full bg-zinc-700 text-zinc-200 font-semibold *:px-4 *:py-3">
                         <div class="text-end ps-10">Group</div>
                         <div>Name</div>
                         <div>Roll No.</div>
@@ -172,13 +172,13 @@ export default function GeneratedGroupsDialog(props: Props) {
                             <div
                                 class={cn(
                                     args.class,
-                                    "grid grid-cols-subgrid col-span-full text-dim-fg border-b border-border",
+                                    "grid grid-cols-subgrid col-span-full text-dim-fg border-be-[0.07rem] border-border",
                                 )}
                             >
                                 <div
                                     class={cn(
                                         args.class,
-                                        "px-4 py-3 font-semibold border-e border-border text-lg flex items-center justify-end tabular-nums",
+                                        "px-4 py-3 font-semibold border-e-[0.07rem] border-border text-lg flex items-center justify-end tabular-nums",
                                     )}
                                     style={{ "grid-row": `span ${args.item.students.length}` }}
                                 >
@@ -191,7 +191,7 @@ export default function GeneratedGroupsDialog(props: Props) {
                                         return (
                                             <div
                                                 class={cn(
-                                                    "contents *:py-2 *:px-4 *:min-w-max *:border-be *:border-border/50",
+                                                    "contents *:py-2 *:px-4 *:min-w-max *:border-be-[0.07rem] *:border-border/50 last:border-none",
                                                 )}
                                             >
                                                 <div class="font-medium text-normal-fg">{student.name}</div>

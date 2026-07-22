@@ -216,8 +216,8 @@ function PageContents(props: { encodedData: EncodedData }) {
                 </Button>
             </div>
 
-            <div id="results" class="grid">
-                <div class="grid grid-cols-1 xl:grid-cols-[4fr_3fr_3fr_3fr_4fr] gap-x-2.5 gap-y-4 py-4 pbe-6 *:first:col-span-full">
+            <div id="results" class="grid @container">
+                <div class="grid grid-cols-1 @min-desktop:grid-cols-[4fr_3fr_3fr_3fr_4fr] gap-x-2.5 gap-y-4 py-4 pbe-6 *:first:col-span-full">
                     <ResultsFilter hook={res} indexedData={indexedData()} alwaysShowSort />
                 </div>
 
@@ -248,7 +248,7 @@ function PageContents(props: { encodedData: EncodedData }) {
                                 label: f.label,
                                 value: f.key,
                             })).sort((a, b) => a.label.localeCompare(b.label))}
-                            class="border-2 w-stretch xl:w-[42ch] border-border focus:border-accent-bg"
+                            class="w-stretch @min-desktop:w-[42ch]"
                         />
 
                         <Button variant="danger-alt-hover" size="sm" onClick={() => setSelectedFields([])}>
@@ -305,7 +305,7 @@ function PreviewCsv(props: PreviewCsvProps) {
             <div class="max-w-stretch overflow-x-auto my-4" style="scrollbar-width: thin;">
                 <div
                     role="table"
-                    class="grid w-full border-t border-l border-border text-[0.925rem]"
+                    class="grid w-full text-[0.925rem]"
                     style={{
                         "grid-template-columns": `repeat(${props.selectedFields.length}, auto)`,
                     }}
@@ -320,7 +320,7 @@ function PreviewCsv(props: PreviewCsvProps) {
                                     return (
                                         <div
                                             role="columnheader"
-                                            class="flex items-center justify-between bg-zinc-700 text-zinc-200 gap-4 px-3 py-2 border-be border-e border-current/25"
+                                            class="flex items-center justify-between bg-zinc-700 text-zinc-200 gap-4 px-3 py-2 border-e-[0.07rem] border-current/25"
                                         >
                                             <span class="inline-block w-max max-w-[24ch] font-semibold">
                                                 {fieldDef.label}
@@ -358,7 +358,7 @@ function PreviewCsv(props: PreviewCsvProps) {
                                         const value = fieldDef.extract(args.item, props.encodedData);
 
                                         return (
-                                            <div role="cell" class="border-be border-e border-border px-3 py-2">
+                                            <div role="cell" class="border-be-[0.07rem] border-e-[0.07rem] first-of-type:border-s-[0.07rem] border-border px-3 py-2">
                                                 <span class="inline-block w-max tabular-nums">{value}</span>
                                             </div>
                                         );

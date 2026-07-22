@@ -312,7 +312,7 @@ interface SubjectCategoryProps {
 function SubjectCategory(props: SubjectCategoryProps) {
     return (
         <Show when={props.subjects.length > 0}>
-            <div class="grid grid-cols-1 @md:grid-cols-2 @4xl:grid-cols-3 gap-3 border-t border-border mt-3 pt-3">
+            <div class="grid grid-cols-1 @md:grid-cols-2 @4xl:grid-cols-3 gap-3 border-bs-[0.07rem] border-border mt-3 pt-3">
                 <span class="capitalize text-xl font-bold text-dim-fg col-span-full">{props.title}</span>
                 <For each={props.subjects}>{(subject) => <SubjectMarksDetails sub={subject} />}</For>
             </div>
@@ -322,7 +322,7 @@ function SubjectCategory(props: SubjectCategoryProps) {
 
 function SubjectMarksDetails(props: { sub: SubjectResult }) {
     return (
-        <div class="grid gap-3 bg-zinc-100 rounded-lg px-4 py-3 border border-zinc-200 tabular-nums">
+        <div class="grid gap-3 bg-zinc-100 rounded-lg px-4 py-3 border-[0.07rem] border-zinc-200 tabular-nums">
             <div class="h-fit flex gap-3 items-center">
                 <span class="text-lg leading-tight font-medium">{props.sub.name}</span>
                 <span
