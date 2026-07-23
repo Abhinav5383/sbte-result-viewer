@@ -374,7 +374,9 @@ function MobileResultRow(props: RowVariantProps) {
 
                 <div class="grid grid-cols-2 gap-4">
                     <div class="grid place-items-center bg-zinc-50/50 p-3 rounded-lg border-[0.07rem] border-zinc-200">
-                        <span class="text-dim-fg font-medium uppercase text-xs opacity-70 whitespace-nowrap">Marks Obtained</span>
+                        <span class="text-dim-fg font-medium uppercase text-xs opacity-70 whitespace-nowrap">
+                            Marks Obtained
+                        </span>
 
                         <div class="text-dim-fg text-xs">
                             <span class={cn(props.marksClassName, "text-lg font-medium")}>

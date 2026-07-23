@@ -358,7 +358,10 @@ function PreviewCsv(props: PreviewCsvProps) {
                                         const value = fieldDef.extract(args.item, props.encodedData);
 
                                         return (
-                                            <div role="cell" class="border-be-[0.07rem] border-e-[0.07rem] first-of-type:border-s-[0.07rem] border-border px-3 py-2">
+                                            <div
+                                                role="cell"
+                                                class="border-be-[0.07rem] border-e-[0.07rem] first-of-type:border-s-[0.07rem] border-border px-3 py-2"
+                                            >
                                                 <span class="inline-block w-max tabular-nums">{value}</span>
                                             </div>
                                         );
