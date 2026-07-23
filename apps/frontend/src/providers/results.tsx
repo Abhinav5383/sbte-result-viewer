@@ -1,5 +1,6 @@
 import type { EncodedData } from "@app/shared/encoder";
 import { createContext, createResource, type JSX, type Resource, useContext } from "solid-js";
+import CompressedResultsData from "~/data/results";
 
 interface ResultsContext {
     data: Resource<EncodedData>;
@@ -18,8 +19,8 @@ export function useResults(): ResultsContext {
 
 export function ResultsProvider(props: { children: JSX.Element }) {
     const [results, { refetch }] = createResource(async (): Promise<EncodedData> => {
-        if (typeof __EMBEDDED_RESULTS__ !== "undefined") {
-            return decodeEmbeddedResults(__EMBEDDED_RESULTS__);
+        if (typeof CompressedResultsData !== "undefined") {
+            return decodeEmbeddedResults(CompressedResultsData);
         }
 
         const res = await fetch(`http://${window.location.hostname}:5500/students-data`);
@@ -41,9 +42,6 @@ export function ResultsProvider(props: { children: JSX.Element }) {
         </resultsContext.Provider>
     );
 }
-
-// Declare the global embedded data (injected at build time) - gzip+base64 encoded string
-declare const __EMBEDDED_RESULTS__: string | undefined;
 
 async function decodeEmbeddedResults(base64: string): Promise<EncodedData> {
     if (typeof DecompressionStream === "undefined") {
