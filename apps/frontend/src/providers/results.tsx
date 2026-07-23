@@ -19,7 +19,7 @@ export function useResults(): ResultsContext {
 }
 
 export function ResultsProvider(props: { children: JSX.Element }) {
-    const [results, { refetch }] = createResource(async (): Promise<EncodedData> {
+    const [results, { refetch }] = createResource(async (): Promise<EncodedData> => {
         try {
             return await decodeEmbeddedResults(await getCompressedResultsData());
         } catch (e) {
