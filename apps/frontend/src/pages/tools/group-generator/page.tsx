@@ -6,6 +6,7 @@ import { Dice5Icon } from "~/components/icons/dice-5";
 import { useResultsFilter } from "~/components/misc/results-filter/hook";
 import { Button } from "~/components/ui/button";
 import { useIndexedResults } from "~/lib/hooks/index-results";
+import { SortBy, SortOrder } from "~/lib/types";
 import { useResults } from "~/providers/results";
 import GeneratedGroupsDialog from "./groups-dialog";
 import { generateGroups, getStudentId, getUniqueResults, makeGroupStudents, mergeResults } from "./helpers";
@@ -41,7 +42,10 @@ function PageContents(props: { encodedData: EncodedData }) {
     };
 
     const indexedData = useIndexedResults(uniqueResults());
-    const pickerResultsFilter = useResultsFilter(uniqueResults());
+    const pickerResultsFilter = useResultsFilter(uniqueResults(), {
+        sortBy: SortBy.RegNo,
+        sortOrder: SortOrder.Ascending,
+    });
 
     const [groupSize, setGroupSize] = createSignal(4);
     const [pickerOpen, setPickerOpen] = createSignal(false);
