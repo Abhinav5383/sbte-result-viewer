@@ -1,6 +1,7 @@
 import type { EncodedData } from "@app/shared/encoder";
-import { createContext, createResource, type JSX, type Resource, useContext } from "solid-js";
-import CompressedResultsData from "~/data/results";
+import { createContext, createResource, ErrorBoundary, type JSX, type Resource, useContext } from "solid-js";
+import { Button } from "~/components/ui/button";
+import getCompressedResultsData from "~/data/results";
 
 interface ResultsContext {
     data: Resource<EncodedData>;
@@ -18,17 +19,13 @@ export function useResults(): ResultsContext {
 }
 
 export function ResultsProvider(props: { children: JSX.Element }) {
-    const [results, { refetch }] = createResource(async (): Promise<EncodedData> => {
-        if (typeof CompressedResultsData !== "undefined") {
-            return decodeEmbeddedResults(CompressedResultsData);
+    const [results, { refetch }] = createResource(async (): Promise<EncodedData> {
+        try {
+            return await decodeEmbeddedResults(await getCompressedResultsData());
+        } catch (e) {
+            console.error(e);
+            throw e;
         }
-
-        const res = await fetch(`http://${window.location.hostname}:5500/students-data`);
-        if (!res.ok) {
-            throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
-        }
-        const data = (await res.json()) as EncodedData;
-        return data;
     });
 
     return (
@@ -38,7 +35,25 @@ export function ResultsProvider(props: { children: JSX.Element }) {
                 refetch,
             }}
         >
-            {props.children}
+            <ErrorBoundary
+                fallback={(err, reset) => (
+                    <div class="min-h-[75vh] grid place-content-center justify-items-center gap-4 p-8">
+                        <span class="text-3xl text-rose-500 font-semibold">Failed to load results!</span>
+                        <span class="text-dim-fg text-sm">{err?.message || "Unknown error occurred"}</span>
+                        <Button
+                            variant="primary-alt"
+                            onClick={() => {
+                                refetch();
+                                reset();
+                            }}
+                        >
+                            Retry
+                        </Button>
+                    </div>
+                )}
+            >
+                {props.children}
+            </ErrorBoundary>
         </resultsContext.Provider>
     );
 }
