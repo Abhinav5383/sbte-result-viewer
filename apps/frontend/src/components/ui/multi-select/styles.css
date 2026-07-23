@@ -56,6 +56,7 @@
         padding-inline-start: 0.7em;
         margin-block-end: 0.1em;
         border-radius: 0.3rem;
+        outline: transparent;
         color: var(--color-zinc-600);
 
         &:last-of-type {
