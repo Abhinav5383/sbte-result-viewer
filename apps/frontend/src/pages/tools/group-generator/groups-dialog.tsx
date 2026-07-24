@@ -170,7 +170,7 @@ export default function GeneratedGroupsDialog(props: Props) {
                             <div
                                 class={cn(
                                     args.class,
-                                    "grid grid-cols-subgrid col-span-full text-dim-fg border-be-[0.07rem] border-border",
+                                    "grid grid-cols-subgrid col-span-full text-dim-fg border-be-[0.12rem] border-border",
                                 )}
                             >
                                 <div
