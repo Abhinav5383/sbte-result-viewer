@@ -49,9 +49,11 @@ function HeroSection(props: { total: number; loading: boolean; error?: string })
                 <div class="grid place-content-center">
                     <div class="inline-flex flex-wrap items-baseline justify-center gap-3 px-5 py-3 border-[0.13rem] border-border rounded-md bg-white">
                         <div class="text-3xl font-semibold text-bright-fg tabular-nums">
-                            {props.loading ? "—" : props.total.toLocaleString()}
+                            <Show when={!props.loading} fallback="—">
+                                {props.total.toLocaleString()}
+                            </Show>
                         </div>
-                        <span class="text-xs text-dim-fg font-semibold uppercase tracking-widest">Student records</span>
+                        <span class="text-xs text-dim-fg font-semibold uppercase tracking-widest">Results total</span>
                     </div>
                 </div>
 
@@ -83,17 +85,10 @@ function AboutSection() {
                 <div class="grid gap-3 text-normal-fg leading-relaxed">
                     <div class="border-[0.13rem] border-border rounded-md p-4 bg-white">
                         <p>
-                            <span class="font-semibold">Data source & availability:</span> For past exams, results are
-                            parsed from PDFs and stored as JSON during the build process, then embedded directly into
-                            the website. The deployed site does not need any results API to show past results.
-                        </p>
-                    </div>
-
-                    <div class="border-[0.13rem] border-border rounded-md p-4 bg-white">
-                        <p>
-                            <span class="font-semibold">Privacy:</span> Results are loaded from the page itself
-                            (embedded data). No API request is made to any third-party results server for normal usage.
-                            Your searches/filters run locally in your browser.
+                            <span class="font-semibold">Data source & availability:</span> Exam results are gathered
+                            from the official SBTE API. So long as the API remains open, new exam results will continue
+                            being added. In case the website goes offline or is not accessible for any reason, all the
+                            results data is available in the git repo.
                         </p>
                     </div>
 
