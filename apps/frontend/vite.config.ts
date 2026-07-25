@@ -13,9 +13,9 @@ export default defineConfig({
             useRecommendedBuildConfig: true,
             overrideConfig: {
                 build: {
-                    assetsDir: ""
-                }
-            }
+                    assetsDir: "",
+                },
+            },
         }),
     ],
     base: process.env.BASE_PATH,

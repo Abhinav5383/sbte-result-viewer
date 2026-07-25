@@ -38,7 +38,7 @@ export default function VirtualList<T>(props: ResultTableContentsProps<T>) {
         const startIndex = Math.floor(containerYScroll / rHeight);
         const endIndex = Math.ceil((containerYScroll + window.innerHeight) / rHeight);
 
-        const rowsPerViewport = Math.ceil(window.innerHeight / rowHeight());
+        const rowsPerViewport = Math.ceil(window.innerHeight / rHeight);
         const overscan = Math.min(rowsPerViewport, endIndex - startIndex);
 
         const adjustedStartIndex = Math.max(0, startIndex - overscan);
