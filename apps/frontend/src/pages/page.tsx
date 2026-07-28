@@ -1,3 +1,4 @@
+import { A } from "@solidjs/router";
 import { Show } from "solid-js";
 import { useResults } from "~/providers/results";
 import { ResultListPage } from "./results/page";
@@ -34,15 +35,19 @@ function HeroSection(props: { total: number; loading: boolean; error?: string })
     return (
         <section class="@container min-h-[80svb] grid place-items-center px-6 py-12 hero-surface">
             <div class="w-full max-w-3xl text-center grid gap-8">
-                <header class="grid gap-4">
+                <header class="grid place-items-center gap-4">
                     <p class="text-dim-fg text-sm font-semibold tracking-widest uppercase">SBTE Result Viewer</p>
 
                     <h1 class="text-bright-fg text-4xl @min-mobile:text-5xl leading-[1.15] font-semibold">
-                        Search through SBTE results — <span class="text-accent-fg">fast</span>, clean, minimal.
+                        Search Bihar SBTE results — <span class="text-accent-fg">fast</span>, clean, minimal.
                     </h1>
 
-                    <p class="text-normal-fg text-base @min-mobile:text-lg">
-                        Everything runs locally in your browser. No tracking, no noise.
+                    <p class="max-w-[48ch] text-normal-fg text-base @min-mobile:text-lg">
+                        Instantly search, filter, and{" "}
+                        <A href="/tools/csv-export" class="text-accent-fg-dark">
+                            export
+                        </A>{" "}
+                        detailed student results from any government polytechnic college in Bihar.
                     </p>
                 </header>
 

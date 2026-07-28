@@ -1,4 +1,5 @@
 import { HashRouter, Route } from "@solidjs/router";
+import NotFoundPage from "./pages/404";
 import RootLayout from "./pages/layout";
 import HomePage from "./pages/page";
 import CsvExportPage from "./pages/tools/csv-export/page";
@@ -20,6 +21,8 @@ export default function App() {
                         <Route path="/csv-export" component={CsvExportPage} />
                         <Route path="/group-generator" component={RandomGroupGeneratorPage} />
                     </Route>
+
+                    <Route path="*" component={NotFoundPage} />
                 </Route>
             </HashRouter>
         </ResultsProvider>
