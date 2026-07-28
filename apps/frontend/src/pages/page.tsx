@@ -1,6 +1,7 @@
 import { A } from "@solidjs/router";
 import { Show } from "solid-js";
 import { useResults } from "~/providers/results";
+import { DisclaimerSection, FeaturesSection } from "./about/page";
 import { ResultListPage } from "./results/page";
 
 export default function HomePage() {
@@ -75,39 +76,11 @@ function HeroSection(props: { total: number; loading: boolean; error?: string })
 
 function AboutSection() {
     return (
-        <aside id="about" class="mt-[4em] py-[6em] px-[2em] bg-zinc-50 about-surface">
-            <div class="max-w-3xl mx-auto grid gap-5">
-                <header class="grid gap-2">
-                    <h2 class="text-3xl text-bright-fg font-semibold">Disclaimer</h2>
-                    <p class="text-normal-fg leading-relaxed">
-                        This project is an independent, unofficial viewer built for convenience. It is{" "}
-                        <span class="font-semibold">not affiliated with</span>,{" "}
-                        <span class="font-semibold">endorsed by</span>, or{" "}
-                        <span class="font-semibold">connected to</span> SBTE (or any related institution/website).
-                    </p>
-                </header>
-
-                <div class="grid gap-3 text-normal-fg leading-relaxed">
-                    <div class="border-[0.13rem] border-border rounded-md p-4 bg-white">
-                        <p>
-                            <span class="font-semibold">Data source & availability:</span> Exam results are gathered
-                            from the official SBTE API. So long as the API remains open, new exam results will continue
-                            being added. In case the website goes offline or is not accessible for any reason, all the
-                            results data is available in the git repo.
-                        </p>
-                    </div>
-
-                    <p class="text-sm text-dim-fg">
-                        If you believe any information is inaccurate or should be removed, please{" "}
-                        <a
-                            class="underline hover:decoration-2"
-                            href="https://github.com/Abhinav5383/sbte-result-viewer/issues"
-                        >
-                            open an issue on the repository
-                        </a>
-                        .
-                    </p>
-                </div>
+        <aside id="about" class="py-[6em] bg-zinc-50 about-surface">
+            <div class="grid mx-auto content-center gap-8 max-w-[70ch] *:px-6">
+                <FeaturesSection />
+                <div class="border-be-[0.13rem] border-border" />
+                <DisclaimerSection />
             </div>
         </aside>
     );

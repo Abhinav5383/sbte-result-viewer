@@ -24,8 +24,8 @@
 }
 
 .about-surface::before {
-    --x: 20%;
-    --y: 15%;
+    --x: 30%;
+    --y: 25%;
 }
 
 input[type="number"]::-webkit-inner-spin-button {
