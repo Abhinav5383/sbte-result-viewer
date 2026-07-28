@@ -41,8 +41,8 @@ export default function VirtualList<T>(props: ResultTableContentsProps<T>) {
         const rowsPerViewport = Math.ceil(window.innerHeight / rHeight);
         const overscan = Math.min(rowsPerViewport, endIndex - startIndex);
 
-        const adjustedStartIndex = Math.max(0, startIndex - overscan);
         const adjustedEndIndex = Math.min(props.items.length - 1, endIndex + overscan);
+        const adjustedStartIndex = Math.min(adjustedEndIndex, Math.max(0, startIndex - overscan));
 
         setVisibleIndices({ start: adjustedStartIndex, end: adjustedEndIndex });
     }
@@ -51,12 +51,14 @@ export default function VirtualList<T>(props: ResultTableContentsProps<T>) {
         const scroller = props.scrollElement ?? window;
         scroller.addEventListener("scroll", handleScroll, { passive: true });
 
-        const container = containerRef();
+        const listContainer = containerRef();
         let observer: ResizeObserver | null = null;
-        if (container) {
-            observer = new ResizeObserver(() => handleResize(container));
-            observer.observe(container);
-            handleResize(container);
+        if (listContainer) {
+            listContainer.style.overflowAnchor = "none";
+
+            observer = new ResizeObserver(() => handleResize(listContainer));
+            observer.observe(listContainer);
+            handleResize(listContainer);
         }
 
         onCleanup(() => {
@@ -67,7 +69,7 @@ export default function VirtualList<T>(props: ResultTableContentsProps<T>) {
 
     createEffect(() => {
         const paddingTop = visibleIndices().start * rowHeight();
-        const paddingBottom = (props.items.length - (visibleIndices().end + 1)) * rowHeight();
+        const paddingBottom = Math.max(0, (props.items.length - (visibleIndices().end + 1)) * rowHeight());
 
         const el = containerRef();
         if (el) {
