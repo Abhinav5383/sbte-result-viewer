@@ -36,6 +36,7 @@ export function Button(props: ButtonProps) {
                 props.class,
             )}
             style={{
+                ...(typeof props?.style === "object" ? props.style : {}),
                 "transition-property": "color, background, scale, transform",
                 "transition-duration": "0.15s",
             }}
