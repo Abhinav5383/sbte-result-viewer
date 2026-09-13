@@ -2,6 +2,9 @@ import { useLocation } from "@solidjs/router";
 import { createEffect, type JSX } from "solid-js";
 import Navbar from "~/components/navbar";
 
+const oldHosts = ["abhinav5383.github.io", "sbte-result-viewer.vercel.app"];
+const currHost = "https://sbte-results.kabhinav.dev";
+
 export default function RootLayout(props: { children: JSX.Element }) {
     const loc = useLocation();
 
@@ -12,11 +15,11 @@ export default function RootLayout(props: { children: JSX.Element }) {
         }
         if (query) query = query.slice(0, -1);
 
-        let url = `https://sbte-result-viewer.vercel.app/#${loc.pathname}`;
+        let url = `${currHost}/#${loc.pathname}`;
         if (query) url += `?${query}`;
         if (loc.hash) url += loc.hash;
 
-        if (window.location.hostname === "abhinav5383.github.io") {
+        if (oldHosts.includes(window.location.hostname)) {
             window.location.href = url;
             console.log("Redirecting to: ", url);
         }
