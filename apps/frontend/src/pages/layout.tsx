@@ -2,7 +2,7 @@ import { useLocation } from "@solidjs/router";
 import { createEffect, type JSX } from "solid-js";
 import Navbar from "~/components/navbar";
 
-const oldHosts = ["abhinav5383.github.io", "sbte-result-viewer.vercel.app"];
+const oldHosts = ["abhinav5383.github.io"];
 const currHost = "https://sbte-results.kabhinav.dev";
 
 export default function RootLayout(props: { children: JSX.Element }) {
