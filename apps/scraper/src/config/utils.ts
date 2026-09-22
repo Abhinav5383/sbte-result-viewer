@@ -1,7 +1,7 @@
 import { BRANCH, type BranchConfig, COLLEGE } from "@app/shared/types";
 import { numRange } from "~/lib/utils";
 
-export const ROLL_LIST = [...numRange(1, 120), ...numRange(301, 310), ...numRange(351, 360)];
+export const ROLL_LIST = [...numRange(1, 120), ...numRange(301, 310), ...numRange(351, 360), ...numRange(601, 610)];
 
 const semestersList = [
     // December 2026 exam
