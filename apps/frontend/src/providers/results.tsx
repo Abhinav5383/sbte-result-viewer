@@ -38,7 +38,7 @@ export function ResultsProvider(props: { children: JSX.Element }) {
             <ErrorBoundary
                 fallback={(err, reset) => (
                     <div class="min-h-[75vh] grid place-content-center justify-items-center gap-4 p-8">
-                        <span class="text-3xl text-rose-500 font-semibold">Failed to load results!</span>
+                        <span class="text-3xl text-rose-500 font-semibold">Oops! Something went wrong</span>
                         <span class="text-dim-fg text-sm">{err?.message || "Unknown error occurred"}</span>
                         <Button
                             variant="primary-alt"

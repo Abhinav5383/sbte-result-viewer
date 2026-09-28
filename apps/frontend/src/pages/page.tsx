@@ -1,5 +1,6 @@
 import { A } from "@solidjs/router";
 import { Show } from "solid-js";
+import BouncingDotsLoader from "~/components/ui/loaders/bouncing-dots";
 import { useResults } from "~/providers/results";
 import { DisclaimerSection, FeaturesSection } from "./about/page";
 import { ResultListPage } from "./results/page";
@@ -16,15 +17,25 @@ export default function HomePage() {
                     error={ctx.data.error?.message}
                 />
 
-                <Show when={ctx.data.loading}>
-                    <div class="flex items-center justify-center p-8">
-                        <span class="text-lg text-dim-fg font-semibold">Loading results...</span>
-                    </div>
-                </Show>
-
                 <Show keyed when={!ctx.data.loading && !ctx.data.error && ctx.data()}>
                     {(data) => <ResultListPage encodedData={data} />}
                 </Show>
+
+                <div class="grid place-content-center py-8">
+                    <Show when={ctx.data.loading}>
+                        <div class="grid items-center justify-items-center gap-12">
+                            <BouncingDotsLoader class="w-32 text-dim-fg" />
+                            <span class="text-xl italic text-dim-fg font-semibold">Loading results...</span>
+                        </div>
+                    </Show>
+
+                    <Show when={ctx.data.error}>
+                        <div class="grid items-center justify-items-center gap-4">
+                            <span class="text-2xl italic text-rose-500 font-semibold">Oops! Something went wrong</span>
+                            <span class="text-dim-fg">{ctx.data.error.message}</span>
+                        </div>
+                    </Show>
+                </div>
             </main>
 
             <AboutSection />

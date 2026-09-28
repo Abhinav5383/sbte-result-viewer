@@ -32,8 +32,10 @@ export function FeaturesSection() {
                     data to find specific branches, colleges, or organize the results exactly how you need them.
                 </li>
                 <li class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2.5 before:h-1.5 before:w-1.5 before:rounded-full before:bg-dim-fg">
-                    <A href="/tools/csv-export" class="text-bright-fg underline font-semibold">CSV Export:</A> Download your customized list of
-                    results as a standard spreadsheet file with a single click.
+                    <A href="/tools/csv-export" class="text-bright-fg underline font-semibold">
+                        CSV Export:
+                    </A>{" "}
+                    Download your customized list of results as a standard spreadsheet file with a single click.
                 </li>
             </ul>
         </section>
