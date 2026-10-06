@@ -1,6 +1,7 @@
 export function generateCSV(headers: string[], rows: string[][]): string {
-    let csvContent = "";
-    csvContent += headers.join(",") + "\n";
+    let csvContent = headers.join(",");
+    csvContent += "\n";
+
     for (const row of rows) {
         let rowStr = "";
         for (const cell of row) {
@@ -13,7 +14,8 @@ export function generateCSV(headers: string[], rows: string[][]): string {
             }
         }
 
-        csvContent += rowStr.slice(0, -1) + "\n";
+        csvContent += rowStr.slice(0, -1);
+        csvContent += "\n";
     }
     return csvContent;
 }

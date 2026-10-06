@@ -1,5 +1,6 @@
 import { COLLEGE, COLLEGE_NAME } from "@app/shared/types";
 import SearchIcon from "lucide-solid/icons/search";
+import { Button } from "~/components/ui/button";
 import MultiSelect from "~/components/ui/multi-select";
 import { Select } from "~/components/ui/select";
 import { OrdinalSuffix } from "~/components/utils";
@@ -7,7 +8,6 @@ import type { IndexedResultsData } from "~/lib/hooks/index-results";
 import { SearchBy, SortBy, SortOrder } from "~/lib/types";
 import type { ResultsFilterHook } from "./hook";
 import { FilterParams } from "./types";
-import { Button } from "~/components/ui/button";
 
 interface Props {
     hook: ResultsFilterHook;
