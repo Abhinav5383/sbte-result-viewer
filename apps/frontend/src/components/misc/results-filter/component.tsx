@@ -118,20 +118,6 @@ export function ResultsFilter(props: Props) {
                 />
             </div>
 
-            <div hidden={props.hideFilters?.includes(FilterParams.SEMESTER)}>
-                <label for="semester-filter">Semester</label>
-                <MultiSelect
-                    id="semester-filter"
-                    selected={res.semester()}
-                    onChange={res.setSemester}
-                    options={indexedData.filters.semester.map((sem) => ({
-                        value: sem,
-                        label: SemesterLabel(sem),
-                    }))}
-                    placeholder="All Semesters"
-                />
-            </div>
-
             <div hidden={props.hideFilters?.includes(FilterParams.SESSION)}>
                 <label for="session-filter">Session</label>
                 <MultiSelect
@@ -143,6 +129,20 @@ export function ResultsFilter(props: Props) {
                         label: `20${year}`,
                     }))}
                     placeholder="All Sessions"
+                />
+            </div>
+
+            <div hidden={props.hideFilters?.includes(FilterParams.SEMESTER)}>
+                <label for="semester-filter">Semester</label>
+                <MultiSelect
+                    id="semester-filter"
+                    selected={res.semester()}
+                    onChange={res.setSemester}
+                    options={indexedData.filters.semester.map((sem) => ({
+                        value: sem,
+                        label: SemesterLabel(sem),
+                    }))}
+                    placeholder="All Semesters"
                 />
             </div>
 
