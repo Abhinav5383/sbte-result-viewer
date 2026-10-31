@@ -6,11 +6,10 @@ import { Select } from "~/components/ui/select";
 import { OrdinalSuffix } from "~/components/utils";
 import type { IndexedResultsData } from "~/lib/hooks/index-results";
 import { SearchBy, SortBy, SortOrder } from "~/lib/types";
-import type { ResultsFilterHook } from "./hook";
-import { FilterParams } from "./types";
+import { type FilterControls, FilterParams } from "./types";
 
 interface Props {
-    hook: ResultsFilterHook;
+    hook: FilterControls;
     indexedData: IndexedResultsData;
     alwaysShowSort?: boolean;
     hideFilters?: FilterParams[];

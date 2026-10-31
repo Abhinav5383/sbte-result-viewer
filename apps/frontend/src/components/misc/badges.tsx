@@ -1,10 +1,10 @@
 import type { BRANCH_NAME } from "@app/shared/types";
-import { Show } from "solid-js";
+import { type JSX, Show } from "solid-js";
 import { cn, OrdinalSuffix } from "~/components/utils";
 
 interface BranchBadgeProps {
     branch: BRANCH_NAME;
-    semester?: string;
+    semester?: string | JSX.Element;
     class?: string;
 }
 
@@ -13,20 +13,24 @@ export function BranchBadge(props: BranchBadgeProps) {
         <span
             class={cn(
                 "branch-badge inline-block rounded-lg text-sm text-nowrap",
-                props.semester ? "ps-2 pe-0.5" : "px-2 py-1",
+                props.semester ? "p-[0.15rem] ps-2" : "px-2 py-1",
                 props.branch.toLowerCase(),
                 props.class,
             )}
         >
-            {props.branch}
+            <span class={props.semester ? "pe-1.5" : ""}>{props.branch}</span>
 
-            <Show when={props.semester} keyed>
+            <Show when={typeof props.semester === "string" && props.semester} keyed>
                 {(sem) => (
-                    <em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 rounded-md">
+                    <em class="inline-block not-italic px-1.5 py-0.5 bg-white/75 rounded-md">
                         {sem}
                         {OrdinalSuffix(sem)} sem
                     </em>
                 )}
+            </Show>
+
+            <Show when={typeof props.semester !== "string" && props.semester} keyed>
+                {(sem) => sem}
             </Show>
         </span>
     );

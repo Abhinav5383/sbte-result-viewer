@@ -55,7 +55,11 @@ function HeroSection(props: { total: number; loading: boolean; error?: string })
                     </h1>
 
                     <p class="max-w-[48ch] text-normal-fg text-base @min-mobile:text-lg">
-                        Instantly search, filter, and{" "}
+                        Instantly search, filter, check the{" "}
+                        <A href="/leaderboard" class="text-accent-fg-dark">
+                            leaderboard
+                        </A>
+                        , and{" "}
                         <A href="/tools/csv-export" class="text-accent-fg-dark">
                             export
                         </A>{" "}

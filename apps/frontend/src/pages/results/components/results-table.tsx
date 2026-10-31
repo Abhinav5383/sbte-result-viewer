@@ -4,10 +4,10 @@ import { BRANCH_NAME, COLLEGE_NAME, type ParsedResult } from "@app/shared/types"
 import { useSearchParams } from "@solidjs/router";
 import ArrowDownWideNarrow from "lucide-solid/icons/arrow-down-wide-narrow";
 import ArrowUpWideNarrow from "lucide-solid/icons/arrow-up-wide-narrow";
-import ChevronUpIcon from "lucide-solid/icons/chevron-up";
-import { createSignal, For, onCleanup, onMount, Show } from "solid-js";
+import { For, Show } from "solid-js";
 import { ChevronRightIcon } from "~/components/icons/chevron-right";
 import { BranchBadge, PercentageBadge } from "~/components/misc/badges";
+import { ScrollToTopButton } from "~/components/misc/scroll-to-top";
 import VirtualList from "~/components/misc/virtual-list";
 import { cn } from "~/components/utils";
 import { marksClass, sgpaClass } from "~/lib/grade-utils";
@@ -108,7 +108,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
                         // adding extra for the semester suffix + spacing
                         "--max-branch-len": `${props.maxStrSizes.branch + 10}ch`,
                         "grid-template-columns": `minmax(8ch, max-content) minmax(max-content, 1fr) minmax(14ch, 0.5fr) minmax(max-content, 0.7fr) minmax(max-content, 0.7fr) minmax(var(--max-branch-len), 1fr) ${
-                            props.showCollegeColumn ? "minmax(max-content, 2fr)" : ""
+                            props.showCollegeColumn ? "minmax(max-content, 1fr)" : ""
                         }`,
                     }}
                 >
@@ -174,7 +174,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
     );
 }
 
-interface SortableHeaderItemProps {
+export interface SortableHeaderItemProps {
     title: string;
     value: SortBy;
 
@@ -183,7 +183,7 @@ interface SortableHeaderItemProps {
     setSortFilter: (by: SortBy, order: SortOrder) => void;
 }
 
-function SortableHeaderItem(props: SortableHeaderItemProps) {
+export function SortableHeaderItem(props: SortableHeaderItemProps) {
     return (
         <button
             type="button"
@@ -238,28 +238,6 @@ interface ResultTableContentsProps {
 
 const DEFAULT_ROW_HEIGHT = 52;
 function ResultTableContents(props: ResultTableContentsProps) {
-    const [scrollToTopVisible, setScrollToTopVisible] = createSignal(false);
-
-    function handleScroll() {
-        if (
-            window.scrollY > window.innerHeight * 4 &&
-            document.body.scrollHeight - window.scrollY > 3 * window.innerHeight
-        ) {
-            setScrollToTopVisible(true);
-        } else {
-            setScrollToTopVisible(false);
-        }
-    }
-
-    onMount(() => {
-        handleScroll();
-        window.addEventListener("scroll", handleScroll, { passive: true });
-
-        onCleanup(() => {
-            window.removeEventListener("scroll", handleScroll);
-        });
-    });
-
     return (
         <>
             <VirtualList
@@ -277,20 +255,7 @@ function ResultTableContents(props: ResultTableContentsProps) {
                 )}
             />
 
-            <div
-                class="fixed bottom-4 inset-e-4 z-50"
-                style={{
-                    visibility: scrollToTopVisible() ? "visible" : "hidden",
-                }}
-            >
-                <button
-                    type="button"
-                    class="flex items-center justify-center bg-accent-bg text-white h-12 aspect-square rounded-full"
-                    onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
-                >
-                    <ChevronUpIcon class="size-6" />
-                </button>
-            </div>
+            <ScrollToTopButton />
         </>
     );
 }
@@ -435,7 +400,11 @@ function DesktopResultRow(props: RowVariantProps) {
             <span class={cn("saturate-70", props.sgpaClassName)}>{props.formattedSgpa}</span>
 
             <div class="block">
-                <BranchBadge branch={BRANCH_NAME[props.item.student.branch]} semester={props.semester} />
+                <BranchBadge
+                    branch={BRANCH_NAME[props.item.student.branch]}
+                    semester={props.semester}
+                    class="text-xs"
+                />
             </div>
 
             <Show when={props.showCollege}>
@@ -445,7 +414,7 @@ function DesktopResultRow(props: RowVariantProps) {
     );
 }
 
-function handleRowKbEvent(
+export function handleRowKbEvent(
     e: KeyboardEvent & {
         currentTarget: HTMLDivElement;
         target: Element;

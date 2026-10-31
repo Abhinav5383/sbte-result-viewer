@@ -7,6 +7,11 @@ import "./styles.css";
 export function ToolsPage() {
     const tools = [
         {
+            name: "Leaderboard",
+            path: "/leaderboard",
+            desc: "Explore top-ranked students across colleges and semesters with averaged marks and SGPA.",
+        },
+        {
             name: "CSV Export",
             path: "/tools/csv-export",
             desc: "Export results to CSV format for further analysis or record-keeping.",

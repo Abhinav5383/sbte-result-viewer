@@ -37,6 +37,15 @@ export default function Navbar() {
                         Results
                     </A>
 
+                    <A
+                        href="/leaderboard"
+                        class="nav-target"
+                        onMouseEnter={handleMouseEnter}
+                        onFocus={handleMouseEnter}
+                    >
+                        Leaderboard
+                    </A>
+
                     <A href="/about" class="nav-target" onMouseEnter={handleMouseEnter} onFocus={handleMouseEnter}>
                         About
                     </A>

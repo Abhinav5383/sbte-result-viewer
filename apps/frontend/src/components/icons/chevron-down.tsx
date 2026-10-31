@@ -1,5 +1,6 @@
 export default function ChevronDown() {
     return (
+        // biome-ignore lint/a11y/noSvgWithoutTitle: __
         <svg
             xmlns="http://www.w3.org/2000/svg"
             width="24"
@@ -12,7 +13,6 @@ export default function ChevronDown() {
             stroke-linejoin="round"
             class="lucide lucide-chevron-down-icon lucide-chevron-down"
         >
-            <title> </title>
             <path d="m6 9 6 6 6-6" />
         </svg>
     );

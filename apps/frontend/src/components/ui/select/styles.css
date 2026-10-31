@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@layer utilities {
+@layer base {
     body:has(.select:open) {
         overflow: hidden;
     }

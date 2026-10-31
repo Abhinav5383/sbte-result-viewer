@@ -2,6 +2,7 @@ import { HashRouter, Route } from "@solidjs/router";
 import NotFoundPage from "./pages/404";
 import AboutPage from "./pages/about/page";
 import RootLayout from "./pages/layout";
+import LeaderboardPage from "./pages/leaderboard/page";
 import HomePage from "./pages/page";
 import CsvExportPage from "./pages/tools/csv-export/page";
 import RandomGroupGeneratorPage from "./pages/tools/group-generator/page";
@@ -17,6 +18,7 @@ export default function App() {
                 {/* @ts-expect-error */}
                 <Route path="/" component={RootLayout}>
                     <Route path="/" component={HomePage} />
+                    <Route path="/leaderboard" component={LeaderboardPage} />
                     <Route path="/about" component={AboutPage} />
                     <Route path="/tools">
                         <Route component={ToolsPage} />

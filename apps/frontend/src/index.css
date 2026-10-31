@@ -47,6 +47,8 @@
     --container-extra-sm: 18rem;
     --container-mobile: 26rem;
     --container-desktop: 74rem;
+
+    --text-xs: 0.82rem;
 }
 
 html,
@@ -85,7 +87,7 @@ body {
         }
 
         &:focus-visible {
-            @apply ring-[0.07rem] ring-accent-fg-light;
+            @apply ring-[0.13rem] ring-accent-fg-light;
 
             &.no-focus-ring {
                 @apply ring-transparent;

@@ -7,59 +7,29 @@ import {
     type ParsedResult,
     type SubjectResult,
 } from "@app/shared/types";
-import { toPng } from "html-to-image";
-import CheckIcon from "lucide-solid/icons/check";
-import ClipboardIcon from "lucide-solid/icons/clipboard";
-import DownloadIcon from "lucide-solid/icons/download";
 import ExternalLinkIcon from "lucide-solid/icons/external-link";
-import ImageIcon from "lucide-solid/icons/image";
 import XIcon from "lucide-solid/icons/x";
-import { createSignal, For, onCleanup, Show } from "solid-js";
+import { For, type JSX, Show } from "solid-js";
+import { BranchBadge } from "~/components/misc/badges";
 import { Button } from "~/components/ui/button";
 import { Dialog } from "~/components/ui/dialog";
-import { cn, OrdinalSuffix } from "~/components/utils";
+import { cn } from "~/components/utils";
 import { alphabeticalGradeClass, marksClass, sgpaClass } from "~/lib/grade-utils";
 
 interface DetailsDialogProps {
     open: boolean;
     onClose: () => void;
     result: ParsedResult | undefined;
+    customBadge?: JSX.Element;
 }
 
 export function DetailsDialog(props: DetailsDialogProps) {
-    const [contentRef, setContentRef] = createSignal<HTMLDivElement | null>(null);
-    const [saving, setSaving] = createSignal(false);
-    const [previewImage, setPreviewImage] = createSignal<string | null>(null);
-    const [previewOpen, setPreviewOpen] = createSignal(false);
-
     function closeDialog() {
         props.onClose();
     }
 
-    async function saveAsImage() {
-        const content = contentRef();
-        if (!content || !props.result) return;
-
-        setSaving(true);
-        try {
-            // wait to apply the saving state
-            await new Promise((resolve) => setTimeout(resolve, 10));
-
-            const dataUrl = await toPng(content, {
-                backgroundColor: "#ffffff",
-                pixelRatio: 2,
-            });
-            setPreviewImage(dataUrl);
-            setPreviewOpen(true);
-        } catch (err) {
-            console.error("Failed to save image:", err);
-        } finally {
-            setSaving(false);
-        }
-    }
-
     return (
-        <Dialog open={props.open} onClose={closeDialog} dialogProps={{ class: "rounded-xl overflow-x-clip" }}>
+        <Dialog open={props.open} onClose={closeDialog} dialogProps={{ class: "rounded-xl relative" }}>
             <Show
                 keyed
                 when={props.result}
@@ -77,229 +47,97 @@ export function DetailsDialog(props: DetailsDialogProps) {
                 }
             >
                 {(data) => (
-                    <div class="relative">
-                        <div ref={setContentRef} class="@container">
-                            <div class="grid gap-y-3 p-6 bg-accent-bg text-zinc-50">
-                                <div class="flex flex-wrap-reverse gap-x-3">
-                                    <div class="flex flex-wrap items-center gap-3">
-                                        <h1 class="text-3xl font-extrabold">{data.student.name}</h1>
+                    <div class="@container">
+                        <div class="grid gap-y-1 p-6 bg-accent-bg text-zinc-50">
+                            <div class="flex flex-wrap items-center gap-x-3 pe-12">
+                                <h1 class="text-3xl font-extrabold">{data.student.name}</h1>
+
+                                <BranchBadge
+                                    branch={BRANCH_NAME[data.student.branch]}
+                                    semester={props.customBadge ? props.customBadge : data.student.roll.charAt(0)}
+                                />
+
+                                <Show when={data.cgpa}>
+                                    {(cgpa) => (
                                         <span
                                             class={`branch-badge ${BRANCH_NAME[data.student.branch].toLowerCase()} inline-block ps-2 pe-0.5 rounded-lg text-sm`}
                                         >
-                                            {BRANCH_NAME[data.student.branch]}
+                                            CGPA
                                             <em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 rounded-md">
-                                                {data.student.roll.charAt(0)}
-                                                {OrdinalSuffix(data.student.roll.charAt(0))} sem
+                                                {cgpa().toFixed(2)}
                                             </em>
                                         </span>
-
-                                        <Show when={data.cgpa}>
-                                            {(cgpa) => (
-                                                <span
-                                                    class={`branch-badge ${BRANCH_NAME[data.student.branch].toLowerCase()} inline-block ps-2 pe-0.5 rounded-lg text-sm`}
-                                                >
-                                                    CGPA
-                                                    <em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 rounded-md">
-                                                        {cgpa().toFixed(2)}
-                                                    </em>
-                                                </span>
-                                            )}
-                                        </Show>
-                                    </div>
-
-                                    {/* dummy buttons to reserve space for the absolute positioned actual buttons */}
-                                    <div class="invisible flex items-center gap-2">
-                                        <Button variant="secondary" class="rounded-full" disabled>
-                                            <ImageIcon />
-                                            Save Image
-                                        </Button>
-
-                                        <Button variant="secondary" size="icon" class="rounded-full" disabled>
-                                            <XIcon />
-                                        </Button>
-                                    </div>
-                                </div>
-
-                                <span class="text-accent-bg-text font-medium">
-                                    {COLLEGE_FULL_NAME[data.student.college]}
-                                </span>
-
-                                <div class="flex items-center gap-3">
-                                    <span class="font-semibold py-1 tabular-nums">{data.student.roll}</span>
-                                    <a
-                                        href={apiUrl(data.student.roll)}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        class="flex items-center font-medium gap-1 text-sm px-2 py-1 rounded-md text-white underline decoration-white/50 hover:text-accent-fg hover:bg-white transition-colors"
-                                    >
-                                        View original PDF
-                                        <ExternalLinkIcon />
-                                    </a>
-                                </div>
+                                    )}
+                                </Show>
                             </div>
 
-                            <div class="grid gap-4 p-4">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div class="grid gap-1 place-items-center bg-zinc-100 rounded-lg p-6">
-                                        <h2 class="uppercase font-semibold text-dim-fg text-sm">Obtained Marks</h2>
-                                        <span
-                                            class={cn(
-                                                "text-4xl font-bold",
-                                                marksClass(data.grandTotal.obtained, data.grandTotal.maximum),
-                                            )}
-                                        >
-                                            {data.grandTotal.obtained}
-                                        </span>
-                                        <span class="text-dim-fg">Out of {data.grandTotal.maximum}</span>
-                                    </div>
+                            <span class="text-accent-bg-text font-medium">
+                                {COLLEGE_FULL_NAME[data.student.college]}
+                            </span>
 
-                                    <div class="grid gap-1 place-items-center bg-zinc-100 rounded-lg p-6">
-                                        <h2 class="uppercase font-semibold text-dim-fg text-sm">SGPA</h2>
-                                        <span class={cn("text-4xl font-bold", sgpaClass(data.sgpa))}>
-                                            {data.sgpa.toFixed(2)}
-                                        </span>
-                                        <span class="text-dim-fg">{data.remarks}</span>
-                                    </div>
-                                </div>
-
-                                <div class="grid gap-6">
-                                    <For each={Object.values(PAPER_TYPE)}>
-                                        {(paperType) => (
-                                            <SubjectCategory
-                                                title={PAPER_NAME[paperType]}
-                                                subjects={data.subjects.filter((sub) => sub.type === paperType)}
-                                            />
-                                        )}
-                                    </For>
-                                </div>
+                            <div class="flex flex-wrap items-center gap-x-3">
+                                <span class="font-semibold py-1 tabular-nums">{data.student.roll}</span>
+                                <a
+                                    href={apiUrl(data.student.roll)}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    class="flex items-center font-medium gap-1 text-sm px-2 py-1 rounded-md text-white underline decoration-white/50 hover:text-accent-fg hover:bg-white transition-colors"
+                                >
+                                    View original PDF
+                                    <ExternalLinkIcon />
+                                </a>
                             </div>
                         </div>
 
-                        <div class="absolute top-6 inset-e-4 flex items-center gap-2">
-                            <Button
-                                variant="secondary"
-                                class="rounded-full bg-zinc-50 hover:text-accent-fg"
-                                disabled={saving()}
-                                onClick={saveAsImage}
-                            >
-                                <ImageIcon />
-                                {saving() ? "Saving..." : "Save Image"}
-                            </Button>
+                        <div class="grid gap-4 p-4">
+                            <div class="grid grid-cols-1 xs:grid-cols-2 gap-4">
+                                <div class="grid gap-1 place-items-center bg-zinc-100 rounded-lg p-6">
+                                    <h2 class="uppercase font-semibold text-dim-fg text-sm">Obtained Marks</h2>
+                                    <span
+                                        class={cn(
+                                            "text-4xl font-bold",
+                                            marksClass(data.grandTotal.obtained, data.grandTotal.maximum),
+                                        )}
+                                    >
+                                        {data.grandTotal.obtained}
+                                    </span>
+                                    <span class="text-dim-fg">Out of {data.grandTotal.maximum}</span>
+                                </div>
 
-                            <Button
-                                variant="secondary"
-                                size="icon"
-                                class="rounded-full bg-zinc-50 hover:text-accent-fg"
-                                onClick={closeDialog}
-                            >
-                                <XIcon />
-                            </Button>
+                                <div class="grid gap-1 place-items-center bg-zinc-100 rounded-lg p-6">
+                                    <h2 class="uppercase font-semibold text-dim-fg text-sm">SGPA</h2>
+                                    <span class={cn("text-4xl font-bold", sgpaClass(data.sgpa))}>
+                                        {data.sgpa.toFixed(2)}
+                                    </span>
+                                    <span class="text-dim-fg">{data.remarks}</span>
+                                </div>
+                            </div>
+
+                            <div class="grid gap-6">
+                                <For each={Object.values(PAPER_TYPE)}>
+                                    {(paperType) => (
+                                        <SubjectCategory
+                                            title={PAPER_NAME[paperType]}
+                                            subjects={data.subjects.filter((sub) => sub.type === paperType)}
+                                        />
+                                    )}
+                                </For>
+                            </div>
                         </div>
                     </div>
                 )}
             </Show>
 
-            <ImagePreviewDialog
-                open={previewOpen()}
-                onClose={() => setPreviewOpen(false)}
-                imageUrl={previewImage()}
-                filename={`${props.result?.student.name.replace(" ", "_")}-${props.result?.student.roll}-result.png`}
-            />
-        </Dialog>
-    );
-}
-
-interface ImagePreviewDialogProps {
-    open: boolean;
-    onClose: () => void;
-    imageUrl: string | null;
-    filename: string;
-}
-
-function ImagePreviewDialog(props: ImagePreviewDialogProps) {
-    const [copied, setCopied] = createSignal(false);
-
-    function download() {
-        if (!props.imageUrl) return;
-        const link = document.createElement("a");
-        link.download = props.filename;
-        link.href = props.imageUrl;
-        link.click();
-    }
-
-    let timeoutRef: ReturnType<typeof setTimeout> | undefined;
-    onCleanup(() => {
-        if (timeoutRef) {
-            clearTimeout(timeoutRef);
-            timeoutRef = undefined;
-        }
-    });
-
-    async function copyToClipboard() {
-        if (!props.imageUrl) return;
-        try {
-            if (timeoutRef) {
-                clearTimeout(timeoutRef);
-            }
-
-            const response = await fetch(props.imageUrl);
-            const blob = await response.blob();
-            await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
-            setCopied(true);
-            timeoutRef = setTimeout(() => {
-                setCopied(false);
-                timeoutRef = undefined;
-            }, 2500);
-        } catch (err) {
-            console.error("Failed to copy image:", err);
-        }
-    }
-
-    return (
-        <Dialog
-            open={props.open}
-            onClose={props.onClose}
-            dialogProps={{
-                closedby: "any",
-                onKeyDown: (e) => e.stopPropagation(),
-                class: "rounded-xl overflow-clip",
-            }}
-        >
-            <Show when={props.imageUrl}>
-                <div class="flex flex-col max-h-[90vh] gap-4 p-4">
-                    <div class="flex items-center justify-between">
-                        <h2 class="text-lg font-semibold">Image Preview</h2>
-
-                        <Button variant="secondary" size="icon" onClick={props.onClose} class="rounded-full">
-                            <XIcon />
-                        </Button>
-                    </div>
-
-                    <div class="flex-1 min-h-0 overflow-auto flex items-center justify-center p-6 bg-zinc-100 rounded-lg">
-                        <div class="bg-white p-3 pb-12 shadow-[0_4px_20px_rgba(0,0,0,0.15),0_8px_40px_rgba(0,0,0,0.1)] rounded-sm rotate-3">
-                            <img
-                                src={props.imageUrl ?? ""}
-                                alt="Result preview"
-                                class="max-w-full max-h-[60vh] rounded-sm shadow-inner"
-                            />
-                        </div>
-                    </div>
-
-                    <div class="flex gap-3 justify-end">
-                        <Button variant="secondary" onClick={copyToClipboard}>
-                            <Show when={copied()} fallback={<ClipboardIcon />}>
-                                <CheckIcon class="text-accent-fg" />
-                            </Show>
-                            {copied() ? "Copied!" : "Copy to Clipboard"}
-                        </Button>
-
-                        <Button variant="primary-alt" onClick={download}>
-                            <DownloadIcon />
-                            Download
-                        </Button>
-                    </div>
-                </div>
-            </Show>
+            <div class="absolute inset-bs-5 inset-e-4 flex items-center gap-2">
+                <Button
+                    variant="secondary"
+                    size="icon"
+                    class="rounded-full bg-zinc-50 hover:text-accent-fg"
+                    onClick={closeDialog}
+                >
+                    <XIcon />
+                </Button>
+            </div>
         </Dialog>
     );
 }

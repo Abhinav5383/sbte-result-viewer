@@ -6,16 +6,16 @@ import { useSearchParams } from "@solidjs/router";
 import { createEffect, createMemo } from "solid-js";
 import { getValidEntry } from "~/lib/enum";
 import { SearchBy, SortBy, SortOrder } from "~/lib/types";
-import { FilterParams, type Filters } from "./types";
+import { type FilterControls, FilterParams, type Filters } from "./types";
 
-const _defaults = {
+export const defaultFilterOptions = {
     searchBy: SearchBy.Name,
     sortBy: SortBy.Marks,
     sortOrder: SortOrder.Descending,
 };
 
-export function useResultsFilter(data: EncodedData, defaultOps?: Partial<typeof _defaults>) {
-    const DEFAULTS = { ..._defaults, ...defaultOps };
+export function useFilterControls(defaultOps?: Partial<typeof defaultFilterOptions>): FilterControls {
+    const DEFAULTS = { ...defaultFilterOptions, ...defaultOps };
     const [searchParams, _setSearchParams] = useSearchParams();
 
     const setSearchParams: typeof _setSearchParams = (params, options) => {
@@ -26,7 +26,6 @@ export function useResultsFilter(data: EncodedData, defaultOps?: Partial<typeof 
     function setSearchBy(newVal: SearchBy) {
         setSearchParams({
             [FilterParams.SEARCH_BY]: newVal === DEFAULTS.searchBy ? null : newVal,
-            // reset 'query'
             [FilterParams.QUERY]: "",
         });
     }
@@ -75,7 +74,6 @@ export function useResultsFilter(data: EncodedData, defaultOps?: Partial<typeof 
         for (const key of Object.values(FilterParams)) {
             newVal[key] = "";
         }
-
         setSearchParams(newVal);
     }
 
@@ -95,16 +93,41 @@ export function useResultsFilter(data: EncodedData, defaultOps?: Partial<typeof 
         });
     }
 
+    return {
+        college,
+        setCollege,
+        branch,
+        setBranch,
+        semester,
+        setSemester,
+        session,
+        setSession,
+        searchBy,
+        setSearchBy,
+        searchQuery,
+        setSearchQuery,
+        clearFilters,
+        anyFilterActive,
+        sortBy,
+        sortOrder,
+        setSortFilter,
+        setQueryInputRef,
+    };
+}
+
+export function useResultsFilter(data: EncodedData, defaultOps?: Partial<typeof defaultFilterOptions>) {
+    const controls = useFilterControls(defaultOps);
+
     const filteredResults = createMemo(() => {
         const fullList = data.results;
         const filterValues: Filters = {
-            college: college(),
-            branch: branch(),
-            semester: semester(),
-            admissionYear: session(),
+            college: controls.college(),
+            branch: controls.branch(),
+            semester: controls.semester(),
+            admissionYear: controls.session(),
         };
-        const searchQ = searchQuery().trim();
-        const searchMode = searchBy();
+        const searchQ = controls.searchQuery().trim();
+        const searchMode = controls.searchBy();
         const searchLower = searchQ.toLowerCase();
 
         const hasCollegeFilter = filterValues.college.length > 0;
@@ -122,7 +145,6 @@ export function useResultsFilter(data: EncodedData, defaultOps?: Partial<typeof 
 
         for (let i = 0; i < fullList.length; i++) {
             const item = data.results[i];
-
             const roll = getVal(item, "roll");
 
             if (hasCollegeFilter && !filterValues.college.includes(COLLEGE_NAME[getCollegeFromRoll(roll)])) continue;
@@ -146,8 +168,8 @@ export function useResultsFilter(data: EncodedData, defaultOps?: Partial<typeof 
 
     const sortedResults = createMemo(() => {
         const sorted = filteredResults();
-        const _sortBy = sortBy();
-        const _sortOrder = sortOrder();
+        const _sortBy = controls.sortBy();
+        const _sortOrder = controls.sortOrder();
 
         const asc = _sortOrder === SortOrder.Ascending;
 
@@ -158,41 +180,37 @@ export function useResultsFilter(data: EncodedData, defaultOps?: Partial<typeof 
             const nameB = getVal(b, "name");
 
             switch (_sortBy) {
-                case SortBy.Roll:
-                    if (rollA < rollB) return asc ? -1 : 1;
-                    if (rollA > rollB) return asc ? 1 : -1;
-                    return 0;
-                case SortBy.RegNo:
-                    if (rollA.slice(2) < rollB.slice(2)) return asc ? -1 : 1;
-                    if (rollA.slice(2) > rollB.slice(2)) return asc ? 1 : -1;
-                    return 0;
-                case SortBy.Name:
-                    if (nameA < nameB) return asc ? -1 : 1;
-                    if (nameA > nameB) return asc ? 1 : -1;
-                    return 0;
                 case SortBy.Marks: {
-                    const obtainedPercentA =
-                        getVal(a, "grandTotalMax") > 0
-                            ? getVal(a, "grandTotalObtained") / getVal(a, "grandTotalMax")
-                            : 0;
-
-                    const obtainedPercentB =
-                        getVal(b, "grandTotalMax") > 0
-                            ? getVal(b, "grandTotalObtained") / getVal(b, "grandTotalMax")
-                            : 0;
-
-                    return asc ? obtainedPercentA - obtainedPercentB : obtainedPercentB - obtainedPercentA;
+                    const diff = getVal(a, "grandTotalObtained") - getVal(b, "grandTotalObtained");
+                    return asc ? diff : -diff;
                 }
-                case SortBy.sgpa:
-                    return asc ? getVal(a, "sgpa") - getVal(b, "sgpa") : getVal(b, "sgpa") - getVal(a, "sgpa");
+
+                case SortBy.sgpa: {
+                    const diff = getVal(a, "sgpa") - getVal(b, "sgpa");
+                    return asc ? diff : -diff;
+                }
+
+                case SortBy.Roll: {
+                    const diff = rollA.localeCompare(rollB);
+                    return asc ? diff : -diff;
+                }
+
+                case SortBy.RegNo: {
+                    const regNoA = rollA.slice(2);
+                    const regNoB = rollB.slice(2);
+                    const diff = regNoA.localeCompare(regNoB);
+                    return asc ? diff : -diff;
+                }
+
+                case SortBy.Name: {
+                    const diff = nameA.localeCompare(nameB);
+                    return asc ? diff : -diff;
+                }
                 default:
                     return 0;
             }
         });
 
-        // the array is sorted in place, no one wants to clone an array of 50k+ items every time
-        // but solid wants the value to "change, so we keep the array the same,
-        // but return a brand new object; magic (insert_sparkly_emoji_here)
         return {
             results: sorted,
             sortedBy: _sortBy,
@@ -201,36 +219,15 @@ export function useResultsFilter(data: EncodedData, defaultOps?: Partial<typeof 
     });
 
     return {
-        college,
-        setCollege,
-        branch,
-        setBranch,
-        semester,
-        setSemester,
-        session,
-        setSession,
-        searchBy,
-        setSearchBy,
-        searchQuery,
-        setSearchQuery,
-
-        clearFilters,
-        anyFilterActive,
-
-        sortBy,
-        sortOrder,
-        setSortFilter,
-
+        ...controls,
         filteredResults,
         sortedResults,
-
-        setQueryInputRef,
     };
 }
 
 export type ResultsFilterHook = ReturnType<typeof useResultsFilter>;
 
-function getValidMultiSelectFilter<T, F>(
+export function getValidMultiSelectFilter<T, F>(
     val: string | string[] | undefined,
     enumObj: Record<string, T>,
     fallback: F[],
@@ -246,7 +243,7 @@ function getValidMultiSelectFilter<T, F>(
     return valid.length > 0 ? valid : (fallback as unknown as T[]);
 }
 
-function getMultiSelectFilter(val: string | string[] | undefined) {
+export function getMultiSelectFilter(val: string | string[] | undefined) {
     if (typeof val === "string") return [val];
     if (Array.isArray(val)) return val;
     return [];

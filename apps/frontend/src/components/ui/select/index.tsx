@@ -1,6 +1,7 @@
 import CheckIcon from "lucide-solid/icons/check";
 import { For, Show } from "solid-js";
 import ChevronDown from "~/components/icons/chevron-down";
+import { cn } from "~/components/utils";
 
 import "./styles.css";
 
@@ -10,15 +11,17 @@ interface SelectProps {
     options: SelectOption[];
     value: string;
     onChange: (value: string) => void;
+    triggerClass?: string;
 }
 
-interface SelectOption {
+export interface SelectOption {
     value: string;
     label?: string;
 }
 
 export function Select(props: SelectProps) {
     const supportsFancySelect = () => CSS.supports("appearance", "base-select");
+    const defaultClass = "no-focus-ring border-border focus-within:border-accent-bg";
 
     return (
         <Show
@@ -26,19 +29,21 @@ export function Select(props: SelectProps) {
             fallback={
                 <RegularSelect
                     id={props.id}
-                    class={`no-focus-ring border-border focus-within:border-accent-bg ${props.class}`}
+                    class={cn(defaultClass, props.class)}
                     options={props.options}
                     value={props.value}
                     onChange={props.onChange}
+                    triggerClass={props.triggerClass}
                 />
             }
         >
             <FancySelect
                 id={props.id}
-                class={`no-focus-ring border-border focus-within:border-accent-bg ${props.class}`}
+                class={cn(defaultClass, props.class)}
                 options={props.options}
                 value={props.value}
                 onChange={props.onChange}
+                triggerClass={props.triggerClass}
             />
         </Show>
     );
@@ -66,7 +71,7 @@ function FancySelect(props: SelectProps) {
                 }
             }}
         >
-            <button type="button" class="select-trigger">
+            <button type="button" class={cn("select-trigger", props.triggerClass)}>
                 {/* @ts-expect-error */}
                 <selectedcontent></selectedcontent>
                 <span class="arrow">
