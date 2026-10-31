@@ -29,7 +29,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
     }
 
     return (
-        <Dialog open={props.open} onClose={closeDialog} dialogProps={{ class: "rounded-xl relative" }}>
+        <Dialog open={props.open} onClose={closeDialog} dialogProps={{ class: "rounded-xl" }}>
             <Show
                 keyed
                 when={props.result}
