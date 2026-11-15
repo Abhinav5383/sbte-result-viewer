@@ -1,428 +1,478 @@
-import { decodeResult, type EncodedData, type EncodedResultT } from "@app/shared/encoder";
-import { getVal } from "@app/shared/encoder/helpers";
-import { BRANCH_NAME, COLLEGE_NAME, type ParsedResult } from "@app/shared/types";
+import type { ResultRow } from "@app/shared/dto";
 import { useSearchParams } from "@solidjs/router";
 import ArrowDownWideNarrow from "lucide-solid/icons/arrow-down-wide-narrow";
 import ArrowUpWideNarrow from "lucide-solid/icons/arrow-up-wide-narrow";
-import { For, Show } from "solid-js";
+import { type Accessor, For, Show } from "solid-js";
 import { ChevronRightIcon } from "~/components/icons/chevron-right";
 import { BranchBadge, PercentageBadge } from "~/components/misc/badges";
+import type { SortColumn, SortDirection } from "~/components/misc/results-filter/types";
 import { ScrollToTopButton } from "~/components/misc/scroll-to-top";
 import VirtualList from "~/components/misc/virtual-list";
+import BouncingDotsLoader from "~/components/ui/loaders/bouncing-dots";
 import { cn } from "~/components/utils";
+import { useMeta } from "~/hooks/use-meta";
 import { marksClass, sgpaClass } from "~/lib/grade-utils";
-import { SortBy, SortOrder } from "~/lib/types";
 import { DetailsDialog } from "./details-dialog";
 
 import "./results-table.css";
 
 interface ResultsListTableProps {
-    resultsData: EncodedData;
-    sortedResults: SortedResults;
-    setSortFilter: (by: SortBy, order: SortOrder) => void;
-    clearFilters: () => void;
-    anyFilterActive: boolean;
-
-    maxStrSizes: {
-        // name: number;
-        // college: number;
-        branch: number;
-    };
-
-    showCollegeColumn: boolean;
-}
-
-interface SortedResults {
-    results: EncodedResultT[];
-    sortedBy: SortBy;
-    sortOrder: SortOrder;
+	results: ResultRow[];
+	total: number | undefined;
+	loading: boolean;
+	loadingMore: boolean;
+	hasMore: boolean;
+	loadMore: () => void;
+	sortBy: Accessor<SortColumn>;
+	sortOrder: Accessor<SortDirection>;
+	setSort: (by: SortColumn, order: SortDirection) => void;
+	clearFilters: () => void;
+	anyFilterActive: boolean;
+	showCollegeColumn?: boolean;
+	error?: string | null;
+	onRetry?: () => void;
 }
 
 export function ResultsListTable(props: ResultsListTableProps) {
-    const [searchParams, setSearchParams] = useSearchParams();
+	const [searchParams, setSearchParams] = useSearchParams();
 
-    const selectedRoll = () => {
-        const roll = searchParams.dialog;
-        if (typeof roll === "string") return roll;
-        return null;
-    };
-    function setSelectedRoll(roll: string) {
-        setSearchParams({ dialog: roll });
-    }
+	const selectedRoll = () => {
+		const roll = searchParams.dialog;
+		if (typeof roll === "string") return roll;
+		return null;
+	};
 
-    const dialogOpen = () => !!selectedRoll();
-    function closeDialog() {
-        setSelectedRoll("");
-    }
+	function setSelectedRoll(roll: string) {
+		setSearchParams({ dialog: roll });
+	}
 
-    function dialogData() {
-        const roll = selectedRoll();
-        if (!roll) return undefined;
+	const dialogOpen = () => !!selectedRoll();
+	function closeDialog() {
+		setSelectedRoll("");
+	}
 
-        const r = props.resultsData.results.find((r) => getVal(r, "roll") === roll);
-        if (!r) return undefined;
+	return (
+		<div class="@container/table">
+			<Show
+				when={!props.error}
+				fallback={
+					<div class="flex flex-col items-center justify-center gap-3 py-16 text-dim-fg">
+						<span class="text-2xl font-semibold text-rose-500">
+							Oops! Something went wrong
+						</span>
+						<span class="text-sm text-dim-fg">{props.error}</span>
+						<Show when={props.onRetry}>
+							<button
+								type="button"
+								onClick={props.onRetry}
+								class="mt-2 font-medium rounded-full px-4 py-1.5 border border-border hover:bg-accent-bg hover:text-white transition-all text-sm"
+							>
+								Try Again
+							</button>
+						</Show>
+					</div>
+				}
+			>
+				<Show
+					when={props.results.length > 0}
+					fallback={
+						<Show
+							when={props.loading}
+							fallback={
+								<div class="flex flex-col items-center justify-center gap-2 py-16 text-dim-fg">
+									<span class="text-xl font-semibold">No results found</span>
+									<span class="text-sm">
+										Try adjusting your search or filters
+									</span>
 
-        return decodeResult(r, props.resultsData);
-    }
+									<button
+										type="button"
+										onClick={props.clearFilters}
+										class="font-medium rounded-full px-4 border-[0.07rem] border-border hover:bg-accent-bg hover:text-accent-bg-text hover:border-accent-bg transition-all"
+									>
+										Clear Filters
+									</button>
+								</div>
+							}
+						>
+							<div class="flex flex-col items-center justify-center gap-4 py-20 text-dim-fg">
+								<BouncingDotsLoader class="w-24 text-accent-fg" />
+								<span class="text-sm font-semibold italic">Loading results...</span>
+							</div>
+						</Show>
+					}
+				>
+					<div class="flex items-center text-sm text-dim-fg px-6 py-3 gap-4 border-be-[0.07rem] border-border">
+						<p>
+							Showing <span class="font-medium">{props.results.length}</span> of{" "}
+							<span class="font-medium">{props.total ?? props.results.length}</span>{" "}
+							{props.anyFilterActive
+								? "matched results"
+								: props.results.length === 1 && props.total === 1
+									? "result"
+									: "results"}
+						</p>
+						<Show when={props.anyFilterActive}>
+							<span class="text-border">|</span>
+							<button
+								type="button"
+								class="text-inherit text-sm min-h-0 px-0 py-0 hover:text-accent-fg underline underline-offset-[0.1lh]"
+								onClick={props.clearFilters}
+							>
+								Clear Filters
+							</button>
+						</Show>
+					</div>
 
-    return (
-        <div class="@container/table">
-            <Show
-                when={props.sortedResults.results.length > 0}
-                fallback={
-                    <div class="flex flex-col items-center justify-center gap-2 py-16 text-dim-fg">
-                        <span class="text-xl font-semibold">No results found</span>
-                        <span class="text-sm">Try adjusting your search or filters</span>
+					<div
+						class={cn(
+							"block @min-desktop:grid gap-x-8 relative justify-between transition-opacity duration-200",
+							props.loading && "opacity-70",
+						)}
+						style={{
+							"--max-branch-len": "25ch",
+							"grid-template-columns": `minmax(8ch, max-content) minmax(max-content, 1fr) minmax(14ch, 0.5fr) minmax(max-content, 0.7fr) minmax(max-content, 0.7fr) minmax(var(--max-branch-len), 1fr) ${
+								props.showCollegeColumn !== false ? "minmax(max-content, 1fr)" : ""
+							}`,
+						}}
+					>
+						<Show when={props.loading}>
+							<div class="absolute top-0 inset-x-0 h-0.5 bg-accent animate-pulse z-20" />
+						</Show>
+						<div class="hidden @min-desktop:grid z-10 sticky top-0 col-span-full grid-cols-subgrid gap-x-0 *:px-4 *:py-3 border-be-[0.07rem] border-border bg-zinc-700 text-zinc-200">
+							<div>
+								<strong>#</strong>
+							</div>
 
-                        <button
-                            type="button"
-                            onClick={props.clearFilters}
-                            class="font-medium rounded-full px-4 border-[0.07rem] border-border hover:bg-accent-bg hover:text-accent-bg-text hover:border-accent-bg transition-all"
-                        >
-                            Clear Filters
-                        </button>
-                    </div>
-                }
-            >
-                <div class="flex items-center text-sm text-dim-fg px-6 py-3 gap-4 border-be-[0.07rem] border-border">
-                    <p>
-                        Showing <span class="font-medium">{props.sortedResults.results.length}</span> of{" "}
-                        <span class="font-medium">{props.resultsData.results.length} </span>
-                        {props.sortedResults.results.length !== 1 ? "results" : "result"}
-                    </p>
-                    <Show when={props.anyFilterActive}>
-                        <span class="text-border">|</span>
-                        <button
-                            type="button"
-                            class="text-inherit text-sm min-h-0 px-0 py-0 hover:text-accent-fg underline underline-offset-[0.1lh]"
-                            onclick={props.clearFilters}
-                        >
-                            Clear Filters
-                        </button>
-                    </Show>
-                </div>
+							<SortableHeaderItem
+								title="Name"
+								value="name"
+								sortBy={props.sortBy()}
+								sortOrder={props.sortOrder()}
+								setSortFilter={props.setSort}
+							/>
 
-                <div
-                    class="block @min-desktop:grid gap-x-8 relative justify-between"
-                    style={{
-                        // adding extra for the semester suffix + spacing
-                        "--max-branch-len": `${props.maxStrSizes.branch + 10}ch`,
-                        "grid-template-columns": `minmax(8ch, max-content) minmax(max-content, 1fr) minmax(14ch, 0.5fr) minmax(max-content, 0.7fr) minmax(max-content, 0.7fr) minmax(var(--max-branch-len), 1fr) ${
-                            props.showCollegeColumn ? "minmax(max-content, 1fr)" : ""
-                        }`,
-                    }}
-                >
-                    <div class="hidden @min-desktop:grid z-10 sticky top-0 col-span-full grid-cols-subgrid gap-x-0 *:px-4 *:py-3 border-be-[0.07rem] border-border bg-zinc-700 text-zinc-200">
-                        <div>
-                            <strong>#</strong>
-                        </div>
+							<SortableHeaderItem
+								title="Roll No"
+								value="roll"
+								sortBy={props.sortBy()}
+								sortOrder={props.sortOrder()}
+								setSortFilter={props.setSort}
+							/>
 
-                        <SortableHeaderItem
-                            title="Name"
-                            value={SortBy.Name}
-                            sortBy={props.sortedResults.sortedBy}
-                            sortOrder={props.sortedResults.sortOrder}
-                            setSortFilter={props.setSortFilter}
-                        />
+							<SortableHeaderItem
+								title="Marks"
+								value="marks"
+								sortBy={props.sortBy()}
+								sortOrder={props.sortOrder()}
+								setSortFilter={props.setSort}
+							/>
 
-                        <SortableHeaderItem
-                            title="Roll No"
-                            value={SortBy.RegNo}
-                            sortBy={props.sortedResults.sortedBy}
-                            sortOrder={props.sortedResults.sortOrder}
-                            setSortFilter={props.setSortFilter}
-                        />
+							<SortableHeaderItem
+								title="SGPA"
+								value="sgpa"
+								sortBy={props.sortBy()}
+								sortOrder={props.sortOrder()}
+								setSortFilter={props.setSort}
+							/>
 
-                        <SortableHeaderItem
-                            title="Marks"
-                            value={SortBy.Marks}
-                            sortBy={props.sortedResults.sortedBy}
-                            sortOrder={props.sortedResults.sortOrder}
-                            setSortFilter={props.setSortFilter}
-                        />
+							<div>
+								<strong>Branch</strong>
+							</div>
 
-                        <SortableHeaderItem
-                            title="SGPA"
-                            value={SortBy.sgpa}
-                            sortBy={props.sortedResults.sortedBy}
-                            sortOrder={props.sortedResults.sortOrder}
-                            setSortFilter={props.setSortFilter}
-                        />
+							<Show when={props.showCollegeColumn !== false}>
+								<div>
+									<strong>College</strong>
+								</div>
+							</Show>
+						</div>
 
-                        <div>
-                            <strong>Branch</strong>
-                        </div>
+						<ResultTableContents
+							results={props.results}
+							onSelect={setSelectedRoll}
+							showCollege={props.showCollegeColumn !== false}
+							loadMore={props.loadMore}
+						/>
+					</div>
+				</Show>
+			</Show>
 
-                        <Show when={props.showCollegeColumn}>
-                            <div>
-                                <strong>College</strong>
-                            </div>
-                        </Show>
-                    </div>
-
-                    <ResultTableContents
-                        sortedResults={props.sortedResults}
-                        onSelect={setSelectedRoll}
-                        showCollege={props.showCollegeColumn}
-                        resultsData={props.resultsData}
-                    />
-                </div>
-            </Show>
-
-            <DetailsDialog open={dialogOpen()} onClose={closeDialog} result={dialogData()} />
-        </div>
-    );
+			<DetailsDialog open={dialogOpen()} onClose={closeDialog} roll={selectedRoll()} />
+		</div>
+	);
 }
 
 export interface SortableHeaderItemProps {
-    title: string;
-    value: SortBy;
-
-    sortBy: SortBy;
-    sortOrder: SortOrder;
-    setSortFilter: (by: SortBy, order: SortOrder) => void;
+	title: string;
+	value: SortColumn;
+	sortBy: SortColumn;
+	sortOrder: SortDirection;
+	setSortFilter: (by: SortColumn, order: SortDirection) => void;
 }
 
 export function SortableHeaderItem(props: SortableHeaderItemProps) {
-    return (
-        <button
-            type="button"
-            class={cn(
-                "h-full rounded-none justify-between text-start", // reset defaults
-                "grid grid-cols-[1fr_min-content] items-center hover:bg-zinc-950 cursor-pointer transition-colors",
-            )}
-            onClick={() => {
-                if (props.sortBy === props.value) {
-                    props.setSortFilter(
-                        props.value,
-                        props.sortOrder === SortOrder.Ascending ? SortOrder.Descending : SortOrder.Ascending,
-                    );
-                } else {
-                    let order = SortOrder.Descending;
-                    switch (props.value) {
-                        case SortBy.Name:
-                        case SortBy.Roll:
-                        case SortBy.RegNo: {
-                            order = SortOrder.Ascending;
-                            break;
-                        }
-                        case SortBy.Marks:
-                        case SortBy.sgpa: {
-                            order = SortOrder.Descending;
-                        }
-                    }
-
-                    props.setSortFilter(props.value, order);
-                }
-            }}
-        >
-            <strong>{props.title}</strong>
-            <Show when={props.sortBy === props.value}>
-                <Show
-                    when={props.sortOrder === SortOrder.Descending}
-                    fallback={<ArrowUpWideNarrow class="text-accent-fg-light" />}
-                >
-                    <ArrowDownWideNarrow class="text-accent-fg-light" />
-                </Show>
-            </Show>
-        </button>
-    );
+	return (
+		<button
+			type="button"
+			class={cn(
+				"h-full rounded-none justify-between text-start",
+				"grid grid-cols-[1fr_min-content] items-center hover:bg-zinc-950 cursor-pointer transition-colors px-4 py-3",
+			)}
+			onClick={() => {
+				if (props.sortBy === props.value) {
+					props.setSortFilter(props.value, props.sortOrder === "asc" ? "desc" : "asc");
+				} else {
+					let order: SortDirection = "desc";
+					switch (props.value) {
+						case "name":
+						case "roll": {
+							order = "asc";
+							break;
+						}
+						case "marks":
+						case "sgpa": {
+							order = "desc";
+							break;
+						}
+					}
+					props.setSortFilter(props.value, order);
+				}
+			}}
+		>
+			<strong>{props.title}</strong>
+			<Show when={props.sortBy === props.value}>
+				<Show
+					when={props.sortOrder === "desc"}
+					fallback={<ArrowUpWideNarrow class="text-accent-fg-light" />}
+				>
+					<ArrowDownWideNarrow class="text-accent-fg-light" />
+				</Show>
+			</Show>
+		</button>
+	);
 }
 
 interface ResultTableContentsProps {
-    sortedResults: SortedResults;
-    onSelect: (roll: string) => void;
-    showCollege: boolean;
-    resultsData: EncodedData;
+	results: ResultRow[];
+	onSelect: (roll: string) => void;
+	showCollege: boolean;
+	loadMore: () => void;
 }
 
 const DEFAULT_ROW_HEIGHT = 52;
-function ResultTableContents(props: ResultTableContentsProps) {
-    return (
-        <>
-            <VirtualList
-                defaultRowHeight={DEFAULT_ROW_HEIGHT}
-                items={props.sortedResults.results}
-                containerProps={{ class: "grid col-span-full grid-cols-subgrid" }}
-                RowComponent={(args) => (
-                    <ResultRow
-                        item={decodeResult(args.item, props.resultsData)}
-                        index={args.index}
-                        onSelect={() => props.onSelect(decodeResult(args.item, props.resultsData).student.roll)}
-                        showCollege={props.showCollege}
-                        class={args.class}
-                    />
-                )}
-            />
 
-            <ScrollToTopButton />
-        </>
-    );
+function ResultTableContents(props: ResultTableContentsProps) {
+	return (
+		<>
+			<VirtualList
+				defaultRowHeight={DEFAULT_ROW_HEIGHT}
+				items={props.results}
+				containerProps={{ class: "grid col-span-full grid-cols-subgrid" }}
+				onScrollBottom={props.loadMore}
+				RowComponent={(args) => (
+					<ResultRowComponent
+						item={args.item}
+						index={args.index}
+						onSelect={() => props.onSelect(args.item.roll)}
+						showCollege={props.showCollege}
+						class={args.class}
+					/>
+				)}
+			/>
+
+			<ScrollToTopButton />
+		</>
+	);
 }
 
 interface ResultRowProps {
-    item: ParsedResult;
-    index: number;
-    onSelect: () => void;
-    showCollege: boolean;
-    class?: string;
+	item: ResultRow;
+	index: number;
+	onSelect: () => void;
+	showCollege: boolean;
+	class?: string;
 }
 
 function calcPercentObtained(obtained: number, maximum: number) {
-    if (maximum <= 0) return 0;
-    return Math.round((obtained / maximum) * 100_00) / 100;
+	if (maximum <= 0) return 0;
+	return Math.round((obtained / maximum) * 100_00) / 100;
 }
 
-function ResultRow(props: ResultRowProps) {
-    return (
-        <div class={`${props.class} grid col-span-full grid-cols-subgrid`}>
-            <For each={[DesktopResultRow, MobileResultRow]}>
-                {(Row) => (
-                    <Row
-                        item={props.item}
-                        index={props.index}
-                        onSelect={props.onSelect}
-                        showCollege={props.showCollege}
-                        semester={props.item.student.roll.charAt(0)}
-                        formattedSgpa={props.item.sgpa.toFixed(2)}
-                        marksClassName={marksClass(props.item.grandTotal.obtained, props.item.grandTotal.maximum)}
-                        sgpaClassName={sgpaClass(props.item.sgpa)}
-                        percentObtained={calcPercentObtained(
-                            props.item.grandTotal.obtained,
-                            props.item.grandTotal.maximum,
-                        )}
-                    />
-                )}
-            </For>
-        </div>
-    );
+function ResultRowComponent(props: ResultRowProps) {
+	const percentObtained = calcPercentObtained(props.item.total_obtained, props.item.total_max);
+	const marksClassName = marksClass(props.item.total_obtained, props.item.total_max);
+	const sgpaClassName = sgpaClass(props.item.sgpa_x100 / 100);
+	const formattedSgpa = (props.item.sgpa_x100 / 100).toFixed(2);
+	const semester = props.item.semester.toString();
+
+	return (
+		<div class={`${props.class} grid col-span-full grid-cols-subgrid`}>
+			<For each={[DesktopResultRow, MobileResultRow]}>
+				{(Row) => (
+					<Row
+						item={props.item}
+						index={props.index}
+						onSelect={props.onSelect}
+						showCollege={props.showCollege}
+						semester={semester}
+						formattedSgpa={formattedSgpa}
+						marksClassName={marksClassName}
+						sgpaClassName={sgpaClassName}
+						percentObtained={percentObtained}
+					/>
+				)}
+			</For>
+		</div>
+	);
 }
 
 interface RowVariantProps extends ResultRowProps {
-    semester: string;
-    formattedSgpa: string;
-    marksClassName: string;
-    sgpaClassName: string;
-    percentObtained: number;
+	semester: string;
+	formattedSgpa: string;
+	marksClassName: string;
+	sgpaClassName: string;
+	percentObtained: number;
 }
 
 function MobileResultRow(props: RowVariantProps) {
-    return (
-        // biome-ignore lint/a11y/noStaticElementInteractions: --
-        <div
-            class="group/row @min-desktop:hidden grid grid-cols-[max-content_1fr] gap-3 px-3 py-5 border-be-[0.07rem] border-border hover:bg-zinc-100/50 active:bg-zinc-100 cursor-pointer focus-ring"
-            onClick={props.onSelect}
-            onKeyDown={(e) => handleRowKbEvent(e, props.onSelect)}
-            tabindex={0}
-        >
-            <div>
-                <span class="text-sm text-dim-fg/50">#{props.index + 1}</span>
-            </div>
+	const meta = useMeta();
 
-            <div class="grid gap-2">
-                <div class="flex items-center gap-x-2 overflow-x-auto whitespace-nowrap">
-                    <span class="font-semibold text-lg leading-tight truncate">{props.item.student.name}</span>
-                    <BranchBadge
-                        branch={BRANCH_NAME[props.item.student.branch]}
-                        semester={props.semester}
-                        class="text-xs"
-                    />
-                </div>
+	return (
+		// biome-ignore lint/a11y/useSemanticElements: grid row container
+		<div
+			class="group/row @min-desktop:hidden grid grid-cols-[max-content_1fr] gap-3 px-3 py-5 border-be-[0.07rem] border-border hover:bg-zinc-100/50 active:bg-zinc-100 cursor-pointer focus-ring"
+			onClick={props.onSelect}
+			onKeyDown={(e) => handleRowKbEvent(e, props.onSelect)}
+			tabIndex={0}
+			role="button"
+		>
+			<div>
+				<span class="text-sm text-dim-fg/50">#{props.index + 1}</span>
+			</div>
 
-                <div class="flex items-center gap-x-2 overflow-x-auto whitespace-nowrap">
-                    <span class="text-sm text-dim-fg tabular-nums">{props.item.student.roll.slice(2)}</span>
-                    <span class="text-xs opacity-50">•</span>
-                    <span class="text-sm text-dim-fg truncate">{COLLEGE_NAME[props.item.student.college]}</span>
-                    <span class="text-xs opacity-50">•</span>
-                    <PercentageBadge percentObtained={props.percentObtained} class={props.marksClassName} />
-                </div>
+			<div class="grid gap-2">
+				<div class="flex items-center gap-x-2 overflow-x-auto whitespace-nowrap">
+					<span class="font-semibold text-lg leading-tight truncate">
+						{props.item.name}
+					</span>
+					<BranchBadge
+						branch={meta.getBranchName(props.item.branch_code)}
+						semester={props.semester}
+						class="text-xs"
+					/>
+				</div>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="grid place-items-center bg-zinc-50/50 p-3 rounded-lg border-[0.07rem] border-zinc-200">
-                        <span class="text-dim-fg font-medium uppercase text-xs opacity-70 whitespace-nowrap">
-                            Marks Obtained
-                        </span>
+				<div class="flex items-center gap-x-2 overflow-x-auto whitespace-nowrap">
+					<span class="text-sm text-dim-fg tabular-nums">{props.item.roll.slice(2)}</span>
+					<span class="text-xs opacity-50">•</span>
+					<span class="text-sm text-dim-fg truncate">
+						{meta.getCollegeName(props.item.college_code)}
+					</span>
+					<span class="text-xs opacity-50">•</span>
+					<PercentageBadge
+						percentObtained={props.percentObtained}
+						class={props.marksClassName}
+					/>
+				</div>
 
-                        <div class="text-dim-fg text-xs">
-                            <span class={cn(props.marksClassName, "text-lg font-medium")}>
-                                {props.item.grandTotal.obtained}
-                            </span>{" "}
-                            <span class="opacity-50">/</span>{" "}
-                            <span class="opacity-70">{props.item.grandTotal.maximum}</span>
-                        </div>
-                    </div>
+				<div class="grid grid-cols-2 gap-4">
+					<div class="grid place-items-center bg-zinc-50/50 p-3 rounded-lg border-[0.07rem] border-zinc-200">
+						<span class="text-dim-fg font-medium uppercase text-xs opacity-70 whitespace-nowrap">
+							Marks Obtained
+						</span>
 
-                    <div class="grid place-items-center bg-zinc-50/50 p-3 rounded-lg border-[0.07rem] border-zinc-200">
-                        <span class="text-dim-fg font-medium uppercase text-xs opacity-70">SGPA</span>
-                        <span class={cn(props.sgpaClassName, "font-semibold text-lg")}>{props.item.sgpa}</span>
-                    </div>
-                </div>
+						<div class="text-dim-fg text-xs">
+							<span class={cn(props.marksClassName, "text-lg font-medium")}>
+								{props.item.total_obtained}
+							</span>{" "}
+							<span class="opacity-50">/</span>{" "}
+							<span class="opacity-70">{props.item.total_max}</span>
+						</div>
+					</div>
 
-                <div class="text-[0.67rem] text-dim-fg/60 flex items-center justify-self-end group-hover/row:underline group-hover/row:text-accent-fg">
-                    <span class="trim-both">Details</span>
-                    <ChevronRightIcon class="w-[1.3em] h-[1.3em]" />
-                </div>
-            </div>
-        </div>
-    );
+					<div class="grid place-items-center bg-zinc-50/50 p-3 rounded-lg border-[0.07rem] border-zinc-200">
+						<span class="text-dim-fg font-medium uppercase text-xs opacity-70">
+							SGPA
+						</span>
+						<span class={cn(props.sgpaClassName, "font-semibold text-lg")}>
+							{props.formattedSgpa}
+						</span>
+					</div>
+				</div>
+
+				<div class="text-[0.67rem] text-dim-fg/60 flex items-center justify-self-end group-hover/row:underline group-hover/row:text-accent-fg">
+					<span class="trim-both">Details</span>
+					<ChevronRightIcon class="w-[1.3em] h-[1.3em]" />
+				</div>
+			</div>
+		</div>
+	);
 }
 
 function DesktopResultRow(props: RowVariantProps) {
-    return (
-        // biome-ignore lint/a11y/noStaticElementInteractions: __
-        <div
-            class={cn(
-                "hidden @min-desktop:grid",
-                "items-center col-span-full grid-cols-subgrid py-3 border-be-[0.07rem] border-border hover:bg-zinc-100 cursor-pointer px-6",
-                "focus-ring",
-            )}
-            onClick={props.onSelect}
-            onKeyDown={(e) => handleRowKbEvent(e, props.onSelect)}
-            tabindex={0}
-        >
-            <span class="text-dim-fg text-sm">{props.index + 1}</span>
-            <span class="truncate">{props.item.student.name}</span>
-            <span class="text-dim-fg tabular-nums flex gap-[0.07em]">
-                <span class="opacity-90">{props.item.student.roll.slice(2, -3)}</span>
-                <span class="text-normal-fg">{props.item.student.roll.slice(-3)}</span>
-            </span>
+	const meta = useMeta();
 
-            <div class="grid grid-cols-2 gap-2 items-center pe-8 tabular-nums">
-                <div class="text-dim-fg text-xs">
-                    <span class="text-base font-medium">{props.item.grandTotal.obtained}</span>{" "}
-                    <span class="text-xs opacity-50">/</span>{" "}
-                    <span class="text-xs opacity-70">{props.item.grandTotal.maximum}</span>
-                </div>
+	return (
+		// biome-ignore lint/a11y/useSemanticElements: grid row container
+		<div
+			class={cn(
+				"hidden @min-desktop:grid",
+				"items-center col-span-full grid-cols-subgrid py-3 border-be-[0.07rem] border-border hover:bg-zinc-100 cursor-pointer px-6",
+				"focus-ring",
+			)}
+			onClick={props.onSelect}
+			onKeyDown={(e) => handleRowKbEvent(e, props.onSelect)}
+			tabIndex={0}
+			role="button"
+		>
+			<span class="text-dim-fg text-sm">{props.index + 1}</span>
+			<span class="truncate">{props.item.name}</span>
+			<span class="text-dim-fg tabular-nums flex gap-[0.07em]">
+				<span class="opacity-90">{props.item.roll.slice(2, -3)}</span>
+				<span class="text-normal-fg">{props.item.roll.slice(-3)}</span>
+			</span>
 
-                <PercentageBadge percentObtained={props.percentObtained} class={props.marksClassName} />
-            </div>
+			<div class="grid grid-cols-2 gap-2 items-center pe-8 tabular-nums">
+				<div class="text-dim-fg text-xs">
+					<span class="text-base font-medium">{props.item.total_obtained}</span>{" "}
+					<span class="text-xs opacity-50">/</span>{" "}
+					<span class="text-xs opacity-70">{props.item.total_max}</span>
+				</div>
 
-            <span class={cn("saturate-70", props.sgpaClassName)}>{props.formattedSgpa}</span>
+				<PercentageBadge
+					percentObtained={props.percentObtained}
+					class={props.marksClassName}
+				/>
+			</div>
 
-            <div class="block">
-                <BranchBadge
-                    branch={BRANCH_NAME[props.item.student.branch]}
-                    semester={props.semester}
-                    class="text-xs"
-                />
-            </div>
+			<span class={cn("saturate-70", props.sgpaClassName)}>{props.formattedSgpa}</span>
 
-            <Show when={props.showCollege}>
-                <span class="text-dim-fg text-sm truncate">{COLLEGE_NAME[props.item.student.college]}</span>
-            </Show>
-        </div>
-    );
+			<div class="block">
+				<BranchBadge
+					branch={meta.getBranchName(props.item.branch_code)}
+					semester={props.semester}
+					class="text-xs"
+				/>
+			</div>
+
+			<Show when={props.showCollege}>
+				<span class="text-dim-fg text-sm truncate">
+					{meta.getCollegeName(props.item.college_code)}
+				</span>
+			</Show>
+		</div>
+	);
 }
 
 export function handleRowKbEvent(
-    e: KeyboardEvent & {
-        currentTarget: HTMLDivElement;
-        target: Element;
-    },
-    callback: () => void,
+	e: KeyboardEvent & {
+		currentTarget: HTMLDivElement;
+		target: Element;
+	},
+	cb: () => void,
 ) {
-    if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        callback();
-    }
+	if (e.key === "Enter" || e.key === " ") {
+		e.preventDefault();
+		cb();
+	}
 }

@@ -1,95 +1,95 @@
 @import "tailwindcss";
 
 @layer utilities {
-    .arrow {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+	.arrow {
+		display: flex;
+		align-items: center;
+		justify-content: center;
 
-        svg {
-            color: var(--gh-text-secondary);
-            width: 1.3em;
-            height: 1.3em;
-            transform-origin: center center;
-            translate: 0 5%;
-            transition: rotate 0.2s ease-in-out;
-        }
-    }
+		svg {
+			color: var(--gh-text-secondary);
+			width: 1.3em;
+			height: 1.3em;
+			transform-origin: center center;
+			translate: 0 5%;
+			transition: rotate 0.2s ease-in-out;
+		}
+	}
 
-    :has(> :popover-open) .arrow svg {
-        rotate: 180deg;
-    }
+	:has(> :popover-open) .arrow svg {
+		rotate: 180deg;
+	}
 
-    .multi-select-popover:popover-open {
-        display: grid;
+	.multi-select-popover:popover-open {
+		display: grid;
 
-        padding: 0.3rem;
-        padding-block-start: 0.4rem;
-        scrollbar-width: thin;
+		padding: 0.3rem;
+		padding-block-start: 0.4rem;
+		scrollbar-width: thin;
 
-        background-color: var(--color-white);
-        box-shadow: 0.12rem 0.3rem 0.5rem #0006;
-        border-radius: var(--radius-md);
-        border: 0.12rem solid var(--color-border);
-    }
+		background-color: var(--color-white);
+		box-shadow: 0.12rem 0.3rem 0.5rem #0006;
+		border-radius: var(--radius-md);
+		border: 0.12rem solid var(--color-border);
+	}
 
-    .multi-select-content:focus-visible {
-        outline-color: transparent;
-    }
+	.multi-select-content:focus-visible {
+		outline-color: transparent;
+	}
 
-    .multi-select-popover:has(.multi-select-content:focus-visible) {
-        border-color: var(--color-accent-bg);
-    }
+	.multi-select-popover:has(.multi-select-content:focus-visible) {
+		border-color: var(--color-accent-bg);
+	}
 
-    .multi-select-option {
-        min-width: max-content;
-        display: flex;
-        gap: 0.5rem;
-        align-items: center;
-        justify-content: start;
-        cursor: pointer;
-        user-select: none;
+	.multi-select-option {
+		min-width: max-content;
+		display: flex;
+		gap: 0.5rem;
+		align-items: center;
+		justify-content: start;
+		cursor: pointer;
+		user-select: none;
 
-        font-weight: 500;
-        font-size: 0.93rem;
-        padding: 0.4em 1em;
-        padding-inline-start: 0.7em;
-        margin-block-end: 0.1em;
-        border-radius: 0.3rem;
-        outline: transparent;
-        color: var(--color-zinc-600);
+		font-weight: 500;
+		font-size: 0.93rem;
+		padding: 0.4em 1em;
+		padding-inline-start: 0.7em;
+		margin-block-end: 0.1em;
+		border-radius: 0.3rem;
+		outline: transparent;
+		color: var(--color-zinc-600);
 
-        &:last-of-type {
-            margin-block-end: 0;
-        }
+		&:last-of-type {
+			margin-block-end: 0;
+		}
 
-        input[type="checkbox"] {
-            display: none;
-        }
+		input[type="checkbox"] {
+			display: none;
+		}
 
-        .checkmark {
-            color: lch(from var(--color-accent-bg) calc(l * 0.7) c h);
-            visibility: hidden;
-        }
+		.checkmark {
+			color: lch(from var(--color-accent-bg) calc(l * 0.7) c h);
+			visibility: hidden;
+		}
 
-        &[data-checked="true"] {
-            color: var(--color-black);
-            background-color: lch(from var(--color-accent-bg) l c h / 0.3);
+		&[data-checked="true"] {
+			color: var(--color-black);
+			background-color: lch(from var(--color-accent-bg) l c h / 0.3);
 
-            .checkmark {
-                visibility: visible;
-            }
-        }
+			.checkmark {
+				visibility: visible;
+			}
+		}
 
-        &:focus-visible,
-        &:hover {
-            color: var(--color-zinc-900);
-            background-color: lch(from var(--color-accent-bg) l c h / 0.17);
-        }
+		&:focus-visible,
+		&:hover {
+			color: var(--color-zinc-900);
+			background-color: lch(from var(--color-accent-bg) l c h / 0.17);
+		}
 
-        &[data-checked="true"]:focus-visible {
-            outline: 0.11rem solid var(--color-accent-bg);
-            outline-offset: 0.07rem;
-        }
-    }
+		&[data-checked="true"]:focus-visible {
+			outline: 0.11rem solid var(--color-accent-bg);
+			outline-offset: 0.07rem;
+		}
+	}
 }

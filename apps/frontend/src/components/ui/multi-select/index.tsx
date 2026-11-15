@@ -1,184 +1,224 @@
 import CheckIcon from "lucide-solid/icons/check";
-import { createEffect, createSignal, For, Show } from "solid-js";
+import { createEffect, createSignal, For, onCleanup, Show } from "solid-js";
 import ChevronDown from "~/components/icons/chevron-down";
+import Popover from "~/components/ui/popover";
 import { cn } from "~/components/utils";
-import Popover from "../popover";
 
 import "./styles.css";
 
 interface SelectOption {
-    value: string;
-    label?: string;
-    description?: string;
+	value: string;
+	label?: string;
+	description?: string;
 }
 
 interface SelectProps {
-    id?: string;
-    class?: string;
-    options: SelectOption[];
-    selected: string[];
-    placeholder?: string;
-    onChange: (selected: string[]) => void;
-    immediate?: boolean;
+	id?: string;
+	class?: string;
+	options: SelectOption[];
+	selected: string[];
+	placeholder?: string;
+	onChange: (selected: string[]) => void;
+	immediate?: boolean;
 }
 
 export default function MultiSelect(props: SelectProps) {
-    const [isOpen, setIsOpen] = createSignal(false);
-    const [selectedItems, setSelectedItems] = createSignal(props.selected);
-    let contentRef: HTMLDivElement | undefined;
+	const [isOpen, setIsOpen] = createSignal(false);
+	const [selectedItems, setSelectedItems] = createSignal(props.selected);
+	let contentRef: HTMLDivElement | undefined;
+	let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
-    const selectedLabels = () => {
-        const list: string[] = [];
-        for (const op of selectedItems()) {
-            const option = props.options.find((o) => o.value === op);
+	createEffect(() => {
+		setSelectedItems(props.selected);
+	});
 
-            if (option?.label) {
-                list.push(option.label);
-            } else {
-                list.push(op);
-            }
-        }
-        return list;
-    };
+	const selectedLabels = () => {
+		const list: string[] = [];
+		for (const op of selectedItems()) {
+			const option = props.options.find((o) => o.value === op);
 
-    function handleChange(value: string, checked: boolean) {
-        const setter = props.immediate ? props.onChange : setSelectedItems;
+			if (option?.label) {
+				list.push(option.label);
+			} else {
+				list.push(op);
+			}
+		}
+		return list;
+	};
 
-        if (checked) {
-            setter([...selectedItems(), value]);
-        } else {
-            setter(selectedItems().filter((v) => v !== value));
-        }
-    }
+	function commit(items: string[]) {
+		clearTimeout(debounceTimer);
+		debounceTimer = undefined;
+		props.onChange(items);
+	}
 
-    function setPopoverState(isOpen: boolean) {
-        setIsOpen(isOpen);
+	function handleChange(value: string, checked: boolean) {
+		const next = checked
+			? [...selectedItems(), value]
+			: selectedItems().filter((v) => v !== value);
 
-        if (isOpen) {
-            requestAnimationFrame(() => {
-                contentRef?.focus();
-            });
-        }
+		setSelectedItems(next);
 
-        if (!isOpen && !props.immediate) {
-            props.onChange(selectedItems());
-        }
-    }
+		if (props.immediate) {
+			commit(next);
+		} else {
+			clearTimeout(debounceTimer);
+			debounceTimer = setTimeout(() => {
+				commit(selectedItems());
+			}, 1000);
+		}
+	}
 
-    function handleKeyDown(e: KeyboardEvent) {
-        if (!contentRef) return;
+	function setPopoverState(openState: boolean) {
+		setIsOpen(openState);
 
-        const options = Array.from(contentRef.querySelectorAll<HTMLElement>(".multi-select-option"));
-        if (!options.length) return;
+		if (openState) {
+			requestAnimationFrame(() => {
+				contentRef?.focus();
+			});
+		} else if (!props.immediate) {
+			if (debounceTimer !== undefined) {
+				commit(selectedItems());
+			}
+		}
+	}
 
-        const currentIndex = options.indexOf(document.activeElement as HTMLElement);
+	onCleanup(() => {
+		clearTimeout(debounceTimer);
+	});
 
-        switch (e.key) {
-            case "ArrowDown":
-                e.preventDefault();
-                if (currentIndex < options.length - 1) {
-                    options[currentIndex + 1]?.focus();
-                }
-                break;
+	function handleKeyDown(e: KeyboardEvent) {
+		if (!contentRef) return;
 
-            case "ArrowUp": {
-                e.preventDefault();
-                if (currentIndex > 0) {
-                    options[currentIndex - 1]?.focus();
-                }
-                break;
-            }
+		const options = Array.from(
+			contentRef.querySelectorAll<HTMLElement>(".multi-select-option"),
+		);
+		if (!options.length) return;
 
-            case "Home":
-                e.preventDefault();
-                options[0]?.focus();
-                break;
+		const currentIndex = options.indexOf(document.activeElement as HTMLElement);
 
-            case "End":
-                e.preventDefault();
-                options[options.length - 1]?.focus();
-                break;
+		switch (e.key) {
+			case "ArrowDown":
+				e.preventDefault();
+				if (currentIndex < options.length - 1) {
+					options[currentIndex + 1]?.focus();
+				}
+				break;
 
-            case "Tab":
-                e.preventDefault();
-                setPopoverState(false);
-                break;
+			case "ArrowUp": {
+				e.preventDefault();
+				if (currentIndex > 0) {
+					options[currentIndex - 1]?.focus();
+				}
+				break;
+			}
 
-            case "Enter":
-            case " ":
-                if (currentIndex !== -1) {
-                    e.preventDefault();
-                    options[currentIndex].click();
-                }
-                break;
+			case "Home":
+				e.preventDefault();
+				options[0]?.focus();
+				break;
 
-            case "Escape":
-                e.stopImmediatePropagation();
-                break;
-        }
-    }
+			case "End":
+				e.preventDefault();
+				options[options.length - 1]?.focus();
+				break;
 
-    createEffect(() => {
-        setSelectedItems(props.selected);
-    });
+			case "Tab":
+				e.preventDefault();
+				setPopoverState(false);
+				break;
 
-    return (
-        <Popover
-            id={`"multi-select-popover-${props.id}`}
-            class="multi-select-popover"
-            trigger={(args) => (
-                <button type="button" {...args} class={cn(props.class, args.class, "no-focus-ring")}>
-                    <span class="text-start text-ellipsis overflow-hidden whitespace-nowrap">
-                        <Show when={selectedLabels().length === 0}>{props.placeholder || "Select..."}</Show>
-                        <Show when={selectedLabels().length === 1}>{selectedLabels()[0]}</Show>
-                        <Show when={selectedLabels().length > 1}>
-                            <span class="text-sm text-dim-fg">[{selectedLabels().length}] </span>
-                            {selectedLabels().join(", ")}
-                        </Show>
-                    </span>
+			case "Enter":
+			case " ":
+				if (currentIndex !== -1) {
+					e.preventDefault();
+					options[currentIndex].click();
+				}
+				break;
 
-                    <span class="arrow">
-                        <ChevronDown />
-                    </span>
-                </button>
-            )}
-            isOpen={isOpen()}
-            onChange={setPopoverState}
-        >
-            {/** biome-ignore lint/a11y/noStaticElementInteractions: meh */}
-            <div class="multi-select-content" ref={contentRef} onKeyDown={handleKeyDown} tabindex={0}>
-                <For each={props.options}>
-                    {(option) => (
-                        <Option
-                            value={option.value}
-                            label={option.label}
-                            selected={selectedItems()}
-                            onChange={(checked) => handleChange(option.value, checked)}
-                        />
-                    )}
-                </For>
-            </div>
-        </Popover>
-    );
+			case "Escape":
+				e.stopImmediatePropagation();
+				break;
+		}
+	}
+
+	createEffect(() => {
+		setSelectedItems(props.selected);
+	});
+
+	return (
+		<Popover
+			id={`"multi-select-popover-${props.id}`}
+			class="multi-select-popover"
+			trigger={(args) => (
+				<button
+					type="button"
+					{...args}
+					class={cn(props.class, args.class, "no-focus-ring")}
+				>
+					<span class="text-start text-ellipsis overflow-hidden whitespace-nowrap">
+						<Show when={selectedLabels().length === 0}>
+							{props.placeholder || "Select..."}
+						</Show>
+						<Show when={selectedLabels().length === 1}>{selectedLabels()[0]}</Show>
+						<Show when={selectedLabels().length > 1}>
+							<span class="text-sm text-dim-fg">[{selectedLabels().length}] </span>
+							{selectedLabels().join(", ")}
+						</Show>
+					</span>
+
+					<span class="arrow">
+						<ChevronDown />
+					</span>
+				</button>
+			)}
+			isOpen={isOpen()}
+			onChange={setPopoverState}
+		>
+			{/** biome-ignore lint/a11y/noStaticElementInteractions: meh */}
+			<div
+				class="multi-select-content"
+				ref={contentRef}
+				onKeyDown={handleKeyDown}
+				tabindex={0}
+			>
+				<For each={props.options}>
+					{(option) => (
+						<Option
+							value={option.value}
+							label={option.label}
+							selected={selectedItems()}
+							onChange={(checked) => handleChange(option.value, checked)}
+						/>
+					)}
+				</For>
+			</div>
+		</Popover>
+	);
 }
 
 interface OptionProps {
-    value: string;
-    label?: string;
-    selected: string[];
-    onChange: (checked: boolean) => void;
+	value: string;
+	label?: string;
+	selected: string[];
+	onChange: (checked: boolean) => void;
 }
 
 function Option(props: OptionProps) {
-    const checked = () => props.selected.includes(props.value);
+	const checked = () => props.selected.includes(props.value);
 
-    return (
-        <label class="multi-select-option" tabindex={0} data-checked={checked()}>
-            <input role="option" type="checkbox" checked={checked()} onInput={() => props.onChange(!checked())} />
+	return (
+		<label class="multi-select-option" tabindex={0} data-checked={checked()}>
+			<input
+				role="option"
+				type="checkbox"
+				checked={checked()}
+				onInput={() => props.onChange(!checked())}
+			/>
 
-            <CheckIcon class="checkmark" stroke-width="3" />
+			<CheckIcon class="checkmark" stroke-width="3" />
 
-            <span>{props.label ?? props.value}</span>
-        </label>
-    );
+			<span>{props.label ?? props.value}</span>
+		</label>
+	);
 }

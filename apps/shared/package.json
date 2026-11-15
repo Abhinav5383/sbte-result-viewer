@@ -1,7 +1,10 @@
 {
-    "name": "@app/shared",
-    "type": "module",
-    "peerDependencies": {
-        "typescript": "^6"
-    }
+	"name": "@app/shared",
+	"type": "module",
+	"dependencies": {
+		"zod": "^4.6.7"
+	},
+	"peerDependencies": {
+		"typescript": "^6"
+	}
 }

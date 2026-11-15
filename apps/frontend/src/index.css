@@ -1,152 +1,152 @@
 @import "tailwindcss";
 
 @font-face {
-    font-family: "Space Grotesk";
-    font-style: normal;
-    font-weight: 300 700;
-    font-display: swap;
-    src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPb94C-s0.woff2) format("woff2");
-    unicode-range:
-        U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+	font-family: "Space Grotesk";
+	font-style: normal;
+	font-weight: 300 700;
+	font-display: swap;
+	src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPb94C-s0.woff2)
+		format("woff2");
+	unicode-range:
+		U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
 @font-face {
-    font-family: "Space Grotesk";
-    font-style: normal;
-    font-weight: 300 700;
-    font-display: swap;
-    src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2) format("woff2");
-    unicode-range:
-        U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+	font-family: "Space Grotesk";
+	font-style: normal;
+	font-weight: 300 700;
+	font-display: swap;
+	src: url(https://fonts.gstatic.com/s/spacegrotesk/v22/V8mDoQDjQSkFtoMM3T6r8E7mPbF4Cw.woff2)
+		format("woff2");
+	unicode-range:
+		U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 
 @layer base;
 @custom-variant hover (&:hover);
 
 @theme {
-    /* text colors */
-    --color-bright-fg: lch(10.0% 0 0);
-    --color-normal-fg: lch(25.0% 5 220);
-    --color-dim-fg: lch(40.0% 10 220);
+	--color-bright-fg: lch(10.0% 0 0);
+	--color-normal-fg: lch(25.0% 5 220);
+	--color-dim-fg: lch(40.0% 10 220);
 
-    --color-accent-fg-light: lch(80.0% 40 190);
-    --color-accent-fg: lch(55.0% 40 190);
-    --color-accent-fg-dark: lch(40.0% 40 190);
+	--color-accent-fg-light: lch(80.0% 40 190);
+	--color-accent-fg: lch(55.0% 40 190);
+	--color-accent-fg-dark: lch(40.0% 40 190);
 
-    /* backgrounds */
-    --color-accent-bg: lch(66% 40 185);
-    --color-accent-bg-text: lch(100% 18 200);
+	--color-accent-bg: lch(66% 40 185);
+	--color-accent-bg-text: lch(100% 18 200);
 
-    --font-body: "Space Grotesk", sans-serif;
+	--font-body: "Space Grotesk", sans-serif;
 
-    --color-border: lch(84% 8 190);
+	--color-border: lch(84% 8 190);
 
-    --breakpoint-xs: 26rem;
-    --breakpoint-lg: 58rem;
+	--breakpoint-xs: 26rem;
+	--breakpoint-lg: 58rem;
 
-    --container-extra-sm: 18rem;
-    --container-mobile: 26rem;
-    --container-desktop: 74rem;
+	--container-extra-sm: 18rem;
+	--container-mobile: 26rem;
+	--container-desktop: 74rem;
 
-    --text-xs: 0.82rem;
+	--text-xs: 0.82rem;
 }
 
 html,
 body {
-    @apply font-body;
-    scrollbar-width: thin;
-    scrollbar-gutter: stable;
-    background-color: var(--color-zinc-50);
+	@apply font-body;
+	scrollbar-width: thin;
+	scrollbar-gutter: stable;
+	background-color: var(--color-zinc-50);
 }
 
 @media (prefers-reduced-motion: no-preference) {
-    body {
-        scroll-behavior: smooth;
-    }
+	body {
+		scroll-behavior: smooth;
+	}
 }
 
 @layer base {
-    a {
-        @apply text-accent-fg underline-offset-2 hover:underline;
-    }
+	a {
+		@apply text-accent-fg underline-offset-2 hover:underline;
+	}
 
-    button {
-        cursor: pointer;
-    }
+	button {
+		cursor: pointer;
+	}
 
-    a,
-    button,
-    select,
-    input,
-    textarea,
-    .focus-ring {
-        outline: none;
+	a,
+	button,
+	select,
+	input,
+	textarea,
+	.focus-ring {
+		outline: none;
 
-        &.no-focus-ring {
-            @apply ring-transparent;
-        }
+		&.no-focus-ring {
+			@apply ring-transparent;
+		}
 
-        &:focus-visible {
-            @apply ring-[0.13rem] ring-accent-fg-light;
+		&:focus-visible {
+			@apply ring-[0.13rem] ring-accent-fg-light;
 
-            &.no-focus-ring {
-                @apply ring-transparent;
-            }
-        }
-    }
+			&.no-focus-ring {
+				@apply ring-transparent;
+			}
+		}
+	}
 
-    svg {
-        width: 1.1em;
-        height: 1.1em;
-        color: currentColor;
-    }
+	svg {
+		width: 1.1em;
+		height: 1.1em;
+		color: currentColor;
+	}
 
-    button,
-    select,
-    input,
-    textarea {
-        @apply rounded-md min-h-10 px-3 py-2 text-base;
-    }
+	button,
+	select,
+	input,
+	textarea {
+		@apply rounded-md min-h-10 px-3 py-2 text-base;
+	}
 
-    select,
-    input {
-        @apply text-normal-fg border-[0.13rem] border-border;
-    }
+	select,
+	input {
+		@apply text-normal-fg border-[0.13rem] border-border;
+	}
 
-    label {
-        font-weight: 600;
-        margin-bottom: 0.2em;
-        display: inline-block;
-        color: var(--color-dim-fg);
-    }
+	label {
+		font-weight: 600;
+		margin-bottom: 0.2em;
+		display: inline-block;
+		color: var(--color-dim-fg);
+	}
 
-    .class-excellent {
-        --clr: var(--color-accent-fg);
-        color: var(--clr);
-    }
+	.class-excellent {
+		--clr: var(--color-accent-fg);
+		color: var(--clr);
+	}
 
-    .class-good {
-        --clr: var(--color-lime-600);
-        color: var(--clr);
-    }
+	.class-good {
+		--clr: var(--color-lime-600);
+		color: var(--clr);
+	}
 
-    .class-average {
-        --clr: var(--color-amber-600);
-        color: var(--clr);
-    }
+	.class-average {
+		--clr: var(--color-amber-600);
+		color: var(--clr);
+	}
 
-    .class-pass {
-        --clr: var(--color-orange-600);
-        color: var(--clr);
-    }
+	.class-pass {
+		--clr: var(--color-orange-600);
+		color: var(--clr);
+	}
 
-    .class-fail {
-        --clr: var(--color-red-600);
-        color: var(--clr);
-    }
+	.class-fail {
+		--clr: var(--color-red-600);
+		color: var(--clr);
+	}
 
-    .trim-both {
-        text-box: trim-both cap alphabetic;
-        line-height: 1;
-    }
+	.trim-both {
+		text-box: trim-both cap alphabetic;
+		line-height: 1;
+	}
 }

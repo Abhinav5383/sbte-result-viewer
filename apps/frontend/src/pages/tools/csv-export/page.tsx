@@ -1,377 +1,327 @@
 /** biome-ignore-all lint/a11y/useFocusableInteractive: f a11y */
 /** biome-ignore-all lint/a11y/useSemanticElements: f a11y */
 
-import type { EncodedData, EncodedResultT } from "@app/shared/encoder";
-import { getVal, getValSub } from "@app/shared/encoder/helpers";
-import { BRANCH_NAME, COLLEGE_NAME, PAPER_TYPE } from "@app/shared/types";
-import { getBranchFromRoll, getCollegeFromRoll } from "@app/shared/utils";
+import type { ResultRow } from "@app/shared/dto";
+import type { ExportField } from "@app/shared/schemas";
 import { useSearchParams } from "@solidjs/router";
 import FileSpreadsheetIcon from "lucide-solid/icons/file-spreadsheet";
 import Trash2Icon from "lucide-solid/icons/trash-2";
-import { For, onMount, Show } from "solid-js";
+import { For, Show } from "solid-js";
 import { ResultsFilter } from "~/components/misc/results-filter/component";
-import { useResultsFilter } from "~/components/misc/results-filter/hook";
+import { useFilterControls } from "~/components/misc/results-filter/hook";
 import VirtualList from "~/components/misc/virtual-list";
 import { Button } from "~/components/ui/button";
 import MultiSelect from "~/components/ui/multi-select";
 import { cn } from "~/components/utils";
-import { useIndexedResults } from "~/lib/hooks/index-results";
-import { useResults } from "~/providers/results";
-import { generateCSV } from "./gen-csv";
+import { useMeta } from "~/hooks/use-meta";
+import { useResults } from "~/hooks/use-results";
+import { getExportCsvUrl } from "~/lib/api/results";
+
+const EXPORT_FIELDS: { key: ExportField; label: string }[] = [
+	{ key: "roll", label: "Roll No." },
+	{ key: "name", label: "Name" },
+	{ key: "branch", label: "Branch" },
+	{ key: "college", label: "College" },
+	{ key: "semester", label: "Semester" },
+	{ key: "session", label: "Admission Year" },
+	{ key: "total_obtained", label: "Marks Obtained" },
+	{ key: "total_max", label: "Maximum Marks" },
+	{ key: "sgpa", label: "SGPA" },
+	{ key: "cgpa", label: "CGPA" },
+	{ key: "remark", label: "Remarks" },
+];
+
+function getValidCsvKeys(keys: string[]): ExportField[] {
+	const valid: ExportField[] = [];
+	for (const key of keys) {
+		if (!valid.includes(key as ExportField) && EXPORT_FIELDS.some((f) => f.key === key)) {
+			valid.push(key as ExportField);
+		}
+	}
+	return valid;
+}
+
+function extractField(
+	row: ResultRow,
+	field: ExportField,
+	meta: ReturnType<typeof useMeta>,
+): string {
+	switch (field) {
+		case "roll":
+			return row.roll;
+		case "name":
+			return row.name;
+		case "branch":
+			return meta.getBranchName(row.branch_code);
+		case "college":
+			return meta.getCollegeName(row.college_code);
+		case "semester":
+			return row.semester.toString();
+		case "session":
+			return row.session;
+		case "total_obtained":
+			return row.total_obtained.toString();
+		case "total_max":
+			return row.total_max.toString();
+		case "sgpa":
+			return (row.sgpa_x100 / 100).toFixed(2);
+		case "cgpa":
+			return row.cgpa_x100 != null ? (row.cgpa_x100 / 100).toFixed(2) : "";
+		case "remark":
+			return row.remark;
+		default:
+			return "";
+	}
+}
 
 export default function CsvExportPage() {
-    const ctx = useResults();
+	const [searchParams, setSearchParams] = useSearchParams();
+	const filters = useFilterControls({ sortBy: "marks", sortOrder: "desc" });
 
-    return (
-        <Show
-            when={ctx.data()}
-            keyed
-            fallback={
-                <div class="grid place-items-center h-96">
-                    <p class="text-dim-fg text-lg">Loading results data...</p>
-                </div>
-            }
-        >
-            {(data) => <PageContents encodedData={data} />}
-        </Show>
-    );
-}
+	const resultsHook = useResults(filters, { limit: 100 });
 
-const CSV_FIELDS = [
-    {
-        key: "roll",
-        label: "Roll No.",
-        extract(result: EncodedResultT) {
-            return getVal(result, "roll");
-        },
-    },
-    {
-        key: "name",
-        label: "Name",
-        extract(result: EncodedResultT) {
-            return getVal(result, "name");
-        },
-    },
-    {
-        key: "branchName",
-        label: "Branch",
-        extract(result: EncodedResultT) {
-            const roll = getVal(result, "roll");
-            return BRANCH_NAME[getBranchFromRoll(roll)];
-        },
-    },
-    {
-        key: "collegeName",
-        label: "College",
-        extract(result: EncodedResultT) {
-            const roll = getVal(result, "roll");
-            return COLLEGE_NAME[getCollegeFromRoll(roll)];
-        },
-    },
-    {
-        key: "totalMarksObtained",
-        label: "Marks Obtained",
-        extract(result: EncodedResultT) {
-            return getVal(result, "grandTotalObtained").toString();
-        },
-    },
-    {
-        key: "totalMarksMax",
-        label: "Maximum Marks",
-        extract(result: EncodedResultT) {
-            return getVal(result, "grandTotalMax").toString();
-        },
-    },
-    {
-        key: "percentObtained",
-        label: "Percentage",
-        extract(result: EncodedResultT) {
-            const obtained = getVal(result, "grandTotalObtained");
-            const max = getVal(result, "grandTotalMax");
-            return ((obtained / max) * 100).toFixed(2).toString();
-        },
-    },
-    {
-        key: "sgpa",
-        label: "SGPA",
-        extract(result: EncodedResultT) {
-            return getVal(result, "sgpa").toFixed(2).toString();
-        },
-    },
-    {
-        key: "cgpa",
-        label: "CGPA",
-        extract(result: EncodedResultT) {
-            return getVal(result, "cgpa")?.toString();
-        },
-    },
-    {
-        key: "remarks",
-        label: "Remarks",
-        extract(result: EncodedResultT, data: EncodedData) {
-            return data.remarks[getVal(result, "remarks")];
-        },
-    },
-    {
-        key: "regNo",
-        label: "Registration No.",
-        extract(result: EncodedResultT) {
-            return getVal(result, "roll").slice(2);
-        },
-    },
-    {
-        key: "carrySubjects",
-        label: "Carry Subjects",
-        extract(result: EncodedResultT, data: EncodedData) {
-            const subjects = getVal(result, "subjects");
-            const sgpa = getVal(result, "sgpa");
-            if (sgpa > 0) return "";
+	const selectedFields = () => {
+		const raw = searchParams.fields;
+		if (!raw) {
+			return [
+				"roll",
+				"name",
+				"branch",
+				"college",
+				"total_obtained",
+				"sgpa",
+				"remark",
+			] as ExportField[];
+		}
+		const keyList = Array.isArray(raw) ? raw[0] : raw;
+		return getValidCsvKeys(keyList.split("__"));
+	};
 
-            const carrySubjects = subjects.filter((sub) => {
-                return (
-                    getValSub(sub, "type") === PAPER_TYPE.THEORY &&
-                    getValSub(sub, "externalObtained") < getValSub(sub, "externalPassing")
-                );
-            });
+	function setSelectedFields(fields: ExportField[]) {
+		const valid = getValidCsvKeys(fields);
+		setSearchParams({ fields: valid.length > 0 ? valid.join("__") : "" });
+	}
 
-            const carrySubs: string[] = [];
-            for (const sub of carrySubjects) {
-                carrySubs.push(data.subjects[getValSub(sub, "name")]);
-            }
+	function handleExport() {
+		if (selectedFields().length === 0) return;
 
-            return carrySubs.join(", ");
-        },
-    },
-] as const;
+		const url = getExportCsvUrl({
+			college: filters.college().length > 0 ? filters.college() : undefined,
+			branch: filters.branch().length > 0 ? filters.branch() : undefined,
+			sem: filters.semester().length > 0 ? filters.semester() : undefined,
+			session: filters.session().length > 0 ? filters.session() : undefined,
+			q: filters.query().trim().length >= 2 ? filters.query().trim() : undefined,
+			fields: selectedFields(),
+		});
 
-type ValidKeys = (typeof CSV_FIELDS)[number]["key"];
+		const link = document.createElement("a");
+		link.setAttribute("href", url);
+		link.setAttribute("download", "results.csv");
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	}
 
-function PageContents(props: { encodedData: EncodedData }) {
-    const [searchParams, setSearchParams] = useSearchParams();
-    const indexedData = useIndexedResults(props.encodedData);
-    const res = useResultsFilter(props.encodedData);
+	return (
+		<main class="@container grid gap-4 content-start px-6">
+			<div class="py-4 flex justify-between items-center">
+				<h1 class="text-3xl font-bold text-normal-fg">CSV Export</h1>
 
-    const selectedFields = () => {
-        let fields = searchParams.fields;
-        if (!fields) return [];
+				<Button
+					variant="primary-alt"
+					onClick={handleExport}
+					disabled={selectedFields().length === 0}
+				>
+					<FileSpreadsheetIcon class="w-[1.2em] h-[1.2em] mbs-[-0.15em]" />
+					<span style="text-box: trim-both cap alphabetic;">Export CSV</span>
+				</Button>
+			</div>
 
-        if (Array.isArray(fields)) fields = fields[0];
-        return getValidCsvKeys(fields.split("__"));
-    };
-    const setSelectedFields = (fields: ValidKeys[]) => {
-        const validKeys = getValidCsvKeys(fields);
-        setSearchParams({ fields: validKeys.length > 0 ? validKeys.join("__") : null });
-    };
-    onMount(() => {
-        if (!searchParams.fields) {
-            setSelectedFields(["roll", "name", "totalMarksObtained", "sgpa"]);
-        }
-    });
+			<div id="results" class="grid">
+				<div class="grid grid-cols-1 @min-desktop:grid-cols-[4fr_3fr_3fr_3fr_4fr] gap-x-2.5 gap-y-4 py-4 pbe-6 *:first:col-span-full">
+					<ResultsFilter hook={filters} alwaysShowSort />
+				</div>
 
-    function handleCSVExport() {
-        const headers = selectedFields().map((key) => {
-            const fieldDef = CSV_FIELDS.find((f) => f.key === key);
-            if (!fieldDef) throw new Error(`Invalid CSV field key: ${key}`);
-            return fieldDef.label;
-        });
+				<div class="flex items-center justify-between flex-wrap gap-x-8 gap-y-4 pbs-6">
+					<div class="flex gap-4 items-center">
+						<p class="text-dim-fg text-sm">
+							Export Preview (showing{" "}
+							<span class="font-medium">{resultsHook.results().length}</span>
+							<Show when={resultsHook.total() !== undefined}>
+								{" "}
+								of <span class="font-medium">{resultsHook.total()}</span>
+							</Show>{" "}
+							{filters.anyFilterActive() ? "matches" : "results"})
+						</p>
+						<Show when={filters.anyFilterActive()}>
+							<span class="text-border">|</span>
+							<button
+								type="button"
+								class="text-inherit text-sm min-h-0 px-0 py-0 hover:text-accent-fg underline underline-offset-[0.1lh]"
+								onClick={filters.clearFilters}
+							>
+								Clear Filters
+							</button>
+						</Show>
+					</div>
 
-        const results = res.sortedResults().results;
-        const selected = selectedFields();
-        const rows: string[][] = [];
+					<div class="grow grid grid-cols-[1fr_auto] gap-4 justify-items-end">
+						<MultiSelect
+							selected={selectedFields()}
+							onChange={(list) => setSelectedFields(list as ExportField[])}
+							options={EXPORT_FIELDS.map((f) => ({
+								label: f.label,
+								value: f.key,
+							})).sort((a, b) => a.label.localeCompare(b.label))}
+							class="w-stretch @min-desktop:w-[42ch]"
+						/>
 
-        for (let i = 0; i < results.length; i++) {
-            const result = results[i];
-            const row: string[] = [];
+						<Button
+							variant="danger-alt-hover"
+							size="sm"
+							onClick={() => setSelectedFields([])}
+						>
+							<Trash2Icon />
+							Clear All
+						</Button>
+					</div>
+				</div>
 
-            for (const key of selected) {
-                const fieldDef = CSV_FIELDS.find((f) => f.key === key);
-                if (!fieldDef) throw new Error(`Invalid CSV field key: ${key}`);
-
-                const value = fieldDef.extract(result, props.encodedData);
-                row.push(value ?? "");
-            }
-            rows.push(row);
-        }
-
-        const csvContent = generateCSV(headers, rows);
-
-        const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.setAttribute("href", url);
-        link.setAttribute("download", "results.csv");
-        link.click();
-
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
-    }
-
-    return (
-        <main class="@container grid gap-4 content-start px-6">
-            <div class="py-4 flex justify-between items-center">
-                <h1 class="text-3xl font-bold text-normal-fg">CSV Export</h1>
-
-                <Button variant="primary-alt" onClick={handleCSVExport}>
-                    <FileSpreadsheetIcon class="w-[1.2em] h-[1.2em] mbs-[-0.15em]" />
-                    <span style="text-box: trim-both cap alphabetic;">Export CSV</span>
-                </Button>
-            </div>
-
-            <div id="results" class="grid">
-                <div class="grid grid-cols-1 @min-desktop:grid-cols-[4fr_3fr_3fr_3fr_4fr] gap-x-2.5 gap-y-4 py-4 pbe-6 *:first:col-span-full">
-                    <ResultsFilter hook={res} indexedData={indexedData()} alwaysShowSort />
-                </div>
-
-                <div class="flex items-center justify-between flex-wrap gap-x-8 gap-y-4 pbs-6">
-                    <div class="flex gap-4 items-center">
-                        <p class="text-dim-fg text-sm">
-                            Includes <span class="font-medium">{res.sortedResults().results.length}</span> of{" "}
-                            <span class="font-medium">{props.encodedData.results.length} </span>
-                            {res.sortedResults().results.length !== 1 ? "results" : "result"}
-                        </p>
-                        <Show when={res.anyFilterActive()}>
-                            <span class="text-border">|</span>
-                            <button
-                                type="button"
-                                class="text-inherit text-sm min-h-0 px-0 py-0 hover:text-accent-fg underline underline-offset-[0.1lh]"
-                                onclick={res.clearFilters}
-                            >
-                                Clear Filters
-                            </button>
-                        </Show>
-                    </div>
-
-                    <div class="grow grid grid-cols-[1fr_auto] gap-4 justify-items-end">
-                        <MultiSelect
-                            selected={selectedFields()}
-                            onChange={(list) => setSelectedFields(list as ValidKeys[])}
-                            options={CSV_FIELDS.map((f) => ({
-                                label: f.label,
-                                value: f.key,
-                            })).sort((a, b) => a.label.localeCompare(b.label))}
-                            class="w-stretch @min-desktop:w-[42ch]"
-                        />
-
-                        <Button variant="danger-alt-hover" size="sm" onClick={() => setSelectedFields([])}>
-                            <Trash2Icon />
-                            Clear All
-                        </Button>
-                    </div>
-                </div>
-
-                <PreviewCsv
-                    encodedData={props.encodedData}
-                    results={res.sortedResults().results}
-                    selectedFields={selectedFields()}
-                    setSelectedFields={setSelectedFields}
-                />
-            </div>
-        </main>
-    );
-}
-
-function getValidCsvKeys(keys: string[]) {
-    const validFields: ValidKeys[] = [];
-    for (const key of keys) {
-        if (!validFields.includes(key as ValidKeys) && CSV_FIELDS.some((f) => f.key === key)) {
-            validFields.push(key as ValidKeys);
-        }
-    }
-
-    return validFields;
+				<PreviewCsv
+					results={resultsHook.results()}
+					loading={resultsHook.loading()}
+					error={resultsHook.error()}
+					selectedFields={selectedFields()}
+					setSelectedFields={setSelectedFields}
+				/>
+			</div>
+		</main>
+	);
 }
 
 interface PreviewCsvProps {
-    encodedData: EncodedData;
-    results: EncodedResultT[];
-    selectedFields: ValidKeys[];
-    setSelectedFields: (fields: ValidKeys[]) => void;
+	results: ResultRow[];
+	loading: boolean;
+	error: string | null;
+	selectedFields: ExportField[];
+	setSelectedFields: (fields: ExportField[]) => void;
 }
 
 function PreviewCsv(props: PreviewCsvProps) {
-    function removeField(field: ValidKeys) {
-        const newFields = props.selectedFields.filter((f) => f !== field);
-        props.setSelectedFields(newFields);
-    }
+	const meta = useMeta();
 
-    return (
-        <Show
-            when={props.selectedFields.length > 0}
-            fallback={
-                <div class="grid place-items-center h-96">
-                    <p class="text-dim-fg text-lg">No fields selected. Select some fields to preview the CSV.</p>
-                </div>
-            }
-        >
-            <div class="max-w-stretch overflow-x-auto my-4" style="scrollbar-width: thin;">
-                <div
-                    role="table"
-                    class="grid w-full text-[0.925rem]"
-                    style={{
-                        "grid-template-columns": `repeat(${props.selectedFields.length}, auto)`,
-                    }}
-                >
-                    <div role="rowgroup" class="contents">
-                        <div role="row" class="grid grid-cols-subgrid col-span-full">
-                            <For each={props.selectedFields}>
-                                {(field) => {
-                                    const fieldDef = CSV_FIELDS.find((f) => f.key === field);
-                                    if (!fieldDef) return null;
+	function removeField(field: ExportField) {
+		const newFields = props.selectedFields.filter((f) => f !== field);
+		props.setSelectedFields(newFields);
+	}
 
-                                    return (
-                                        <div
-                                            role="columnheader"
-                                            class="flex items-center justify-between bg-zinc-700 text-zinc-200 gap-4 px-3 py-2 border-e-[0.07rem] border-current/25"
-                                        >
-                                            <span class="inline-block w-max max-w-[24ch] font-semibold">
-                                                {fieldDef.label}
-                                            </span>
+	return (
+		<Show
+			when={props.selectedFields.length > 0}
+			fallback={
+				<div class="grid place-items-center h-96">
+					<p class="text-dim-fg text-lg">
+						No fields selected. Select some fields to preview the CSV.
+					</p>
+				</div>
+			}
+		>
+			<div
+				class={cn(
+					"max-w-stretch overflow-x-auto my-4 transition-opacity duration-200 relative",
+					props.loading && "opacity-70",
+				)}
+				style="scrollbar-width: thin;"
+			>
+				<Show when={props.loading}>
+					<div class="absolute top-0 inset-x-0 h-0.5 bg-accent animate-pulse z-20" />
+				</Show>
 
-                                            <Button
-                                                variant="danger-muted"
-                                                size="icon-sm"
-                                                onClick={() => removeField(fieldDef.key)}
-                                                class="text-rose-300"
-                                            >
-                                                <Trash2Icon />
-                                            </Button>
-                                        </div>
-                                    );
-                                }}
-                            </For>
-                        </div>
-                    </div>
+				<div
+					role="table"
+					class="grid w-full text-[0.925rem]"
+					style={{
+						"grid-template-columns": `repeat(${props.selectedFields.length}, auto)`,
+					}}
+				>
+					<div role="rowgroup" class="contents">
+						<div role="row" class="grid grid-cols-subgrid col-span-full">
+							<For each={props.selectedFields}>
+								{(field) => {
+									const fieldDef = EXPORT_FIELDS.find((f) => f.key === field);
+									if (!fieldDef) return null;
 
-                    <VirtualList
-                        items={props.results}
-                        defaultRowHeight={32}
-                        containerProps={{
-                            role: "rowgroup",
-                            class: "grid grid-cols-subgrid col-span-full text-normal-fg",
-                        }}
-                        RowComponent={(args) => (
-                            <div role="row" class={cn(args.class, "grid grid-cols-subgrid col-span-full")}>
-                                <For each={props.selectedFields}>
-                                    {(field) => {
-                                        const fieldDef = CSV_FIELDS.find((f) => f.key === field);
-                                        if (!fieldDef) return null;
+									return (
+										<div
+											role="columnheader"
+											class="flex items-center justify-between bg-zinc-700 text-zinc-200 gap-4 px-3 py-2 border-e-[0.07rem] border-current/25"
+										>
+											<span class="inline-block w-max max-w-[24ch] font-semibold">
+												{fieldDef.label}
+											</span>
 
-                                        const value = fieldDef.extract(args.item, props.encodedData);
+											<Button
+												variant="danger-muted"
+												size="icon-sm"
+												onClick={() => removeField(fieldDef.key)}
+												class="text-rose-300"
+											>
+												<Trash2Icon />
+											</Button>
+										</div>
+									);
+								}}
+							</For>
+						</div>
+					</div>
 
-                                        return (
-                                            <div
-                                                role="cell"
-                                                class="border-be-[0.07rem] border-e-[0.07rem] first-of-type:border-s-[0.07rem] border-border px-3 py-2"
-                                            >
-                                                <span class="inline-block w-max tabular-nums">{value}</span>
-                                            </div>
-                                        );
-                                    }}
-                                </For>
-                            </div>
-                        )}
-                    />
-                </div>
-            </div>
-        </Show>
-    );
+					<Show
+						when={props.results.length > 0}
+						fallback={
+							<div class="col-span-full grid place-items-center py-16 text-dim-fg">
+								{props.loading
+									? "Loading preview..."
+									: "No results found matching your filters."}
+							</div>
+						}
+					>
+						<VirtualList
+							items={props.results}
+							defaultRowHeight={32}
+							containerProps={{
+								role: "rowgroup",
+								class: "grid grid-cols-subgrid col-span-full text-normal-fg",
+							}}
+							RowComponent={(args) => (
+								<div
+									role="row"
+									class={cn(
+										args.class,
+										"grid grid-cols-subgrid col-span-full hover:bg-hover-bg",
+									)}
+								>
+									<For each={props.selectedFields}>
+										{(field) => {
+											const value = extractField(args.item, field, meta);
+
+											return (
+												<div
+													role="cell"
+													class="border-be-[0.07rem] border-e-[0.07rem] first-of-type:border-s-[0.07rem] border-border px-3 py-2"
+												>
+													<span class="inline-block w-max tabular-nums">
+														{value}
+													</span>
+												</div>
+											);
+										}}
+									</For>
+								</div>
+							)}
+						/>
+					</Show>
+				</div>
+			</div>
+		</Show>
+	);
 }

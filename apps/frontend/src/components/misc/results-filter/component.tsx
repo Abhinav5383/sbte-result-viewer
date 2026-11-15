@@ -1,181 +1,175 @@
-import { COLLEGE, COLLEGE_NAME } from "@app/shared/types";
 import SearchIcon from "lucide-solid/icons/search";
 import { Button } from "~/components/ui/button";
 import MultiSelect from "~/components/ui/multi-select";
 import { Select } from "~/components/ui/select";
 import { OrdinalSuffix } from "~/components/utils";
-import type { IndexedResultsData } from "~/lib/hooks/index-results";
-import { SearchBy, SortBy, SortOrder } from "~/lib/types";
-import { type FilterControls, FilterParams } from "./types";
+import { useMeta } from "~/hooks/use-meta";
+import type { FilterControls, SortColumn, SortDirection } from "./types";
 
-interface Props {
-    hook: FilterControls;
-    indexedData: IndexedResultsData;
-    alwaysShowSort?: boolean;
-    hideFilters?: FilterParams[];
+export interface ResultsFilterProps {
+	hook: FilterControls;
+	hideFilters?: string[];
+	alwaysShowSort?: boolean;
+	sortOptions?: { value: SortColumn; label: string }[];
 }
 
-export function ResultsFilter(props: Props) {
-    const res = props.hook;
-    const indexedData = props.indexedData;
+export function ResultsFilter(props: ResultsFilterProps) {
+	const meta = useMeta();
+	const res = props.hook;
 
-    const collegeOptions = () => {
-        const ngp = COLLEGE_NAME[COLLEGE.NGP_PATNA_13];
-        const all = indexedData.filters.college
-            .filter((c) => c !== ngp)
-            .map((college) => ({
-                value: college,
-                label: college,
-            }));
+	const collegeOptions = () => {
+		const ngpName = "NGP Patna-13";
+		const colleges = meta.colleges();
+		const ngp = colleges.find((c) => c.short_name === ngpName);
+		const others = colleges
+			.filter((c) => c.short_name !== ngpName)
+			.slice()
+			.sort((a, b) => a.short_name.localeCompare(b.short_name));
 
-        return [
-            {
-                value: ngp,
-                label: ngp,
-            },
-            ...all,
-        ];
-    };
+		const sorted = ngp ? [ngp, ...others] : others;
+		return sorted.map((c) => ({
+			value: c.short_name,
+			label: c.short_name,
+		}));
+	};
 
-    return (
-        <>
-            <div hidden={props.hideFilters?.includes(FilterParams.QUERY)}>
-                <label for="searchBy" class="w-fit">
-                    Search
-                </label>
-                <div class="grid gap-y-3 grid-cols-1 @min-extra-sm:grid-cols-[12ch_1fr] gap-0">
-                    <Select
-                        value={res.searchBy()}
-                        onChange={(val) => res.setSearchBy(val as SearchBy)}
-                        options={[
-                            {
-                                value: SearchBy.Roll,
-                                label: "Roll",
-                            },
-                            {
-                                value: SearchBy.Name,
-                                label: "Name",
-                            },
-                        ]}
-                        class="@min-extra-sm:rounded-e-none @min-extra-sm:border-e-0 min-w-[10ch] border-border focus:border-accent-bg"
-                    />
+	const branchOptions = () =>
+		meta
+			.branches()
+			.slice()
+			.sort((a, b) => a.name.localeCompare(b.name))
+			.map((b) => ({
+				value: b.name,
+				label: b.name,
+			}));
 
-                    <div class="relative">
-                        <input
-                            id="searchBy"
-                            type="text"
-                            inputMode={res.searchBy() === SearchBy.Roll ? "numeric" : "text"}
-                            autocomplete="off"
-                            spellcheck={false}
-                            enterkeyhint="search"
-                            placeholder={`Enter ${res.searchBy()} to search`}
-                            class="no-focus-ring @min-extra-sm:rounded-s-none border-border focus:border-accent-bg w-full"
-                            ref={res.setQueryInputRef}
-                            onChange={(e) => {
-                                res.setSearchQuery(e.currentTarget.value);
-                                e.currentTarget.blur();
-                            }}
-                            onInput={(e) => {
-                                if (!e.currentTarget.value) res.setSearchQuery("");
-                            }}
-                            onBlur={(e) => res.setSearchQuery(e.currentTarget.value)}
-                        />
+	const semesterOptions = () =>
+		meta.semesters().map((sem) => ({
+			value: sem.toString(),
+			label: `${sem}${OrdinalSuffix(sem.toString())} Semester`,
+		}));
 
-                        <Button
-                            variant="primary-alt"
-                            size="icon-sm"
-                            class="grid place-content-center absolute rounded aspect-square inset-y-1 inset-e-1"
-                        >
-                            <SearchIcon />
-                        </Button>
-                    </div>
-                </div>
-            </div>
+	const sessionOptions = () =>
+		meta
+			.sessions()
+			.slice()
+			.sort((a, b) => b.localeCompare(a))
+			.map((s) => ({
+				value: s,
+				label: s.length === 2 ? `20${s}` : s,
+			}));
 
-            <div hidden={props.hideFilters?.includes(FilterParams.COLLEGE)}>
-                <label for="college-filter">College</label>
-                <MultiSelect
-                    id="college-filter"
-                    selected={res.college()}
-                    onChange={res.setCollege}
-                    options={collegeOptions()}
-                    placeholder="All Colleges"
-                />
-            </div>
+	return (
+		<>
+			<div hidden={props.hideFilters?.includes("query")}>
+				<label for="search-input" class="w-fit">
+					Search
+				</label>
+				<div class="relative">
+					<input
+						id="search-input"
+						type="text"
+						autocomplete="off"
+						spellcheck={false}
+						placeholder="Search by name or roll..."
+						value={res.query()}
+						onInput={(e) => res.setQuery(e.currentTarget.value)}
+						onKeyDown={(e) => {
+							if (e.key === "Enter") {
+								res.flushQuery();
+							}
+						}}
+						class="no-focus-ring border-border focus:border-accent-bg w-full"
+					/>
+					<Button
+						variant="primary-alt"
+						size="icon-sm"
+						onClick={res.flushQuery}
+						class="grid place-content-center absolute rounded aspect-square inset-y-1 inset-e-1"
+					>
+						<SearchIcon />
+					</Button>
+				</div>
+			</div>
 
-            <div hidden={props.hideFilters?.includes(FilterParams.BRANCH)}>
-                <label for="branch-filter">Branch</label>
-                <MultiSelect
-                    id="branch-filter"
-                    selected={res.branch()}
-                    onChange={res.setBranch}
-                    options={indexedData.filters.branch.map((branch) => ({
-                        value: branch,
-                        label: branch,
-                    }))}
-                    placeholder="All Branches"
-                />
-            </div>
+			<div hidden={props.hideFilters?.includes("college")}>
+				<label for="college-filter">College</label>
+				<MultiSelect
+					id="college-filter"
+					selected={res.collegeNames()}
+					onChange={res.setCollege}
+					options={collegeOptions()}
+					placeholder="All Colleges"
+				/>
+			</div>
 
-            <div hidden={props.hideFilters?.includes(FilterParams.SESSION)}>
-                <label for="session-filter">Session</label>
-                <MultiSelect
-                    id="session-filter"
-                    selected={res.session()}
-                    onChange={res.setSession}
-                    options={indexedData.filters.admissionYear.map((year) => ({
-                        value: year,
-                        label: `20${year}`,
-                    }))}
-                    placeholder="All Sessions"
-                />
-            </div>
+			<div hidden={props.hideFilters?.includes("branch")}>
+				<label for="branch-filter">Branch</label>
+				<MultiSelect
+					id="branch-filter"
+					selected={res.branchNames()}
+					onChange={res.setBranch}
+					options={branchOptions()}
+					placeholder="All Branches"
+				/>
+			</div>
 
-            <div hidden={props.hideFilters?.includes(FilterParams.SEMESTER)}>
-                <label for="semester-filter">Semester</label>
-                <MultiSelect
-                    id="semester-filter"
-                    selected={res.semester()}
-                    onChange={res.setSemester}
-                    options={indexedData.filters.semester.map((sem) => ({
-                        value: sem,
-                        label: SemesterLabel(sem),
-                    }))}
-                    placeholder="All Semesters"
-                />
-            </div>
+			<div hidden={props.hideFilters?.includes("session")}>
+				<label for="session-filter">Admission year</label>
+				<MultiSelect
+					id="session-filter"
+					selected={res.session()}
+					onChange={res.setSession}
+					options={sessionOptions()}
+					placeholder="All Sessions"
+				/>
+			</div>
 
-            <div class={props.alwaysShowSort ? "" : "@min-desktop:hidden"}>
-                <label for="mb-sort">Sort By</label>
-                <div class="grid gap-y-3 grid-cols-1 @min-mobile:grid-cols-[3fr_max-content]">
-                    <Select
-                        id="mb-sort"
-                        value={res.sortBy()}
-                        onChange={(v) => res.setSortFilter(v as SortBy, res.sortOrder())}
-                        options={Object.values(SortBy).map((sortBy) => ({
-                            value: sortBy,
-                            label: sortBy,
-                        }))}
-                        class="@min-mobile:rounded-e-none"
-                    />
+			<div hidden={props.hideFilters?.includes("semester")}>
+				<label for="semester-filter">Semester</label>
+				<MultiSelect
+					id="semester-filter"
+					selected={res.semester().map((s) => s.toString())}
+					onChange={(list) =>
+						res.setSemester(
+							list.map((v) => Number.parseInt(v, 10)).filter((n) => !Number.isNaN(n)),
+						)
+					}
+					options={semesterOptions()}
+					placeholder="All Semesters"
+				/>
+			</div>
 
-                    <Select
-                        id="mb-order"
-                        value={res.sortOrder()}
-                        onChange={(v) => res.setSortFilter(res.sortBy(), v as SortOrder)}
-                        options={[
-                            { value: SortOrder.Descending, label: SortOrder.Descending },
-                            { value: SortOrder.Ascending, label: SortOrder.Ascending },
-                        ]}
-                        class="@min-mobile:rounded-s-none @min-mobile:border-s-0"
-                    />
-                </div>
-            </div>
-        </>
-    );
-}
+			<div class={props.alwaysShowSort ? "" : "@min-desktop:hidden"}>
+				<label for="mb-sort">Sort By</label>
+				<div class="grid gap-y-3 grid-cols-1 @min-mobile:grid-cols-[3fr_max-content]">
+					<Select
+						id="mb-sort"
+						value={res.sortBy()}
+						onChange={(v) => res.setSortFilter(v as SortColumn, res.sortOrder())}
+						options={
+							props.sortOptions ?? [
+								{ value: "marks", label: "Marks" },
+								{ value: "sgpa", label: "SGPA" },
+								{ value: "name", label: "Name" },
+								{ value: "roll", label: "Roll" },
+							]
+						}
+						class="@min-mobile:rounded-e-none"
+					/>
 
-function SemesterLabel(sem: string) {
-    const suffix = OrdinalSuffix(sem);
-    return `${sem}${suffix} Semester`;
+					<Select
+						id="mb-order"
+						value={res.sortOrder()}
+						onChange={(v) => res.setSortFilter(res.sortBy(), v as SortDirection)}
+						options={[
+							{ value: "desc", label: "Descending" },
+							{ value: "asc", label: "Ascending" },
+						]}
+						class="@min-mobile:rounded-s-none @min-mobile:border-s-0"
+					/>
+				</div>
+			</div>
+		</>
+	);
 }

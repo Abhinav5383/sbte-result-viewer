@@ -1,10 +1,15 @@
 module.exports = {
     apps: [
         {
-            command: "bun run dev",
+            name: "sbte-scraper",
+            script: "bun",
+            args: "run src/main.ts",
             cwd: ".",
             watch: false,
-            autorestart: false
-        }
-    ]
-}
+            autorestart: false,  // scraper runs once and exits; use cron for scheduling
+            env: {
+                NODE_ENV: "production",
+            },
+        },
+    ],
+};

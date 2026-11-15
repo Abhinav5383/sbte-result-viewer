@@ -1,61 +1,49 @@
-import { BRANCH, type BranchConfig, COLLEGE } from "@app/shared/types";
+import { db } from "~/db/index";
 import { numRange } from "~/lib/utils";
+import { CURRENT_EXAM_CONFIG, type ExamConfig } from "./exam";
 
-export const ROLL_LIST = [...numRange(1, 120), ...numRange(301, 310), ...numRange(351, 360), ...numRange(601, 610)];
-
-const semestersList = [
-    // December 2026 exam
-    // { sem: 1, admissionYear: 2026 },
-    // { sem: 3, admissionYear: 2025 },
-    // { sem: 5, admissionYear: 2024 },
-
-    // May 2026 exam
-    { sem: 2, admissionYear: 2025 },
-    { sem: 4, admissionYear: 2024 },
-    { sem: 6, admissionYear: 2023 },
-
-    // December 2025 exam
-    { sem: 1, admissionYear: 2025 },
-    { sem: 3, admissionYear: 2024 },
-    { sem: 5, admissionYear: 2023 },
+export const ROLL_LIST = [
+	...numRange(1, 120),
+	...numRange(301, 310),
+	...numRange(351, 360),
+	...numRange(601, 610),
 ];
 
-export function getAllCollegeBranches() {
-    const allBranches: BranchConfig[] = [];
-
-    for (const collegeCode of Object.values(COLLEGE)) {
-        if (!collegeCode) continue;
-
-        const collegeBranches = getCollegeBranches(collegeCode, semestersList);
-        allBranches.push(...collegeBranches);
-    }
-
-    return allBranches;
+export interface ScrapeTarget {
+	collegeCode: number;
+	collegeName: string;
+	branchCode: number;
+	branchName: string;
+	semester: number;
+	admissionYear: number;
+	rollList: number[];
 }
 
-export function getCollegeBranches(collegeCode: number, semesters = semestersList) {
-    const branches = [];
+export async function getScrapeTargets(
+	examConfig: ExamConfig = CURRENT_EXAM_CONFIG,
+): Promise<ScrapeTarget[]> {
+	const [colleges, branches] = await Promise.all([
+		db.selectFrom("college").select(["code", "short_name"]).orderBy("code", "asc").execute(),
+		db.selectFrom("branch").select(["code", "name"]).orderBy("code", "asc").execute(),
+	]);
 
-    for (const semObj of semesters) {
-        const semBranches = getBranches_ForSemester(collegeCode, semObj.sem, semObj.admissionYear);
-        branches.push(...semBranches);
-    }
+	const targets: ScrapeTarget[] = [];
 
-    return branches;
-}
+	for (const college of colleges) {
+		for (const branch of branches) {
+			for (const sem of examConfig.semesters) {
+				targets.push({
+					collegeCode: college.code,
+					collegeName: college.short_name,
+					branchCode: branch.code,
+					branchName: branch.name,
+					semester: sem.semester,
+					admissionYear: sem.admissionYear,
+					rollList: ROLL_LIST,
+				});
+			}
+		}
+	}
 
-function getBranches_ForSemester(collegeCode: number, semester: number, admissionYear: number) {
-    const branchConfigs: BranchConfig[] = [];
-
-    for (const branchCode of Object.values(BRANCH)) {
-        branchConfigs.push({
-            branchCode: branchCode,
-            semester: semester,
-            collegeCode: collegeCode,
-            admissionYear: admissionYear,
-            rollList: ROLL_LIST,
-        });
-    }
-
-    return branchConfigs;
+	return targets;
 }

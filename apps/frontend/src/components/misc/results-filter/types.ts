@@ -1,42 +1,33 @@
-import type { SearchBy, SortBy, SortOrder } from "~/lib/types";
-
-export interface Filters {
-    college: string[];
-    branch: string[];
-    semester: string[];
-    admissionYear: string[];
-}
-
-export type FilterOptions = {
-    [K in keyof Filters]: Filters[K];
-};
-
 export enum FilterParams {
-    SEARCH_BY = "searchBy",
-    QUERY = "query",
-    COLLEGE = "college",
-    BRANCH = "branch",
-    SEMESTER = "sem",
-    SESSION = "session",
+	COLLEGE = "college",
+	BRANCH = "branch",
+	SEMESTER = "sem",
+	SESSION = "session",
+	QUERY = "q",
+	SORT_BY = "by",
+	SORT_ORDER = "order",
 }
+
+export type SortColumn = "marks" | "sgpa" | "name" | "reg_no" | "roll";
+export type SortDirection = "asc" | "desc";
 
 export interface FilterControls {
-    college: () => string[];
-    setCollege: (clg: string[]) => void;
-    branch: () => string[];
-    setBranch: (br: string[]) => void;
-    semester: () => string[];
-    setSemester: (sem: string[]) => void;
-    session: () => string[];
-    setSession: (sess: string[]) => void;
-    searchBy: () => SearchBy;
-    setSearchBy: (newVal: SearchBy) => void;
-    searchQuery: () => string;
-    setSearchQuery: (q: string) => void;
-    clearFilters: () => void;
-    anyFilterActive: () => boolean;
-    sortBy: () => SortBy;
-    sortOrder: () => SortOrder;
-    setSortFilter: (by: SortBy, order: SortOrder) => void;
-    setQueryInputRef: (ref: HTMLInputElement) => void;
+	college: () => number[];
+	collegeNames: () => string[];
+	setCollege: (val: (number | string)[]) => void;
+	branch: () => number[];
+	branchNames: () => string[];
+	setBranch: (val: (number | string)[]) => void;
+	semester: () => number[];
+	setSemester: (val: number[]) => void;
+	session: () => string[];
+	setSession: (val: string[]) => void;
+	query: () => string;
+	setQuery: (val: string) => void;
+	flushQuery: () => void;
+	sortBy: () => SortColumn;
+	sortOrder: () => SortDirection;
+	setSortFilter: (by: SortColumn, order: SortDirection) => void;
+	clearFilters: () => void;
+	anyFilterActive: () => boolean;
 }

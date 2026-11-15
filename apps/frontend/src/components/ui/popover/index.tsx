@@ -4,46 +4,46 @@ import { cn } from "~/components/utils";
 import "./styles.css";
 
 interface PopoverProps {
-    id: string;
-    isOpen: boolean;
-    onChange: (isOpen: boolean) => void;
-    trigger: (props: JSX.ButtonHTMLAttributes<HTMLButtonElement>) => JSX.Element;
-    class?: string;
-    children: JSX.Element;
+	id: string;
+	isOpen: boolean;
+	onChange: (isOpen: boolean) => void;
+	trigger: (props: JSX.ButtonHTMLAttributes<HTMLButtonElement>) => JSX.Element;
+	class?: string;
+	children: JSX.Element;
 }
 
 export default function Popover(props: PopoverProps) {
-    let popoverRef: HTMLDivElement | undefined;
+	let popoverRef: HTMLDivElement | undefined;
 
-    createEffect(() => {
-        if (!popoverRef) return;
-        if (props.isOpen) {
-            popoverRef.showPopover();
-        } else {
-            popoverRef.hidePopover();
-        }
-    });
+	createEffect(() => {
+		if (!popoverRef) return;
+		if (props.isOpen) {
+			popoverRef.showPopover();
+		} else {
+			popoverRef.hidePopover();
+		}
+	});
 
-    return (
-        <>
-            <props.trigger
-                popovertarget={props.id}
-                class="__popover-trigger"
-                style={{ "anchor-name": `--popover-${props.id}` }}
-            />
+	return (
+		<>
+			<props.trigger
+				popovertarget={props.id}
+				class="__popover-trigger"
+				style={{ "anchor-name": `--popover-${props.id}` }}
+			/>
 
-            <div
-                id={props.id}
-                popover
-                ref={popoverRef}
-                class={cn(props.class, "__popover")}
-                style={{ "position-anchor": `--popover-${props.id}` }}
-                onToggle={(e) => {
-                    props.onChange(e.newState === "open");
-                }}
-            >
-                {props.children}
-            </div>
-        </>
-    );
+			<div
+				id={props.id}
+				popover
+				ref={popoverRef}
+				class={cn(props.class, "__popover")}
+				style={{ "position-anchor": `--popover-${props.id}` }}
+				onToggle={(e) => {
+					props.onChange(e.newState === "open");
+				}}
+			>
+				{props.children}
+			</div>
+		</>
+	);
 }

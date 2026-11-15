@@ -5,30 +5,25 @@ import RootLayout from "./pages/layout";
 import LeaderboardPage from "./pages/leaderboard/page";
 import HomePage from "./pages/page";
 import CsvExportPage from "./pages/tools/csv-export/page";
-import RandomGroupGeneratorPage from "./pages/tools/group-generator/page";
 import { ToolsPage } from "./pages/tools/page";
-import { ResultsProvider } from "./providers/results";
 
 import "./app.css";
 
 export default function App() {
-    return (
-        <ResultsProvider>
-            <HashRouter>
-                {/* @ts-expect-error */}
-                <Route path="/" component={RootLayout}>
-                    <Route path="/" component={HomePage} />
-                    <Route path="/leaderboard" component={LeaderboardPage} />
-                    <Route path="/about" component={AboutPage} />
-                    <Route path="/tools">
-                        <Route component={ToolsPage} />
-                        <Route path="/csv-export" component={CsvExportPage} />
-                        <Route path="/group-generator" component={RandomGroupGeneratorPage} />
-                    </Route>
+	return (
+		<HashRouter>
+			{/* @ts-expect-error router component typing */}
+			<Route path="/" component={RootLayout}>
+				<Route path="/" component={HomePage} />
+				<Route path="/leaderboard" component={LeaderboardPage} />
+				<Route path="/about" component={AboutPage} />
+				<Route path="/tools">
+					<Route component={ToolsPage} />
+					<Route path="/csv-export" component={CsvExportPage} />
+				</Route>
 
-                    <Route path="*" component={NotFoundPage} />
-                </Route>
-            </HashRouter>
-        </ResultsProvider>
-    );
+				<Route path="*" component={NotFoundPage} />
+			</Route>
+		</HashRouter>
+	);
 }

@@ -1,80 +1,83 @@
 @import "tailwindcss";
 
 @layer utilities {
-    body:has(.__popover:popover-open) {
-        overflow: hidden;
-    }
+	body:has(.__popover:popover-open) {
+		overflow: hidden;
+	}
 
-    .__popover-trigger {
-        width: stretch;
-        display: grid;
-        align-items: center;
-        grid-template-columns: 1fr min-content;
-        gap: 0.7em;
-        transition: all 0.2s ease;
-        font-family: inherit;
-        cursor: pointer;
-        border: 0.13rem solid var(--color-border);
-        border-radius: var(--radius-md);
+	.__popover-trigger {
+		width: stretch;
+		display: grid;
+		align-items: center;
+		grid-template-columns: 1fr min-content;
+		gap: 0.7em;
+		transition: all 0.2s ease;
+		font-family: inherit;
+		cursor: pointer;
+		border: 0.13rem solid var(--color-border);
+		border-radius: var(--radius-md);
 
-        &:where(:focus-visible, :hover) {
-            border-color: var(--color-accent-bg);
-        }
-    }
+		&:where(:focus-visible, :hover) {
+			border-color: var(--color-accent-bg);
+		}
+	}
 
-    .__popover {
-        background-color: unset;
-        align-self: center;
-        justify-self: center;
-        border-radius: var(--radius-md);
-        max-height: calc(100% - 2rem);
-        min-width: min(calc(100% - 2rem), 24rem);
+	.__popover {
+		background-color: unset;
+		align-self: center;
+		justify-self: center;
+		border-radius: var(--radius-md);
+		max-height: calc(100% - 2rem);
+		min-width: min(calc(100% - 2rem), 24rem);
 
-        opacity: 1;
-        translate: 0 0;
-        transition:
-            opacity 0.25s ease-in-out,
-            translate 0.3s,
-            display 1s;
+		opacity: 1;
+		translate: 0 0;
+		transition:
+			opacity 0.25s ease-in-out,
+			translate 0.3s,
+			display 1s;
 
-        @starting-style {
-            opacity: 0;
-            translate: 0 0.5em;
-        }
-    }
+		@starting-style {
+			opacity: 0;
+			translate: 0 0.5em;
+		}
+	}
 
-    .__popover::backdrop {
-        background-image: linear-gradient(180deg, #0004, lch(from var(--color-accent-fg-dark) calc(l / 4) c h / 0.6));
-        opacity: 1;
-        transition: opacity 0.3s ease-in-out;
+	.__popover::backdrop {
+		background-image: linear-gradient(
+			180deg,
+			#0004,
+			lch(from var(--color-accent-fg-dark) calc(l / 4) c h / 0.6)
+		);
+		opacity: 1;
+		transition: opacity 0.3s ease-in-out;
 
-        @starting-style {
-            opacity: 0;
-        }
-    }
+		@starting-style {
+			opacity: 0;
+		}
+	}
 
-    @supports (anchor-name: --test) and (position-area: center) {
-        .__popover {
-            margin: 0;
-            margin-block: 0.2rem;
-            inset: unset;
-            position: fixed;
-            position-area: bottom center;
-            align-self: start;
+	@supports (anchor-name: --test) and (position-area: center) {
+		.__popover {
+			margin: 0;
+			margin-block: 0.2rem;
+			inset: unset;
+			position: fixed;
+			position-area: bottom center;
+			align-self: start;
 
-            min-width: anchor-size(inline);
-            max-height: calc(100% - 2rem);
-            overflow-y: auto;
+			min-width: anchor-size(inline);
+			max-height: calc(100% - 2rem);
+			overflow-y: auto;
 
-            position-try: flip-block;
-            position-try-fallbacks: flip-block;
-            position-try-order: most-block-size;
-            position-try-options: flip-block;
-        }
+			position-try: flip-block;
+			position-try-fallbacks: flip-block;
+			position-try-order: most-block-size;
+		}
 
-        .__popover::backdrop {
-            background: revert;
-            backdrop-filter: revert;
-        }
-    }
+		.__popover::backdrop {
+			background: revert;
+			backdrop-filter: revert;
+		}
+	}
 }
