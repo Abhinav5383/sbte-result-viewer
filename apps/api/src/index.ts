@@ -8,7 +8,10 @@ const app = new Hono();
 
 app.use(cors({ origin: env.CORS_ORIGIN }));
 
-app.get("/", (c) => c.json({ ok: true, message: "sbte-result-viewer API" }));
+app.get("/", (c) => {
+	c.header("Cache-Control", "public, max-age=86400");
+	return c.json({ ok: true, message: "sbte-result-viewer API" });
+});
 
 app.route("/", resultsRouter);
 

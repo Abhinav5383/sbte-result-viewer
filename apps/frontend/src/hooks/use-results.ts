@@ -34,7 +34,7 @@ export function useResults(filters: FilterControls, options?: UseResultsOptions)
 		const query = filters.query();
 		const timer = setTimeout(() => {
 			setDebouncedQ(query);
-		}, 300);
+		}, 400);
 
 		onCleanup(() => clearTimeout(timer));
 	});

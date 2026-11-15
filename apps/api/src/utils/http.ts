@@ -15,6 +15,12 @@ export const HTTP_STATUS = {
 	SERVER_ERROR: 500,
 } as const;
 
+export const CACHE_CONTROL = {
+	SHORT: "public, max-age=3600, stale-while-revalidate=86400",
+	LONG: "public, max-age=21600, stale-while-revalidate=86400",
+	NO_CACHE: "no-store",
+} as const;
+
 export type THttpStatus = (typeof HTTP_STATUS)[keyof typeof HTTP_STATUS];
 
 export type ApiSuccess<T> = {
@@ -66,13 +72,16 @@ export function conflictResponseData(message = "Conflict"): ApiError {
 }
 
 export function invalidRequestResponse(ctx: Context, message?: string) {
+	ctx.header("Cache-Control", CACHE_CONTROL.NO_CACHE);
 	return respondJson(ctx, invalidRequestResponseData(message));
 }
 
 export function notFoundResponse(ctx: Context, message?: string) {
+	ctx.header("Cache-Control", CACHE_CONTROL.NO_CACHE);
 	return respondJson(ctx, notFoundResponseData(message));
 }
 
 export function serverErrorResponse(ctx: Context, message?: string) {
+	ctx.header("Cache-Control", CACHE_CONTROL.NO_CACHE);
 	return respondJson(ctx, serverErrorResponseData(message));
 }

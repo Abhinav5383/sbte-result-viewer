@@ -1,6 +1,7 @@
 import type { Context } from "hono";
 import type { TypedResponse } from "hono/types";
 import type { ContentfulStatusCode } from "hono/utils/http-status";
+import { CACHE_CONTROL } from "~/utils/http";
 
 type JsonResponse<T, S extends ContentfulStatusCode> = Response & TypedResponse<T, S, "json">;
 
@@ -14,5 +15,8 @@ type Discriminate<T extends { data: unknown; status: ContentfulStatusCode }> = T
 export function respondJson<
 	T extends { readonly data: unknown; readonly status: ContentfulStatusCode },
 >(ctx: Context, result: T): Discriminate<T> {
+	if (result.status >= 400 && !ctx.res.headers.has("Cache-Control")) {
+		ctx.header("Cache-Control", CACHE_CONTROL.NO_CACHE);
+	}
 	return ctx.json(result.data, result.status) as Discriminate<T>;
 }

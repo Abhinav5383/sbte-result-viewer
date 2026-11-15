@@ -7,7 +7,7 @@ import {
 import { Hono } from "hono";
 import { z } from "zod";
 import { getDataVersion } from "~/lib/data-version";
-import { invalidRequestResponse } from "~/utils/http";
+import { CACHE_CONTROL, invalidRequestResponse } from "~/utils/http";
 import { respondJson } from "~/utils/jsonRes";
 import { getResultDetailHandler } from "./handlers/detail";
 import { createExportCsvStream } from "./handlers/export-csv";
@@ -29,7 +29,7 @@ resultsRouter.get("/meta", async (c) => {
 	const res = await getMetaHandler(dataVersion);
 
 	c.header("ETag", etag);
-	c.header("Cache-Control", "public, max-age=300, stale-while-revalidate=86400");
+	c.header("Cache-Control", CACHE_CONTROL.SHORT);
 	return respondJson(c, res);
 });
 
@@ -41,6 +41,9 @@ resultsRouter.get("/results", async (c) => {
 
 	const dataVersion = await getDataVersion();
 	const res = await listResultsHandler(parseResult.data, dataVersion);
+	if (res.status === 200) {
+		c.header("Cache-Control", CACHE_CONTROL.SHORT);
+	}
 	return respondJson(c, res);
 });
 
@@ -53,6 +56,9 @@ resultsRouter.get("/results/:roll", async (c) => {
 	}
 
 	const res = await getResultDetailHandler(parseResult.data);
+	if (res.status === 200) {
+		c.header("Cache-Control", CACHE_CONTROL.LONG);
+	}
 	return respondJson(c, res);
 });
 
@@ -64,6 +70,9 @@ resultsRouter.get("/leaderboard", async (c) => {
 
 	const dataVersion = await getDataVersion();
 	const res = await getLeaderboardHandler(parseResult.data, dataVersion);
+	if (res.status === 200) {
+		c.header("Cache-Control", CACHE_CONTROL.SHORT);
+	}
 	return respondJson(c, res);
 });
 
@@ -74,6 +83,9 @@ resultsRouter.get("/students", async (c) => {
 	}
 
 	const res = await getStudentsHandler(parseResult.data);
+	if (res.status === 200) {
+		c.header("Cache-Control", CACHE_CONTROL.SHORT);
+	}
 	return respondJson(c, res);
 });
 
@@ -89,7 +101,7 @@ resultsRouter.get("/export.csv", async (c) => {
 		headers: {
 			"Content-Type": "text/csv; charset=utf-8",
 			"Content-Disposition": 'attachment; filename="sbte-results.csv"',
-			"Cache-Control": "no-cache",
+			"Cache-Control": CACHE_CONTROL.SHORT,
 		},
 	});
 });
