@@ -99,6 +99,7 @@ export function useMeta() {
 		semesters: () => data()?.semesters ?? [1, 2, 3, 4, 5, 6],
 		sessions: () => data()?.sessions ?? [],
 		totalResults: () => data()?.total_results ?? 0,
+		totalStudents: () => data()?.total_students ?? 0,
 		dataVersion: () => data()?.data_version ?? 0,
 		getCollege,
 		getCollegeName,

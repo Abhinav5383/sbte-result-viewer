@@ -2,6 +2,7 @@ import type { ResultRow } from "@app/shared/dto";
 import type { ResultQuery } from "@app/shared/schemas";
 import { createEffect, createSignal, onCleanup } from "solid-js";
 import type { FilterControls } from "~/components/misc/results-filter/types";
+import { useMeta } from "~/hooks/use-meta";
 import { fetchResults } from "~/lib/api/results";
 
 export interface UseResultsOptions {
@@ -11,6 +12,7 @@ export interface UseResultsOptions {
 const STEP_LIMITS = [100, 250, 500, 1000];
 
 export function useResults(filters: FilterControls, options?: UseResultsOptions) {
+	const meta = useMeta();
 	const [results, setResults] = createSignal<ResultRow[]>([]);
 	const [total, setTotal] = createSignal<number | undefined>(undefined);
 	const [nextCursor, setNextCursor] = createSignal<string | undefined>(undefined);
@@ -134,6 +136,7 @@ export function useResults(filters: FilterControls, options?: UseResultsOptions)
 	return {
 		results,
 		total,
+		totalItems: () => meta.totalResults(),
 		loading,
 		loadingMore,
 		error,

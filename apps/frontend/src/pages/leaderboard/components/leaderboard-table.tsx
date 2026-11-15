@@ -18,6 +18,7 @@ import "~/pages/results/components/results-table.css";
 interface LeaderboardTableProps {
 	results: LeaderboardRow[];
 	total: number | undefined;
+	totalItems?: number;
 	loading: boolean;
 	loadingMore: boolean;
 	hasMore: boolean;
@@ -34,7 +35,11 @@ interface LeaderboardTableProps {
 }
 
 export function LeaderboardTable(props: LeaderboardTableProps) {
+	const meta = useMeta();
 	const [searchParams, setSearchParams] = useSearchParams();
+
+	const filtered = () => props.total ?? props.results.length;
+	const totalItems = () => props.totalItems ?? (meta.totalStudents() || filtered());
 
 	const selectedStudentId = () => {
 		const id = searchParams.dialog;
@@ -137,15 +142,9 @@ export function LeaderboardTable(props: LeaderboardTableProps) {
 					>
 						<div class="flex items-center text-sm text-dim-fg px-6 py-3 gap-4 border-be-[0.07rem] border-border">
 							<p>
-								Showing <span class="font-medium">{props.results.length}</span> of{" "}
-								<span class="font-medium">
-									{props.total ?? props.results.length}
-								</span>{" "}
-								{props.anyFilterActive
-									? "matched students"
-									: props.results.length === 1 && props.total === 1
-										? "student"
-										: "students"}
+								Showing <span class="font-medium">{filtered()}</span> of{" "}
+								<span class="font-medium">{totalItems()}</span>{" "}
+								{totalItems() === 1 ? "student" : "students"}
 							</p>
 							<Show when={props.anyFilterActive}>
 								<span class="text-border">|</span>

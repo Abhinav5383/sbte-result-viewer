@@ -34,6 +34,7 @@ export default function LeaderboardPage() {
 			<LeaderboardTable
 				results={leaderboardHook.results()}
 				total={leaderboardHook.total()}
+				totalItems={leaderboardHook.totalItems()}
 				loading={leaderboardHook.loading()}
 				loadingMore={leaderboardHook.loadingMore()}
 				hasMore={leaderboardHook.hasMore()}

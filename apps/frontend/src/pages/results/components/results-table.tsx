@@ -19,6 +19,7 @@ import "./results-table.css";
 interface ResultsListTableProps {
 	results: ResultRow[];
 	total: number | undefined;
+	totalItems?: number;
 	loading: boolean;
 	loadingMore: boolean;
 	hasMore: boolean;
@@ -34,7 +35,11 @@ interface ResultsListTableProps {
 }
 
 export function ResultsListTable(props: ResultsListTableProps) {
+	const meta = useMeta();
 	const [searchParams, setSearchParams] = useSearchParams();
+
+	const filtered = () => props.total ?? props.results.length;
+	const totalItems = () => props.totalItems ?? (meta.totalResults() || filtered());
 
 	const selectedRoll = () => {
 		const roll = searchParams.dialog;
@@ -104,13 +109,9 @@ export function ResultsListTable(props: ResultsListTableProps) {
 				>
 					<div class="flex items-center text-sm text-dim-fg px-6 py-3 gap-4 border-be-[0.07rem] border-border">
 						<p>
-							Showing <span class="font-medium">{props.results.length}</span> of{" "}
-							<span class="font-medium">{props.total ?? props.results.length}</span>{" "}
-							{props.anyFilterActive
-								? "matched results"
-								: props.results.length === 1 && props.total === 1
-									? "result"
-									: "results"}
+							Showing <span class="font-medium">{filtered()}</span> of{" "}
+							<span class="font-medium">{totalItems()}</span>{" "}
+							{totalItems() === 1 ? "result" : "results"}
 						</p>
 						<Show when={props.anyFilterActive}>
 							<span class="text-border">|</span>

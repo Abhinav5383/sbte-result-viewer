@@ -16,6 +16,7 @@ export function ResultListPage() {
 			<ResultsListTable
 				results={resultsHook.results()}
 				total={resultsHook.total()}
+				totalItems={resultsHook.totalItems()}
 				loading={resultsHook.loading()}
 				loadingMore={resultsHook.loadingMore()}
 				hasMore={resultsHook.hasMore()}

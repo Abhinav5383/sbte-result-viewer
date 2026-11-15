@@ -23,14 +23,13 @@ export function FeaturesSection() {
 					roll numbers, names, or colleges immediately without waiting for pages to load.
 				</li>
 				<li class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2.5 before:h-1.5 before:w-1.5 before:rounded-full before:bg-dim-fg">
-					<span class="text-bright-fg font-semibold">Offline Support:</span> Once the site
-					loads, everything works directly in your browser. You can keep searching and
-					filtering even if your internet connection drops.
+					<span class="text-bright-fg font-semibold">Leaderboard & Rankings:</span> View
+					student rankings across semesters, colleges, and branches with averaged marks
+					and SGPA.
 				</li>
 				<li class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2.5 before:h-1.5 before:w-1.5 before:rounded-full before:bg-dim-fg">
 					<span class="text-bright-fg font-semibold">Advanced Filtering:</span> Easily
-					sort and filter the data to find specific branches, colleges, or organize the
-					results exactly how you need them.
+					sort and filter results by college, branch, semester, or academic session.
 				</li>
 				<li class="relative pl-6 before:content-[''] before:absolute before:left-0 before:top-2.5 before:h-1.5 before:w-1.5 before:rounded-full before:bg-dim-fg">
 					<A href="/tools/csv-export" class="text-bright-fg underline font-semibold">
@@ -62,10 +61,8 @@ export function DisclaimerSection() {
 				<div class="border-[0.13rem] border-border rounded-md p-4 bg-white">
 					<p>
 						<span class="font-semibold">Data source & availability:</span> Exam results
-						are gathered from the official SBTE API. So long as the API remains open,
-						new exam results will continue being added. In case the website goes offline
-						or is not accessible for any reason, all the results data is available in
-						the git repo.
+						are gathered from the official SBTE portal. So long as the source remains
+						accessible, new exam results will continue being added.
 					</p>
 				</div>
 

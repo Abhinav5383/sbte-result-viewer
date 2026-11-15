@@ -102,6 +102,7 @@ export type MetaData = {
 	semesters: number[];
 	sessions: string[];
 	total_results?: number;
+	total_students?: number;
 	data_version: number;
 };
 

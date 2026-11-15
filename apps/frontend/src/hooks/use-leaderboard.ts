@@ -2,6 +2,7 @@ import type { LeaderboardRow } from "@app/shared/dto";
 import type { LeaderboardQuery } from "@app/shared/schemas";
 import { createEffect, createSignal } from "solid-js";
 import type { FilterControls } from "~/components/misc/results-filter/types";
+import { useMeta } from "~/hooks/use-meta";
 import { fetchLeaderboard } from "~/lib/api/results";
 
 export interface UseLeaderboardOptions {
@@ -11,6 +12,7 @@ export interface UseLeaderboardOptions {
 const STEP_LIMITS = [100, 250, 500, 1000];
 
 export function useLeaderboard(filters: FilterControls, options?: UseLeaderboardOptions) {
+	const meta = useMeta();
 	const [results, setResults] = createSignal<LeaderboardRow[]>([]);
 	const [total, setTotal] = createSignal<number | undefined>(undefined);
 	const [nextCursor, setNextCursor] = createSignal<string | undefined>(undefined);
@@ -124,6 +126,7 @@ export function useLeaderboard(filters: FilterControls, options?: UseLeaderboard
 	return {
 		results,
 		total,
+		totalItems: () => meta.totalStudents(),
 		loading,
 		loadingMore,
 		error,
