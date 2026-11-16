@@ -29,7 +29,7 @@ export function useLeaderboard(filters: FilterControls, options?: UseLeaderboard
 	}
 
 	const by = () => {
-		return filters.sortBy() as LeaderboardQuery["by"];
+		return filters.sortBy();
 	};
 
 	let currentAbort: AbortController | null = null;

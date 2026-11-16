@@ -1,10 +1,11 @@
 import { ResultsFilter } from "~/components/misc/results-filter/component";
 import { useFilterControls } from "~/components/misc/results-filter/hook";
+import { SortBy, SortDirection } from "~/components/misc/results-filter/types";
 import { useResults } from "~/hooks/use-results";
 import { ResultsListTable } from "./components/results-table";
 
 export function ResultListPage() {
-	const filters = useFilterControls({ sortBy: "marks", sortOrder: "desc" });
+	const filters = useFilterControls({ sortBy: SortBy.MARKS, sortOrder: SortDirection.DESC });
 	const resultsHook = useResults(filters);
 
 	return (

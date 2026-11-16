@@ -2,13 +2,14 @@
 /** biome-ignore-all lint/a11y/useSemanticElements: f a11y */
 
 import type { ResultRow } from "@app/shared/dto";
-import type { ExportField } from "@app/shared/schemas";
+import { ExportField } from "@app/shared/schemas";
 import { useSearchParams } from "@solidjs/router";
 import FileSpreadsheetIcon from "lucide-solid/icons/file-spreadsheet";
 import Trash2Icon from "lucide-solid/icons/trash-2";
 import { For, Show } from "solid-js";
 import { ResultsFilter } from "~/components/misc/results-filter/component";
 import { useFilterControls } from "~/components/misc/results-filter/hook";
+import { SortBy, SortDirection } from "~/components/misc/results-filter/types";
 import VirtualList from "~/components/misc/virtual-list";
 import { Button } from "~/components/ui/button";
 import MultiSelect from "~/components/ui/multi-select";
@@ -18,17 +19,17 @@ import { useResults } from "~/hooks/use-results";
 import { getExportCsvUrl } from "~/lib/api/results";
 
 const EXPORT_FIELDS: { key: ExportField; label: string }[] = [
-	{ key: "roll", label: "Roll No." },
-	{ key: "name", label: "Name" },
-	{ key: "branch", label: "Branch" },
-	{ key: "college", label: "College" },
-	{ key: "semester", label: "Semester" },
-	{ key: "session", label: "Admission Year" },
-	{ key: "total_obtained", label: "Marks Obtained" },
-	{ key: "total_max", label: "Maximum Marks" },
-	{ key: "sgpa", label: "SGPA" },
-	{ key: "cgpa", label: "CGPA" },
-	{ key: "remark", label: "Remarks" },
+	{ key: ExportField.ROLL, label: "Roll No." },
+	{ key: ExportField.NAME, label: "Name" },
+	{ key: ExportField.BRANCH, label: "Branch" },
+	{ key: ExportField.COLLEGE, label: "College" },
+	{ key: ExportField.SEMESTER, label: "Semester" },
+	{ key: ExportField.SESSION, label: "Admission Year" },
+	{ key: ExportField.TOTAL_OBTAINED, label: "Marks Obtained" },
+	{ key: ExportField.TOTAL_MAX, label: "Maximum Marks" },
+	{ key: ExportField.SGPA, label: "SGPA" },
+	{ key: ExportField.CGPA, label: "CGPA" },
+	{ key: ExportField.REMARK, label: "Remarks" },
 ];
 
 function getValidCsvKeys(keys: string[]): ExportField[] {
@@ -47,27 +48,27 @@ function extractField(
 	meta: ReturnType<typeof useMeta>,
 ): string {
 	switch (field) {
-		case "roll":
+		case ExportField.ROLL:
 			return row.roll;
-		case "name":
+		case ExportField.NAME:
 			return row.name;
-		case "branch":
+		case ExportField.BRANCH:
 			return meta.getBranchName(row.branch_code);
-		case "college":
+		case ExportField.COLLEGE:
 			return meta.getCollegeName(row.college_code);
-		case "semester":
+		case ExportField.SEMESTER:
 			return row.semester.toString();
-		case "session":
+		case ExportField.SESSION:
 			return row.session;
-		case "total_obtained":
+		case ExportField.TOTAL_OBTAINED:
 			return row.total_obtained.toString();
-		case "total_max":
+		case ExportField.TOTAL_MAX:
 			return row.total_max.toString();
-		case "sgpa":
+		case ExportField.SGPA:
 			return (row.sgpa_x100 / 100).toFixed(2);
-		case "cgpa":
+		case ExportField.CGPA:
 			return row.cgpa_x100 != null ? (row.cgpa_x100 / 100).toFixed(2) : "";
-		case "remark":
+		case ExportField.REMARK:
 			return row.remark;
 		default:
 			return "";
@@ -76,7 +77,7 @@ function extractField(
 
 export default function CsvExportPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
-	const filters = useFilterControls({ sortBy: "marks", sortOrder: "desc" });
+	const filters = useFilterControls({ sortBy: SortBy.MARKS, sortOrder: SortDirection.DESC });
 
 	const resultsHook = useResults(filters, { limit: 100 });
 
@@ -84,14 +85,14 @@ export default function CsvExportPage() {
 		const raw = searchParams.fields;
 		if (!raw) {
 			return [
-				"roll",
-				"name",
-				"branch",
-				"college",
-				"total_obtained",
-				"sgpa",
-				"remark",
-			] as ExportField[];
+				ExportField.ROLL,
+				ExportField.NAME,
+				ExportField.BRANCH,
+				ExportField.COLLEGE,
+				ExportField.TOTAL_OBTAINED,
+				ExportField.SGPA,
+				ExportField.REMARK,
+			];
 		}
 		const keyList = Array.isArray(raw) ? raw[0] : raw;
 		return getValidCsvKeys(keyList.split("__"));

@@ -3,7 +3,7 @@ import { useSearchParams } from "@solidjs/router";
 import { type Accessor, For, Show } from "solid-js";
 import { ChevronRightIcon } from "~/components/icons/chevron-right";
 import { BranchBadge, PercentageBadge } from "~/components/misc/badges";
-import type { SortColumn, SortDirection } from "~/components/misc/results-filter/types";
+import { SortBy, type SortDirection } from "~/components/misc/results-filter/types";
 import { ScrollToTopButton } from "~/components/misc/scroll-to-top";
 import VirtualList from "~/components/misc/virtual-list";
 import BouncingDotsLoader from "~/components/ui/loaders/bouncing-dots";
@@ -23,9 +23,9 @@ interface LeaderboardTableProps {
 	loadingMore: boolean;
 	hasMore: boolean;
 	loadMore: () => void;
-	sortBy: Accessor<SortColumn>;
+	sortBy: Accessor<SortBy>;
 	sortOrder: Accessor<SortDirection>;
-	setSort: (by: SortColumn, order: SortDirection) => void;
+	setSort: (by: SortBy, order: SortDirection) => void;
 	clearFilters: () => void;
 	anyFilterActive: boolean;
 	showCollegeColumn?: boolean;
@@ -182,7 +182,7 @@ export function LeaderboardTable(props: LeaderboardTableProps) {
 
 								<SortableHeaderItem
 									title="Name"
-									value="name"
+									value={SortBy.NAME}
 									sortBy={props.sortBy()}
 									sortOrder={props.sortOrder()}
 									setSortFilter={props.setSort}
@@ -190,7 +190,7 @@ export function LeaderboardTable(props: LeaderboardTableProps) {
 
 								<SortableHeaderItem
 									title="Roll No"
-									value="reg_no"
+									value={SortBy.REG_NO}
 									sortBy={props.sortBy()}
 									sortOrder={props.sortOrder()}
 									setSortFilter={props.setSort}
@@ -198,7 +198,7 @@ export function LeaderboardTable(props: LeaderboardTableProps) {
 
 								<SortableHeaderItem
 									title="Avg Marks"
-									value="marks"
+									value={SortBy.MARKS}
 									sortBy={props.sortBy()}
 									sortOrder={props.sortOrder()}
 									setSortFilter={props.setSort}
@@ -206,7 +206,7 @@ export function LeaderboardTable(props: LeaderboardTableProps) {
 
 								<SortableHeaderItem
 									title="Avg SGPA"
-									value="sgpa"
+									value={SortBy.SGPA}
 									sortBy={props.sortBy()}
 									sortOrder={props.sortOrder()}
 									setSortFilter={props.setSort}

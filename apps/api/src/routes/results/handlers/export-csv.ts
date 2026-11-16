@@ -1,4 +1,4 @@
-import type { ExportField, ExportQuery } from "@app/shared/schemas";
+import { ALL_EXPORT_FIELDS, ExportField, type ExportQuery } from "@app/shared/schemas";
 import { db } from "~/db/index";
 
 function escapeCsv(val: unknown): string {
@@ -11,19 +11,7 @@ function escapeCsv(val: unknown): string {
 }
 
 export function createExportCsvStream(query: ExportQuery): ReadableStream {
-	const selectedFields = (query.fields ?? [
-		"roll",
-		"name",
-		"semester",
-		"college",
-		"branch",
-		"session",
-		"total_obtained",
-		"total_max",
-		"sgpa",
-		"cgpa",
-		"remark",
-	]) as ExportField[];
+	const selectedFields = query.fields ?? ALL_EXPORT_FIELDS;
 
 	const BATCH_SIZE = 1000;
 	const encoder = new TextEncoder();
@@ -103,29 +91,29 @@ export function createExportCsvStream(query: ExportQuery): ReadableStream {
 					for (const r of rows) {
 						const values = selectedFields.map((field) => {
 							switch (field) {
-								case "roll":
+								case ExportField.ROLL:
 									return escapeCsv(r.roll);
-								case "name":
+								case ExportField.NAME:
 									return escapeCsv(r.name);
-								case "semester":
+								case ExportField.SEMESTER:
 									return escapeCsv(r.semester);
-								case "college":
+								case ExportField.COLLEGE:
 									return escapeCsv(r.college);
-								case "branch":
+								case ExportField.BRANCH:
 									return escapeCsv(r.branch);
-								case "session":
+								case ExportField.SESSION:
 									return escapeCsv(r.session);
-								case "total_obtained":
+								case ExportField.TOTAL_OBTAINED:
 									return escapeCsv(r.total_obtained);
-								case "total_max":
+								case ExportField.TOTAL_MAX:
 									return escapeCsv(r.total_max);
-								case "sgpa":
+								case ExportField.SGPA:
 									return escapeCsv((r.sgpa_x100 / 100).toFixed(2));
-								case "cgpa":
+								case ExportField.CGPA:
 									return escapeCsv(
 										r.cgpa_x100 != null ? (r.cgpa_x100 / 100).toFixed(2) : "",
 									);
-								case "remark":
+								case ExportField.REMARK:
 									return escapeCsv(r.remark);
 								default:
 									return "";

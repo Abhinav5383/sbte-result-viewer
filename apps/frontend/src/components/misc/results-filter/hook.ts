@@ -1,15 +1,23 @@
 import { useSearchParams } from "@solidjs/router";
 import { createMemo } from "solid-js";
 import { useMeta } from "~/hooks/use-meta";
-import { type FilterControls, FilterParams, type SortColumn, type SortDirection } from "./types";
+import { type FilterControls, FilterParams, SortBy, SortDirection } from "./types";
 
 export interface UseFilterControlsOptions {
-	sortBy?: SortColumn;
+	sortBy?: SortBy;
 	sortOrder?: SortDirection;
 }
 
-const VALID_SORT_COLUMNS: SortColumn[] = ["marks", "sgpa", "name", "reg_no", "roll"];
-const VALID_SORT_DIRECTIONS: SortDirection[] = ["asc", "desc"];
+const VALID_SORT_BY = Object.values(SortBy);
+const VALID_SORT_DIRECTIONS = Object.values(SortDirection);
+
+const NON_FILTER_PARAMS = new Set([FilterParams.SORT_BY, FilterParams.SORT_ORDER]);
+
+const RESET_FILTERS_PAYLOAD = Object.fromEntries(
+	Object.values(FilterParams)
+		.filter((param) => !NON_FILTER_PARAMS.has(param))
+		.map((param) => [param, null]),
+);
 
 function parseArrayParam(val: unknown): string[] {
 	if (!val) return [];
@@ -34,9 +42,9 @@ function parseNumberArrayParam(val: unknown): number[] {
 		.filter((n) => !Number.isNaN(n));
 }
 
-export function useFilterControls(options?: UseFilterControlsOptions): FilterControls {
-	const defaultSortBy: SortColumn = options?.sortBy ?? "marks";
-	const defaultSortOrder: SortDirection = options?.sortOrder ?? "desc";
+export function useFilterControls(defaults?: UseFilterControlsOptions): FilterControls {
+	const defaultSortBy: SortBy = defaults?.sortBy ?? SortBy.MARKS;
+	const defaultSortOrder: SortDirection = defaults?.sortOrder ?? SortDirection.DESC;
 
 	const meta = useMeta();
 	const [searchParams, setSearchParams] = useSearchParams();
@@ -91,14 +99,12 @@ export function useFilterControls(options?: UseFilterControlsOptions): FilterCon
 		);
 	}
 
-	const semester = () =>
-		parseNumberArrayParam(searchParams[FilterParams.SEMESTER] ?? searchParams.semester);
+	const semester = () => parseNumberArrayParam(searchParams[FilterParams.SEMESTER]);
 	function setSemester(vals: number[]) {
 		const sorted = [...vals].sort((a, b) => a - b);
 		setSearchParams(
 			{
 				[FilterParams.SEMESTER]: sorted.length > 0 ? sorted.map(String) : null,
-				semester: null,
 			},
 			{ replace: true },
 		);
@@ -114,7 +120,7 @@ export function useFilterControls(options?: UseFilterControlsOptions): FilterCon
 	}
 
 	const queryFromUrl = () => {
-		const q = searchParams[FilterParams.QUERY] ?? searchParams.query;
+		const q = searchParams[FilterParams.QUERY];
 		if (typeof q === "string") return q;
 		return "";
 	};
@@ -124,17 +130,14 @@ export function useFilterControls(options?: UseFilterControlsOptions): FilterCon
 		setSearchParams(
 			{
 				[FilterParams.QUERY]: trimmed ? newQ : null,
-				query: null,
 			},
 			{ replace: true },
 		);
 	}
 
 	const sortBy = () => {
-		const raw = (searchParams[FilterParams.SORT_BY] ?? searchParams.sortBy) as
-			| SortColumn
-			| undefined;
-		if (raw && VALID_SORT_COLUMNS.includes(raw)) {
+		const raw = searchParams[FilterParams.SORT_BY] as SortBy | undefined;
+		if (raw && VALID_SORT_BY.includes(raw)) {
 			return raw;
 		}
 		return defaultSortBy;
@@ -148,11 +151,10 @@ export function useFilterControls(options?: UseFilterControlsOptions): FilterCon
 		return defaultSortOrder;
 	};
 
-	function setSortFilter(by: SortColumn, order: SortDirection) {
+	function setSortFilter(by: SortBy, order: SortDirection) {
 		setSearchParams(
 			{
 				[FilterParams.SORT_BY]: by === defaultSortBy ? null : by,
-				sortBy: null,
 				[FilterParams.SORT_ORDER]: order === defaultSortOrder ? null : order,
 			},
 			{ replace: true },
@@ -170,18 +172,7 @@ export function useFilterControls(options?: UseFilterControlsOptions): FilterCon
 	});
 
 	function clearFilters() {
-		setSearchParams(
-			{
-				[FilterParams.COLLEGE]: null,
-				[FilterParams.BRANCH]: null,
-				[FilterParams.SEMESTER]: null,
-				semester: null,
-				[FilterParams.SESSION]: null,
-				[FilterParams.QUERY]: null,
-				query: null,
-			},
-			{ replace: true },
-		);
+		setSearchParams(RESET_FILTERS_PAYLOAD, { replace: true });
 	}
 
 	return {

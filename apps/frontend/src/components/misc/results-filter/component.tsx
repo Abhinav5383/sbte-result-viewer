@@ -5,13 +5,13 @@ import { Select } from "~/components/ui/select";
 import { OrdinalSuffix } from "~/components/utils";
 import { useDebouncedState } from "~/hooks/use-debounce";
 import { useMeta } from "~/hooks/use-meta";
-import type { FilterControls, SortColumn, SortDirection } from "./types";
+import { type FilterControls, SortBy, SortDirection } from "./types";
 
 export interface ResultsFilterProps {
 	hook: FilterControls;
 	hideFilters?: string[];
 	alwaysShowSort?: boolean;
-	sortOptions?: { value: SortColumn; label: string }[];
+	sortOptions?: { value: SortBy; label: string }[];
 }
 
 export function ResultsFilter(props: ResultsFilterProps) {
@@ -153,13 +153,13 @@ export function ResultsFilter(props: ResultsFilterProps) {
 					<Select
 						id="mb-sort"
 						value={res.sortBy()}
-						onChange={(v) => res.setSortFilter(v as SortColumn, res.sortOrder())}
+						onChange={(v) => res.setSortFilter(v as SortBy, res.sortOrder())}
 						options={
 							props.sortOptions ?? [
-								{ value: "marks", label: "Marks" },
-								{ value: "sgpa", label: "SGPA" },
-								{ value: "name", label: "Name" },
-								{ value: "roll", label: "Roll" },
+								{ value: SortBy.MARKS, label: "Marks" },
+								{ value: SortBy.SGPA, label: "SGPA" },
+								{ value: SortBy.NAME, label: "Name" },
+								{ value: SortBy.ROLL, label: "Roll" },
 							]
 						}
 						class="@min-mobile:rounded-e-none"
@@ -170,8 +170,8 @@ export function ResultsFilter(props: ResultsFilterProps) {
 						value={res.sortOrder()}
 						onChange={(v) => res.setSortFilter(res.sortBy(), v as SortDirection)}
 						options={[
-							{ value: "desc", label: "Descending" },
-							{ value: "asc", label: "Ascending" },
+							{ value: SortDirection.DESC, label: "Descending" },
+							{ value: SortDirection.ASC, label: "Ascending" },
 						]}
 						class="@min-mobile:rounded-s-none @min-mobile:border-s-0"
 					/>

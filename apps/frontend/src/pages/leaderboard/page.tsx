@@ -1,10 +1,11 @@
 import { ResultsFilter } from "~/components/misc/results-filter/component";
 import { useFilterControls } from "~/components/misc/results-filter/hook";
+import { SortBy, SortDirection } from "~/components/misc/results-filter/types";
 import { useLeaderboard } from "~/hooks/use-leaderboard";
 import { LeaderboardTable } from "./components/leaderboard-table";
 
 export default function LeaderboardPage() {
-	const filters = useFilterControls({ sortBy: "sgpa", sortOrder: "desc" });
+	const filters = useFilterControls({ sortBy: SortBy.SGPA, sortOrder: SortDirection.DESC });
 	const leaderboardHook = useLeaderboard(filters);
 
 	return (
@@ -23,10 +24,10 @@ export default function LeaderboardPage() {
 					hook={filters}
 					hideFilters={["query"]}
 					sortOptions={[
-						{ value: "sgpa", label: "Avg SGPA" },
-						{ value: "marks", label: "Avg Marks" },
-						{ value: "name", label: "Name" },
-						{ value: "reg_no", label: "Roll No" },
+						{ value: SortBy.SGPA, label: "Avg SGPA" },
+						{ value: SortBy.MARKS, label: "Avg Marks" },
+						{ value: SortBy.NAME, label: "Name" },
+						{ value: SortBy.REG_NO, label: "Roll No" },
 					]}
 				/>
 			</div>

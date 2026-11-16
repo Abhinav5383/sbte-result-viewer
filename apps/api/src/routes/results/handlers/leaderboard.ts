@@ -1,5 +1,5 @@
 import type { LeaderboardData, LeaderboardRow } from "@app/shared/dto";
-import type { LeaderboardQuery } from "@app/shared/schemas";
+import { type LeaderboardQuery, SortBy, SortDirection } from "@app/shared/schemas";
 import { sql } from "kysely";
 import { db } from "~/db/index";
 import { decodeCursor, encodeCursor } from "~/lib/cursor";
@@ -71,28 +71,26 @@ export async function getLeaderboardHandler(
 	}
 
 	const sortField =
-		query.by === "sgpa"
+		query.by === SortBy.SGPA
 			? "avg_sgpa_x100"
-			: query.by === "marks"
+			: query.by === SortBy.MARKS
 				? "avg_obtained"
-				: query.by === "cgpa"
-					? "cgpa_sort"
-					: query.by === "name"
-						? "name"
-						: "reg_no";
+				: query.by === SortBy.NAME
+					? "name"
+					: "reg_no";
 
-	const sortDir = query.order.toLowerCase() === "asc" ? sql`ASC` : sql`DESC`;
-	const cursorOp = query.order.toLowerCase() === "asc" ? sql`>` : sql`<`;
+	const sortDir = query.order === SortDirection.ASC ? sql`ASC` : sql`DESC`;
+	const cursorOp = query.order === SortDirection.ASC ? sql`>` : sql`<`;
 
 	const cursorCondition = cursor
-		? query.by === "reg_no"
+		? query.by === SortBy.REG_NO || query.by === SortBy.ROLL
 			? sql`WHERE reg_no ${cursorOp} ${cursor.tieBreaker}`
 			: sql`WHERE (${sql.ref(sortField)}, reg_no) ${cursorOp} (${cursor.sortVal}, ${cursor.tieBreaker})`
 		: sql``;
 
 	const limitPlusOne = query.limit + 1;
 
-	const querySql = sql<LeaderboardRow & { cgpa_sort: number }>`
+	const querySql = sql<LeaderboardRow>`
         WITH stats AS (
             SELECT
                 s.reg_no,
@@ -104,7 +102,6 @@ export async function getLeaderboardHandler(
                 ROUND(AVG(r.total_obtained))::int AS avg_obtained,
                 ROUND(AVG(r.total_max))::int AS avg_max,
                 MAX(r.cgpa_x100) AS cgpa_x100,
-                COALESCE(MAX(r.cgpa_x100), -1) AS cgpa_sort,
                 COUNT(r.id)::int AS semesters_count,
                 RANK() OVER (ORDER BY ROUND(AVG(r.sgpa_x100)) DESC, s.reg_no ASC)::int AS rank
             FROM student s
@@ -122,7 +119,6 @@ export async function getLeaderboardHandler(
             avg_max,
             avg_sgpa_x100,
             cgpa_x100,
-            cgpa_sort,
             semesters_count,
             rank
         FROM stats
@@ -143,16 +139,13 @@ export async function getLeaderboardHandler(
 		let sortVal: string | number;
 
 		switch (query.by) {
-			case "sgpa":
+			case SortBy.SGPA:
 				sortVal = lastRow.avg_sgpa_x100;
 				break;
-			case "marks":
+			case SortBy.MARKS:
 				sortVal = lastRow.avg_obtained;
 				break;
-			case "cgpa":
-				sortVal = lastRow.cgpa_sort;
-				break;
-			case "name":
+			case SortBy.NAME:
 				sortVal = lastRow.name;
 				break;
 			default:

@@ -1,5 +1,5 @@
 import type { ResultListData, ResultRow } from "@app/shared/dto";
-import type { ResultQuery } from "@app/shared/schemas";
+import { type ResultQuery, SortBy, SortDirection } from "@app/shared/schemas";
 import { sql } from "kysely";
 import { db } from "~/db/index";
 import { decodeCursor, encodeCursor } from "~/lib/cursor";
@@ -27,7 +27,7 @@ export async function listResultsHandler(
 
 	let qb = db.selectFrom("result").innerJoin("remark", "remark.id", "result.remark_id");
 
-	if (query.by === "reg_no") {
+	if (query.by === SortBy.REG_NO) {
 		qb = qb.innerJoin("student", "student.id", "result.student_id");
 	}
 
@@ -72,29 +72,29 @@ export async function listResultsHandler(
 	}
 
 	const sortColRef =
-		query.by === "marks"
+		query.by === SortBy.MARKS
 			? "result.total_obtained"
-			: query.by === "sgpa"
+			: query.by === SortBy.SGPA
 				? "result.sgpa_x100"
-				: query.by === "name"
+				: query.by === SortBy.NAME
 					? "result.name"
-					: query.by === "reg_no"
+					: query.by === SortBy.REG_NO
 						? "student.reg_no"
 						: "result.roll";
 
 	if (cursor) {
-		if (query.by === "roll") {
-			const op = query.order === "desc" ? sql`<` : sql`>`;
+		if (query.by === SortBy.ROLL) {
+			const op = query.order === SortDirection.DESC ? sql`<` : sql`>`;
 			qb = qb.where(sql<boolean>`result.roll ${op} ${cursor.tieBreaker}`);
 		} else {
-			const op = query.order === "desc" ? sql`<` : sql`>`;
+			const op = query.order === SortDirection.DESC ? sql`<` : sql`>`;
 			qb = qb.where(
 				sql<boolean>`(${sql.ref(sortColRef)}, result.roll) ${op} (${cursor.sortVal}, ${cursor.tieBreaker})`,
 			);
 		}
 	}
 
-	if (query.by !== "roll") {
+	if (query.by !== SortBy.ROLL) {
 		qb = qb.orderBy(sql.ref(sortColRef), query.order);
 	}
 	qb = qb.orderBy("result.roll", query.order);
@@ -114,7 +114,7 @@ export async function listResultsHandler(
 			"result.sgpa_x100",
 			"result.cgpa_x100",
 			"remark.text as remark",
-			...(query.by === "reg_no" ? [sql<string>`student.reg_no`.as("reg_no")] : []),
+			...(query.by === SortBy.REG_NO ? [sql<string>`student.reg_no`.as("reg_no")] : []),
 		])
 		.execute();
 
@@ -127,16 +127,16 @@ export async function listResultsHandler(
 		let sortVal: string | number;
 
 		switch (query.by) {
-			case "marks":
+			case SortBy.MARKS:
 				sortVal = lastRow.total_obtained;
 				break;
-			case "sgpa":
+			case SortBy.SGPA:
 				sortVal = lastRow.sgpa_x100;
 				break;
-			case "name":
+			case SortBy.NAME:
 				sortVal = lastRow.name;
 				break;
-			case "reg_no":
+			case SortBy.REG_NO:
 				sortVal = (lastRow as Record<string, unknown>).reg_no as string;
 				break;
 			default:

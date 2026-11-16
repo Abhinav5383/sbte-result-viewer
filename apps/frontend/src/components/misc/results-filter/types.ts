@@ -1,15 +1,6 @@
-export enum FilterParams {
-	COLLEGE = "college",
-	BRANCH = "branch",
-	SEMESTER = "sem",
-	SESSION = "session",
-	QUERY = "q",
-	SORT_BY = "by",
-	SORT_ORDER = "order",
-}
+import { FilterParams, SortBy, SortDirection } from "@app/shared/schemas";
 
-export type SortColumn = "marks" | "sgpa" | "name" | "reg_no" | "roll";
-export type SortDirection = "asc" | "desc";
+export { FilterParams, SortBy, SortDirection };
 
 export interface FilterControls {
 	college: () => number[];
@@ -24,9 +15,9 @@ export interface FilterControls {
 	setSession: (val: string[]) => void;
 	query: () => string;
 	setQuery: (val: string) => void;
-	sortBy: () => SortColumn;
+	sortBy: () => SortBy;
 	sortOrder: () => SortDirection;
-	setSortFilter: (by: SortColumn, order: SortDirection) => void;
+	setSortFilter: (by: SortBy, order: SortDirection) => void;
 	clearFilters: () => void;
 	anyFilterActive: () => boolean;
 }

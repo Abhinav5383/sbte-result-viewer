@@ -36,11 +36,31 @@ export const stringArrayParam = z
 		return strs.length > 0 ? strs : undefined;
 	});
 
-const ResultSortBy = z.enum(["marks", "sgpa", "name", "reg_no", "roll"]);
-export type ResultSortBy = z.infer<typeof ResultSortBy>;
+export enum FilterParams {
+	COLLEGE = "college",
+	BRANCH = "branch",
+	SEMESTER = "sem",
+	SESSION = "session",
+	QUERY = "q",
+	SORT_BY = "by",
+	SORT_ORDER = "order",
+}
 
-const SortOrder = z.enum(["asc", "desc"]);
-export type SortOrder = z.infer<typeof SortOrder>;
+export enum SortDirection {
+	ASC = "asc",
+	DESC = "desc",
+}
+
+export enum SortBy {
+	MARKS = "marks",
+	SGPA = "sgpa",
+	NAME = "name",
+	REG_NO = "reg_no",
+	ROLL = "roll",
+}
+
+export const SortBySchema = z.enum(SortBy);
+export const SortDirectionSchema = z.enum(SortDirection);
 
 export const ResultQuerySchema = z.object({
 	college: numberArrayParam,
@@ -48,24 +68,21 @@ export const ResultQuerySchema = z.object({
 	sem: semesterArrayParam,
 	session: stringArrayParam,
 	q: z.string().min(2).max(100).optional(),
-	by: ResultSortBy.default("marks"),
-	order: SortOrder.default("desc"),
+	by: SortBySchema.default(SortBy.MARKS),
+	order: SortDirectionSchema.default(SortDirection.DESC),
 	cursor: z.string().max(512).optional(),
 	limit: z.coerce.number().int().min(1).max(1000).default(100),
 });
 
 export type ResultQuery = z.infer<typeof ResultQuerySchema>;
 
-export const LeaderboardSortBy = z.enum(["sgpa", "marks", "name", "reg_no", "cgpa"]);
-export type LeaderboardSortBy = z.infer<typeof LeaderboardSortBy>;
-
 export const LeaderboardQuerySchema = z.object({
 	college: numberArrayParam,
 	branch: numberArrayParam,
 	sem: semesterArrayParam,
 	session: stringArrayParam,
-	by: LeaderboardSortBy.default("sgpa"),
-	order: SortOrder.default("desc"),
+	by: SortBySchema.default(SortBy.SGPA),
+	order: SortDirectionSchema.default(SortDirection.DESC),
 	cursor: z.string().max(512).optional(),
 	limit: z.coerce.number().int().min(1).max(1000).default(100),
 });
@@ -81,20 +98,22 @@ export const StudentsQuerySchema = z.object({
 
 export type StudentsQuery = z.infer<typeof StudentsQuerySchema>;
 
-const ExportField = z.enum([
-	"roll",
-	"name",
-	"semester",
-	"college",
-	"branch",
-	"session",
-	"total_obtained",
-	"total_max",
-	"sgpa",
-	"cgpa",
-	"remark",
-]);
-export type ExportField = z.infer<typeof ExportField>;
+export enum ExportField {
+	ROLL = "roll",
+	NAME = "name",
+	SEMESTER = "semester",
+	COLLEGE = "college",
+	BRANCH = "branch",
+	SESSION = "session",
+	TOTAL_OBTAINED = "total_obtained",
+	TOTAL_MAX = "total_max",
+	SGPA = "sgpa",
+	CGPA = "cgpa",
+	REMARK = "remark",
+}
+
+export const ALL_EXPORT_FIELDS = Object.values(ExportField);
+export const ExportFieldSchema = z.enum(ExportField);
 
 export const ExportQuerySchema = ResultQuerySchema.omit({
 	cursor: true,
@@ -107,11 +126,13 @@ export const ExportQuerySchema = ResultQuerySchema.omit({
 		.optional()
 		.transform((v?: string) =>
 			v
-				? (v
+				? v
 						.split(",")
 						.map((f: string) => f.trim())
-						.filter(Boolean) as ExportField[])
-				: ExportField.options,
+						.filter((f): f is ExportField =>
+							ALL_EXPORT_FIELDS.includes(f as ExportField),
+						)
+				: ALL_EXPORT_FIELDS,
 		),
 });
 

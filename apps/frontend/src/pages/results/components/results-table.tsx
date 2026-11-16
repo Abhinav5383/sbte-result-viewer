@@ -5,7 +5,7 @@ import ArrowUpWideNarrow from "lucide-solid/icons/arrow-up-wide-narrow";
 import { type Accessor, For, Show } from "solid-js";
 import { ChevronRightIcon } from "~/components/icons/chevron-right";
 import { BranchBadge, PercentageBadge } from "~/components/misc/badges";
-import type { SortColumn, SortDirection } from "~/components/misc/results-filter/types";
+import { SortBy, SortDirection } from "~/components/misc/results-filter/types";
 import { ScrollToTopButton } from "~/components/misc/scroll-to-top";
 import VirtualList from "~/components/misc/virtual-list";
 import BouncingDotsLoader from "~/components/ui/loaders/bouncing-dots";
@@ -24,9 +24,9 @@ interface ResultsListTableProps {
 	loadingMore: boolean;
 	hasMore: boolean;
 	loadMore: () => void;
-	sortBy: Accessor<SortColumn>;
+	sortBy: Accessor<SortBy>;
 	sortOrder: Accessor<SortDirection>;
-	setSort: (by: SortColumn, order: SortDirection) => void;
+	setSort: (by: SortBy, order: SortDirection) => void;
 	clearFilters: () => void;
 	anyFilterActive: boolean;
 	showCollegeColumn?: boolean;
@@ -147,7 +147,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
 
 							<SortableHeaderItem
 								title="Name"
-								value="name"
+								value={SortBy.NAME}
 								sortBy={props.sortBy()}
 								sortOrder={props.sortOrder()}
 								setSortFilter={props.setSort}
@@ -155,7 +155,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
 
 							<SortableHeaderItem
 								title="Roll No"
-								value="roll"
+								value={SortBy.ROLL}
 								sortBy={props.sortBy()}
 								sortOrder={props.sortOrder()}
 								setSortFilter={props.setSort}
@@ -163,7 +163,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
 
 							<SortableHeaderItem
 								title="Marks"
-								value="marks"
+								value={SortBy.MARKS}
 								sortBy={props.sortBy()}
 								sortOrder={props.sortOrder()}
 								setSortFilter={props.setSort}
@@ -171,7 +171,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
 
 							<SortableHeaderItem
 								title="SGPA"
-								value="sgpa"
+								value={SortBy.SGPA}
 								sortBy={props.sortBy()}
 								sortOrder={props.sortOrder()}
 								setSortFilter={props.setSort}
@@ -205,10 +205,10 @@ export function ResultsListTable(props: ResultsListTableProps) {
 
 export interface SortableHeaderItemProps {
 	title: string;
-	value: SortColumn;
-	sortBy: SortColumn;
+	value: SortBy;
+	sortBy: SortBy;
 	sortOrder: SortDirection;
-	setSortFilter: (by: SortColumn, order: SortDirection) => void;
+	setSortFilter: (by: SortBy, order: SortDirection) => void;
 }
 
 export function SortableHeaderItem(props: SortableHeaderItemProps) {
@@ -221,18 +221,23 @@ export function SortableHeaderItem(props: SortableHeaderItemProps) {
 			)}
 			onClick={() => {
 				if (props.sortBy === props.value) {
-					props.setSortFilter(props.value, props.sortOrder === "asc" ? "desc" : "asc");
+					props.setSortFilter(
+						props.value,
+						props.sortOrder === SortDirection.ASC
+							? SortDirection.DESC
+							: SortDirection.ASC,
+					);
 				} else {
-					let order: SortDirection = "desc";
+					let order: SortDirection = SortDirection.DESC;
 					switch (props.value) {
-						case "name":
-						case "roll": {
-							order = "asc";
+						case SortBy.NAME:
+						case SortBy.ROLL: {
+							order = SortDirection.ASC;
 							break;
 						}
-						case "marks":
-						case "sgpa": {
-							order = "desc";
+						case SortBy.MARKS:
+						case SortBy.SGPA: {
+							order = SortDirection.DESC;
 							break;
 						}
 					}
