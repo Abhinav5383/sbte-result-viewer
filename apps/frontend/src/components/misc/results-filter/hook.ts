@@ -1,5 +1,5 @@
 import { useSearchParams } from "@solidjs/router";
-import { createEffect, createMemo, createSignal, onCleanup, untrack } from "solid-js";
+import { createMemo } from "solid-js";
 import { useMeta } from "~/hooks/use-meta";
 import { type FilterControls, FilterParams, type SortColumn, type SortDirection } from "./types";
 
@@ -119,41 +119,11 @@ export function useFilterControls(options?: UseFilterControlsOptions): FilterCon
 		return "";
 	};
 
-	const [localQuery, setLocalQuery] = createSignal(queryFromUrl());
-	let searchTimer: ReturnType<typeof setTimeout> | undefined;
-
-	createEffect(() => {
-		const urlQ = queryFromUrl();
-		if (urlQ !== untrack(localQuery)) {
-			setLocalQuery(urlQ);
-		}
-	});
-
-	onCleanup(() => {
-		clearTimeout(searchTimer);
-	});
-
 	function setQuery(newQ: string) {
-		setLocalQuery(newQ);
-		clearTimeout(searchTimer);
-		searchTimer = setTimeout(() => {
-			const trimmed = newQ.trim();
-			setSearchParams(
-				{
-					[FilterParams.QUERY]: trimmed ? newQ : null,
-					query: null,
-				},
-				{ replace: true },
-			);
-		}, 300);
-	}
-
-	function flushQuery() {
-		clearTimeout(searchTimer);
-		const q = untrack(localQuery).trim();
+		const trimmed = newQ.trim();
 		setSearchParams(
 			{
-				[FilterParams.QUERY]: q ? q : null,
+				[FilterParams.QUERY]: trimmed ? newQ : null,
 				query: null,
 			},
 			{ replace: true },
@@ -195,13 +165,11 @@ export function useFilterControls(options?: UseFilterControlsOptions): FilterCon
 			rawBranchParams().length > 0 ||
 			semester().length > 0 ||
 			session().length > 0 ||
-			localQuery().trim().length > 0
+			queryFromUrl().trim().length > 0
 		);
 	});
 
 	function clearFilters() {
-		clearTimeout(searchTimer);
-		setLocalQuery("");
 		setSearchParams(
 			{
 				[FilterParams.COLLEGE]: null,
@@ -227,9 +195,8 @@ export function useFilterControls(options?: UseFilterControlsOptions): FilterCon
 		setSemester,
 		session,
 		setSession,
-		query: localQuery,
+		query: queryFromUrl,
 		setQuery,
-		flushQuery,
 		sortBy,
 		sortOrder,
 		setSortFilter,

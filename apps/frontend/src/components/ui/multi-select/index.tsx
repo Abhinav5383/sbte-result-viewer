@@ -1,8 +1,9 @@
 import CheckIcon from "lucide-solid/icons/check";
-import { createEffect, createSignal, For, onCleanup, Show } from "solid-js";
+import { createSignal, For, Show } from "solid-js";
 import ChevronDown from "~/components/icons/chevron-down";
 import Popover from "~/components/ui/popover";
 import { cn } from "~/components/utils";
+import { useDebouncedState } from "~/hooks/use-debounce";
 
 import "./styles.css";
 
@@ -20,21 +21,25 @@ interface SelectProps {
 	placeholder?: string;
 	onChange: (selected: string[]) => void;
 	immediate?: boolean;
+	debounceDelay?: number;
 }
 
 export default function MultiSelect(props: SelectProps) {
 	const [isOpen, setIsOpen] = createSignal(false);
-	const [selectedItems, setSelectedItems] = createSignal(props.selected);
 	let contentRef: HTMLDivElement | undefined;
-	let debounceTimer: ReturnType<typeof setTimeout> | undefined;
 
-	createEffect(() => {
-		setSelectedItems(props.selected);
-	});
+	const debounced = useDebouncedState(
+		() => props.selected,
+		(items) => props.onChange(items),
+		{
+			immediate: props.immediate ?? true,
+			delay: props.debounceDelay ?? 500,
+		},
+	);
 
 	const selectedLabels = () => {
 		const list: string[] = [];
-		for (const op of selectedItems()) {
+		for (const op of debounced.value()) {
 			const option = props.options.find((o) => o.value === op);
 
 			if (option?.label) {
@@ -46,27 +51,10 @@ export default function MultiSelect(props: SelectProps) {
 		return list;
 	};
 
-	function commit(items: string[]) {
-		clearTimeout(debounceTimer);
-		debounceTimer = undefined;
-		props.onChange(items);
-	}
-
 	function handleChange(value: string, checked: boolean) {
-		const next = checked
-			? [...selectedItems(), value]
-			: selectedItems().filter((v) => v !== value);
-
-		setSelectedItems(next);
-
-		if (props.immediate) {
-			commit(next);
-		} else {
-			clearTimeout(debounceTimer);
-			debounceTimer = setTimeout(() => {
-				commit(selectedItems());
-			}, 1000);
-		}
+		const current = debounced.value();
+		const next = checked ? [...current, value] : current.filter((v) => v !== value);
+		debounced.setValue(next);
 	}
 
 	function setPopoverState(openState: boolean) {
@@ -76,16 +64,10 @@ export default function MultiSelect(props: SelectProps) {
 			requestAnimationFrame(() => {
 				contentRef?.focus();
 			});
-		} else if (!props.immediate) {
-			if (debounceTimer !== undefined) {
-				commit(selectedItems());
-			}
+		} else if (!(props.immediate ?? true)) {
+			debounced.flush();
 		}
 	}
-
-	onCleanup(() => {
-		clearTimeout(debounceTimer);
-	});
 
 	function handleKeyDown(e: KeyboardEvent) {
 		if (!contentRef) return;
@@ -142,10 +124,6 @@ export default function MultiSelect(props: SelectProps) {
 		}
 	}
 
-	createEffect(() => {
-		setSelectedItems(props.selected);
-	});
-
 	return (
 		<Popover
 			id={`"multi-select-popover-${props.id}`}
@@ -187,7 +165,7 @@ export default function MultiSelect(props: SelectProps) {
 						<Option
 							value={option.value}
 							label={option.label}
-							selected={selectedItems()}
+							selected={debounced.value()}
 							onChange={(checked) => handleChange(option.value, checked)}
 						/>
 					)}

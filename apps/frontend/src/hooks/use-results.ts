@@ -1,6 +1,6 @@
 import type { ResultRow } from "@app/shared/dto";
 import type { ResultQuery } from "@app/shared/schemas";
-import { createEffect, createSignal, onCleanup } from "solid-js";
+import { createEffect, createSignal } from "solid-js";
 import type { FilterControls } from "~/components/misc/results-filter/types";
 import { useMeta } from "~/hooks/use-meta";
 import { fetchResults } from "~/lib/api/results";
@@ -28,17 +28,6 @@ export function useResults(filters: FilterControls, options?: UseResultsOptions)
 		return STEP_LIMITS[idx];
 	}
 
-	const [debouncedQ, setDebouncedQ] = createSignal(filters.query());
-
-	createEffect(() => {
-		const query = filters.query();
-		const timer = setTimeout(() => {
-			setDebouncedQ(query);
-		}, 400);
-
-		onCleanup(() => clearTimeout(timer));
-	});
-
 	let currentAbort: AbortController | null = null;
 	let requestGen = 0;
 
@@ -57,13 +46,14 @@ export function useResults(filters: FilterControls, options?: UseResultsOptions)
 		const branchVal = filters.branch();
 		const semVal = filters.semester();
 		const sessionVal = filters.session();
+		const qVal = filters.query().trim();
 
 		const params: Partial<ResultQuery> = {
 			college: collegeVal.length > 0 ? collegeVal : undefined,
 			branch: branchVal.length > 0 ? branchVal : undefined,
 			sem: semVal.length > 0 ? semVal : undefined,
 			session: sessionVal.length > 0 ? sessionVal : undefined,
-			q: debouncedQ() && debouncedQ().trim().length >= 2 ? debouncedQ().trim() : undefined,
+			q: qVal.length >= 2 ? qVal : undefined,
 			by: filters.sortBy(),
 			order: filters.sortOrder(),
 			limit: getCurrentLimit(),
@@ -91,7 +81,7 @@ export function useResults(filters: FilterControls, options?: UseResultsOptions)
 		filters.branch();
 		filters.semester();
 		filters.session();
-		debouncedQ();
+		filters.query();
 		filters.sortBy();
 		filters.sortOrder();
 
@@ -109,13 +99,14 @@ export function useResults(filters: FilterControls, options?: UseResultsOptions)
 		const branchVal = filters.branch();
 		const semVal = filters.semester();
 		const sessionVal = filters.session();
+		const qVal = filters.query().trim();
 
 		const params: Partial<ResultQuery> = {
 			college: collegeVal.length > 0 ? collegeVal : undefined,
 			branch: branchVal.length > 0 ? branchVal : undefined,
 			sem: semVal.length > 0 ? semVal : undefined,
 			session: sessionVal.length > 0 ? sessionVal : undefined,
-			q: debouncedQ() && debouncedQ().trim().length >= 2 ? debouncedQ().trim() : undefined,
+			q: qVal.length >= 2 ? qVal : undefined,
 			by: filters.sortBy(),
 			order: filters.sortOrder(),
 			limit: getCurrentLimit(),

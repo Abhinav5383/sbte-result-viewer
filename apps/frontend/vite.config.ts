@@ -10,7 +10,8 @@ export default defineConfig({
 	server: {
 		proxy: {
 			"/api": {
-				target: "http://localhost:3001",
+				// target: "http://localhost:3001",
+				target: "https://sbte-results-api.kabhinav.dev",
 				changeOrigin: true,
 				rewrite: (path) => path.replace(/^\/api/, ""),
 			},

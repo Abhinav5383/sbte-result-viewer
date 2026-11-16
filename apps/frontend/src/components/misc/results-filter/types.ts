@@ -24,7 +24,6 @@ export interface FilterControls {
 	setSession: (val: string[]) => void;
 	query: () => string;
 	setQuery: (val: string) => void;
-	flushQuery: () => void;
 	sortBy: () => SortColumn;
 	sortOrder: () => SortDirection;
 	setSortFilter: (by: SortColumn, order: SortDirection) => void;

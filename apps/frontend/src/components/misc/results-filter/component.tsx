@@ -3,6 +3,7 @@ import { Button } from "~/components/ui/button";
 import MultiSelect from "~/components/ui/multi-select";
 import { Select } from "~/components/ui/select";
 import { OrdinalSuffix } from "~/components/utils";
+import { useDebouncedState } from "~/hooks/use-debounce";
 import { useMeta } from "~/hooks/use-meta";
 import type { FilterControls, SortColumn, SortDirection } from "./types";
 
@@ -59,6 +60,12 @@ export function ResultsFilter(props: ResultsFilterProps) {
 				label: s.length === 2 ? `20${s}` : s,
 			}));
 
+	const debouncedSearch = useDebouncedState(
+		() => res.query(),
+		(val) => res.setQuery(val),
+		{ delay: 750 },
+	);
+
 	return (
 		<>
 			<div hidden={props.hideFilters?.includes("query")}>
@@ -72,11 +79,11 @@ export function ResultsFilter(props: ResultsFilterProps) {
 						autocomplete="off"
 						spellcheck={false}
 						placeholder="Search by name or roll..."
-						value={res.query()}
-						onInput={(e) => res.setQuery(e.currentTarget.value)}
+						value={debouncedSearch.value()}
+						onInput={(e) => debouncedSearch.setValue(e.currentTarget.value)}
 						onKeyDown={(e) => {
 							if (e.key === "Enter") {
-								res.flushQuery();
+								debouncedSearch.flush();
 							}
 						}}
 						class="no-focus-ring border-border focus:border-accent-bg w-full"
@@ -84,7 +91,7 @@ export function ResultsFilter(props: ResultsFilterProps) {
 					<Button
 						variant="primary-alt"
 						size="icon-sm"
-						onClick={res.flushQuery}
+						onClick={debouncedSearch.flush}
 						class="grid place-content-center absolute rounded aspect-square inset-y-1 inset-e-1"
 					>
 						<SearchIcon />
