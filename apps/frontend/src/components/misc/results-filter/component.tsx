@@ -107,6 +107,7 @@ export function ResultsFilter(props: ResultsFilterProps) {
 					onChange={res.setCollege}
 					options={collegeOptions()}
 					placeholder="All Colleges"
+					immediate={false}
 				/>
 			</div>
 
@@ -118,6 +119,7 @@ export function ResultsFilter(props: ResultsFilterProps) {
 					onChange={res.setBranch}
 					options={branchOptions()}
 					placeholder="All Branches"
+					immediate={false}
 				/>
 			</div>
 
@@ -129,6 +131,7 @@ export function ResultsFilter(props: ResultsFilterProps) {
 					onChange={res.setSession}
 					options={sessionOptions()}
 					placeholder="All Sessions"
+					immediate={false}
 				/>
 			</div>
 
@@ -144,6 +147,7 @@ export function ResultsFilter(props: ResultsFilterProps) {
 					}
 					options={semesterOptions()}
 					placeholder="All Semesters"
+					immediate={false}
 				/>
 			</div>
 

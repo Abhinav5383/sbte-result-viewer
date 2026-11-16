@@ -64,7 +64,7 @@ export default function MultiSelect(props: SelectProps) {
 			requestAnimationFrame(() => {
 				contentRef?.focus();
 			});
-		} else if (!(props.immediate ?? true)) {
+		} else if (props.immediate !== true) {
 			debounced.flush();
 		}
 	}
