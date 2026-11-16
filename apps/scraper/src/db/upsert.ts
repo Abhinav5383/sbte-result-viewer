@@ -1,10 +1,12 @@
 import type { ParsedResult } from "@app/shared/types";
-import { getRegNoFromRoll, getSessionFromRoll } from "@app/shared/utils";
+import {
+	getBranchCodeFromRoll,
+	getCollegeCodeFromRoll,
+	getRegNoFromRoll,
+	getSemesterFromRoll,
+	getSessionFromRoll,
+} from "@app/shared/utils";
 import { db } from "./index";
-
-function getSemester(roll: string): number {
-	return Number.parseInt(roll[0], 10);
-}
 
 function toHundredths(value: number | null | undefined): number | null {
 	if (value == null) return null;
@@ -85,8 +87,8 @@ async function getOrCreateStudent(
 	if (cached !== undefined) return cached;
 
 	const roll = result.student.roll;
-	const collegeCode = Number.parseInt(roll.substring(2, 5), 10);
-	const branchCode = Number.parseInt(roll.substring(5, 7), 10);
+	const collegeCode = getCollegeCodeFromRoll(roll);
+	const branchCode = getBranchCodeFromRoll(roll);
 
 	// On conflict (reg_no already exists): update name in case it changed
 	const { id } = await trx
@@ -111,14 +113,14 @@ export type UpsertOutcome = "inserted" | "updated" | "skipped";
 export async function upsertResult(parsed: ParsedResult): Promise<UpsertOutcome> {
 	const roll = parsed.student.roll;
 	const regNo = getRegNoFromRoll(roll);
-	const collegeCode = Number.parseInt(roll.substring(2, 5), 10);
-	const branchCode = Number.parseInt(roll.substring(5, 7), 10);
+	const collegeCode = getCollegeCodeFromRoll(roll);
+	const branchCode = getBranchCodeFromRoll(roll);
 
 	if (!collegeCodeCache.has(collegeCode) || !branchCodeCache.has(branchCode)) {
 		return "skipped";
 	}
 
-	const semester = getSemester(roll);
+	const semester = getSemesterFromRoll(roll);
 	const session = getSessionFromRoll(roll);
 
 	const newRemarks = new Map<string, number>();
@@ -131,7 +133,6 @@ export async function upsertResult(parsed: ParsedResult): Promise<UpsertOutcome>
 			newStudent = s;
 		});
 
-		// Upsert result row — on conflict (roll) update mutable fields
 		const resultRow = await trx
 			.insertInto("result")
 			.values({

@@ -56,7 +56,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
 		return d.result;
 	});
 
-	const semesterSelector = () => {
+	function semesterSelector() {
 		const d = data();
 		if (!d) return undefined;
 		const results = d.results ?? [];
@@ -77,11 +77,11 @@ export function DetailsDialog(props: DetailsDialogProps) {
 						value: r.roll,
 					}))}
 					class="min-w-0 w-fit border-transparent min-h-0 bg-white text-current"
-					triggerClass="min-h-0 p-0 gap-1 ps-1 pe-0.5 [&_arrow_svg]:w-2 [&_arrow_svg]:h-2"
+					triggerClass="min-h-0 p-0 gap-1 ps-1 pe-0.5 text-sm"
 				/>
 			</div>
 		);
-	};
+	}
 
 	return (
 		<Dialog open={props.open} onClose={closeDialog} dialogProps={{ class: "rounded-xl" }}>
@@ -196,13 +196,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
 								</div>
 
 								<div class="grid gap-6">
-									<For
-										each={[
-											PAPER_TYPE.THEORY,
-											PAPER_TYPE.PRACTICAL,
-											PAPER_TYPE.TERM_WORK,
-										]}
-									>
+									<For each={Object.values(PAPER_TYPE)}>
 										{(paperType) => (
 											<SubjectCategory
 												title={

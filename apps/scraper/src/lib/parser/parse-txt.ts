@@ -1,4 +1,5 @@
 import { PAPER_TYPE, type ParsedResult, type SubjectResult } from "@app/shared/types";
+import { getCollegeCodeFromRoll } from "@app/shared/utils";
 
 export function parseTxtToJson(txt: string): ParsedResult {
 	const lines = txt.split("\n").map((line) => line.trim());
@@ -129,7 +130,7 @@ export function parseTxtToJson(txt: string): ParsedResult {
 		result.grandTotal.passing += sub.total.passing;
 	}
 
-	result.student.college = Number.parseInt(result.student.roll.substring(2, 5), 10) || 0;
+	result.student.college = getCollegeCodeFromRoll(result.student.roll) || 0;
 	return result;
 }
 
