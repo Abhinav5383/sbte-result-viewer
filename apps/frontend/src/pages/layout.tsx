@@ -38,7 +38,7 @@ function Footer() {
 	return (
 		<footer
 			id="footer"
-			class="bg-zinc-900 text-zinc-50 py-4 px-8 grid gap-3 place-items-center"
+			class="bg-zinc-900 text-zinc-50 dark:bg-surface dark:text-dim-fg dark:border-t dark:border-border-subtle py-4 px-8 grid gap-3 place-items-center"
 		>
 			<div class="grid place-items-center text-center">
 				<span>

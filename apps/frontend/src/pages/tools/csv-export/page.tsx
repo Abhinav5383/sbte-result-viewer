@@ -6,7 +6,7 @@ import { ExportField } from "@app/shared/schemas";
 import { useSearchParams } from "@solidjs/router";
 import FileSpreadsheetIcon from "lucide-solid/icons/file-spreadsheet";
 import Trash2Icon from "lucide-solid/icons/trash-2";
-import { For, Show } from "solid-js";
+import { For, onMount, Show } from "solid-js";
 import { ResultsFilter } from "~/components/misc/results-filter/component";
 import { useFilterControls } from "~/components/misc/results-filter/hook";
 import { SortBy, SortDirection } from "~/components/misc/results-filter/types";
@@ -30,6 +30,16 @@ const EXPORT_FIELDS: { key: ExportField; label: string }[] = [
 	{ key: ExportField.SGPA, label: "SGPA" },
 	{ key: ExportField.CGPA, label: "CGPA" },
 	{ key: ExportField.REMARK, label: "Remarks" },
+];
+
+const DEFAULT_FIELDS: ExportField[] = [
+	ExportField.ROLL,
+	ExportField.NAME,
+	ExportField.BRANCH,
+	ExportField.COLLEGE,
+	ExportField.TOTAL_OBTAINED,
+	ExportField.SGPA,
+	ExportField.REMARK,
 ];
 
 function getValidCsvKeys(keys: string[]): ExportField[] {
@@ -81,26 +91,22 @@ export default function CsvExportPage() {
 
 	const resultsHook = useResults(filters, { limit: 100 });
 
+	onMount(() => {
+		if (searchParams.fields === undefined) {
+			setSearchParams({ fields: DEFAULT_FIELDS.join("__") }, { replace: true });
+		}
+	});
+
 	const selectedFields = () => {
 		const raw = searchParams.fields;
-		if (!raw) {
-			return [
-				ExportField.ROLL,
-				ExportField.NAME,
-				ExportField.BRANCH,
-				ExportField.COLLEGE,
-				ExportField.TOTAL_OBTAINED,
-				ExportField.SGPA,
-				ExportField.REMARK,
-			];
-		}
+		if (!raw) return [];
 		const keyList = Array.isArray(raw) ? raw[0] : raw;
 		return getValidCsvKeys(keyList.split("__"));
 	};
 
 	function setSelectedFields(fields: ExportField[]) {
 		const valid = getValidCsvKeys(fields);
-		setSearchParams({ fields: valid.length > 0 ? valid.join("__") : "" });
+		setSearchParams({ fields: valid.join("__") });
 	}
 
 	function handleExport() {
@@ -255,7 +261,7 @@ function PreviewCsv(props: PreviewCsvProps) {
 									return (
 										<div
 											role="columnheader"
-											class="flex items-center justify-between bg-zinc-700 text-zinc-200 gap-4 px-3 py-2 border-e-[0.07rem] border-current/25"
+											class="flex items-center justify-between bg-zinc-700 dark:bg-subtle text-zinc-200 dark:text-dim-fg gap-4 px-3 py-2 border-e-[0.07rem] border-border-subtle"
 										>
 											<span class="inline-block w-max max-w-[24ch] font-semibold">
 												{fieldDef.label}
@@ -265,7 +271,7 @@ function PreviewCsv(props: PreviewCsvProps) {
 												variant="danger-muted"
 												size="icon-sm"
 												onClick={() => removeField(fieldDef.key)}
-												class="text-rose-300"
+												class="text-zinc-300 dark:text-dim-fg/70"
 											>
 												<Trash2Icon />
 											</Button>
@@ -298,7 +304,8 @@ function PreviewCsv(props: PreviewCsvProps) {
 									role="row"
 									class={cn(
 										args.class,
-										"grid grid-cols-subgrid col-span-full hover:bg-hover-bg",
+										"grid grid-cols-subgrid col-span-full hover:bg-hover/50 active:bg-hover",
+										args.index % 2 === 1 && "bg-subtle/40 dark:bg-surface/30",
 									)}
 								>
 									<For each={props.selectedFields}>

@@ -58,7 +58,7 @@ export function DisclaimerSection() {
 			</header>
 
 			<div class="grid gap-3 text-normal-fg leading-relaxed">
-				<div class="border-[0.13rem] border-border rounded-md p-4 bg-white">
+				<div class="border-[0.13rem] border-border rounded-md p-4 bg-surface">
 					<p>
 						<span class="font-semibold">Data source & availability:</span> Exam results
 						are gathered from the official SBTE portal. So long as the source remains

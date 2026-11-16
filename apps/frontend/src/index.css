@@ -24,22 +24,100 @@
 
 @layer base;
 @custom-variant hover (&:hover);
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+	color-scheme: light;
+
+	/* Surfaces & Backgrounds */
+	--bg-app: oklch(98.5% 0.004 250);
+	--bg-surface: oklch(100% 0 0);
+	--bg-subtle: oklch(95.5% 0.006 250);
+	--bg-hover: oklch(92% 0.01 250);
+	--bg-control: oklch(100% 0 0);
+
+	/* Foregrounds & Typography */
+	--fg-bright: oklch(18% 0.015 250);
+	--fg-normal: oklch(30% 0.02 250);
+	--fg-dim: oklch(48% 0.025 250);
+	--fg-muted: oklch(65% 0.02 250);
+
+	/* Borders */
+	--border-subtle: oklch(92% 0.006 250);
+	--border-default: oklch(86% 0.02 195);
+
+	/* Accent Family */
+	--accent-fg: oklch(58% 0.125 195);
+	--accent-fg-light: oklch(78% 0.11 195);
+	--accent-fg-dark: oklch(42% 0.11 195);
+	--accent-bg: oklch(68% 0.12 190);
+	--accent-bg-text: oklch(99% 0.005 200);
+	/* Performance Class Highlights (OKLCH) */
+	--class-excellent: var(--accent-fg);
+	--class-good: oklch(58% 0.18 135);
+	--class-average: oklch(62% 0.17 75);
+	--class-pass: oklch(60% 0.18 45);
+	--class-fail: oklch(55% 0.22 25);
+}
+
+.dark {
+	color-scheme: dark;
+
+	/* Surfaces & Backgrounds */
+	--bg-app: oklch(20% 0.006 250);
+	--bg-surface: oklch(24% 0.008 250);
+	--bg-subtle: oklch(16.5% 0.005 250);
+	--bg-hover: oklch(28% 0.01 250);
+	--bg-control: oklch(18% 0.006 250);
+
+	/* Foregrounds & Typography */
+	--fg-bright: oklch(98% 0.003 250);
+	--fg-normal: oklch(88% 0.006 250);
+	--fg-dim: oklch(68% 0.01 250);
+	--fg-muted: oklch(48% 0.01 250);
+
+	/* Borders */
+	--border-subtle: oklch(22.5% 0.006 250);
+	--border-default: oklch(28% 0.008 250);
+
+	/* Accent Family */
+	--accent-fg: oklch(76% 0.12 195);
+	--accent-fg-light: oklch(84% 0.1 195);
+	--accent-fg-dark: oklch(70% 0.11 195);
+	--accent-bg: oklch(38% 0.08 195);
+	--accent-bg-text: oklch(98% 0.005 200);
+
+	/* Performance Class Highlights (OKLCH) */
+	--class-excellent: var(--accent-fg);
+	--class-good: oklch(76% 0.17 135);
+	--class-average: oklch(80% 0.16 75);
+	--class-pass: oklch(75% 0.17 45);
+	--class-fail: oklch(70% 0.2 25);
+}
 
 @theme {
-	--color-bright-fg: lch(10.0% 0 0);
-	--color-normal-fg: lch(25.0% 5 220);
-	--color-dim-fg: lch(40.0% 10 220);
+	--color-app: var(--bg-app);
+	--color-surface: var(--bg-surface);
+	--color-subtle: var(--bg-subtle);
+	--color-hover: var(--bg-hover);
+	--color-control: var(--bg-control);
 
-	--color-accent-fg-light: lch(80.0% 40 190);
-	--color-accent-fg: lch(55.0% 40 190);
-	--color-accent-fg-dark: lch(40.0% 40 190);
+	--color-bright-fg: var(--fg-bright);
+	--color-normal-fg: var(--fg-normal);
+	--color-dim-fg: var(--fg-dim);
+	--color-muted-fg: var(--fg-muted);
 
-	--color-accent-bg: lch(66% 40 185);
-	--color-accent-bg-text: lch(100% 18 200);
+	--color-accent-fg-light: var(--accent-fg-light);
+	--color-accent-fg: var(--accent-fg);
+	--color-accent-fg-dark: var(--accent-fg-dark);
+
+	--color-accent-bg: var(--accent-bg);
+	--color-accent-bg-text: var(--accent-bg-text);
+
+	--color-border: var(--border-default);
+	--color-border-subtle: var(--border-subtle);
 
 	--font-body: "Space Grotesk", sans-serif;
-
-	--color-border: lch(84% 8 190);
 
 	--breakpoint-xs: 26rem;
 	--breakpoint-lg: 58rem;
@@ -56,7 +134,8 @@ body {
 	@apply font-body;
 	scrollbar-width: thin;
 	scrollbar-gutter: stable;
-	background-color: var(--color-zinc-50);
+	background-color: var(--color-app);
+	color: var(--color-normal-fg);
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -109,8 +188,9 @@ body {
 	}
 
 	select,
-	input {
-		@apply text-normal-fg border-[0.13rem] border-border;
+	input,
+	textarea {
+		@apply text-normal-fg border-[0.13rem] border-border bg-control;
 	}
 
 	label {
@@ -121,27 +201,27 @@ body {
 	}
 
 	.class-excellent {
-		--clr: var(--color-accent-fg);
+		--clr: var(--class-excellent);
 		color: var(--clr);
 	}
 
 	.class-good {
-		--clr: var(--color-lime-600);
+		--clr: var(--class-good);
 		color: var(--clr);
 	}
 
 	.class-average {
-		--clr: var(--color-amber-600);
+		--clr: var(--class-average);
 		color: var(--clr);
 	}
 
 	.class-pass {
-		--clr: var(--color-orange-600);
+		--clr: var(--class-pass);
 		color: var(--clr);
 	}
 
 	.class-fail {
-		--clr: var(--color-red-600);
+		--clr: var(--class-fail);
 		color: var(--clr);
 	}
 

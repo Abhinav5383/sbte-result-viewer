@@ -1,34 +1,62 @@
 .branch-badge {
-	background-color: var(--color-zinc-200);
-	color: var(--color-bright-fg);
+	background-color: var(--color-subtle);
+	color: var(--color-normal-fg);
+}
+.dark .branch-badge {
+	background-color: oklch(29% 0.02 250);
+	color: oklch(85% 0.05 250);
 }
 
 .branch-badge.civil {
-	background: #e8e4d8;
-	color: #6b4423;
+	background: oklch(91% 0.02 85);
+	color: oklch(42% 0.08 55);
+}
+.dark .branch-badge.civil {
+	background: oklch(30% 0.045 58);
+	color: oklch(84% 0.16 55);
 }
 
 .branch-badge.cse {
-	background: #dbeafe;
-	color: #1e40af;
+	background: oklch(92% 0.04 245);
+	color: oklch(40% 0.16 250);
+}
+.dark .branch-badge.cse {
+	background: oklch(30% 0.06 248);
+	color: oklch(82% 0.18 240);
 }
 
 .branch-badge.electrical {
-	background: #fef3c7;
-	color: #b45309;
+	background: oklch(94% 0.06 85);
+	color: oklch(50% 0.14 70);
+}
+.dark .branch-badge.electrical {
+	background: oklch(33.5% 0.05 88);
+	color: oklch(88% 0.18 85);
 }
 
 .branch-badge.electronics {
-	background: #d1fae5;
-	color: #047857;
+	background: oklch(92% 0.05 160);
+	color: oklch(48% 0.13 160);
+}
+.dark .branch-badge.electronics {
+	background: oklch(30.5% 0.055 160);
+	color: oklch(84% 0.18 155);
 }
 
 .branch-badge.mechanical {
-	background: #e4e4e7;
-	color: #3f3f46;
+	background: oklch(90% 0.005 240);
+	color: oklch(35% 0.01 240);
+}
+.dark .branch-badge.mechanical {
+	background: oklch(30.5% 0.026 241);
+	color: oklch(85% 0.08 240);
 }
 
 .branch-badge.automobile {
-	background: #fee2e2;
-	color: #b91c1c;
+	background: oklch(92% 0.04 25);
+	color: oklch(48% 0.17 25);
+}
+.dark .branch-badge.automobile {
+	background: oklch(29% 0.058 18);
+	color: oklch(82% 0.2 25);
 }

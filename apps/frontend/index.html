@@ -20,6 +20,21 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon.png" />
     <meta name="apple-mobile-web-app-title" content="SBTE Results Viewer" />
     <link rel="manifest" href="/favicon/site.webmanifest" />
+    <script>
+        (() => {
+            try {
+                const theme = localStorage.getItem("sbte_theme") || "system";
+                const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+                if (isDark) {
+                    document.documentElement.classList.add("dark");
+                    document.documentElement.setAttribute("data-theme-variant", "dark");
+                } else {
+                    document.documentElement.classList.remove("dark");
+                    document.documentElement.setAttribute("data-theme-variant", "light");
+                }
+            } catch {}
+        })();
+    </script>
 </head>
 
 <body>

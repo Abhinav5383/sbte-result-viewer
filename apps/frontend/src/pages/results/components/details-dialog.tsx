@@ -76,7 +76,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
 						label: `${r.semester}${OrdinalSuffix(r.semester)} sem`,
 						value: r.roll,
 					}))}
-					class="min-w-0 w-fit border-transparent min-h-0 bg-white text-current"
+					class="min-w-0 w-fit border-transparent min-h-0 bg-surface text-current"
 					triggerClass="min-h-0 p-0 gap-1 ps-1 pe-0.5 text-sm"
 				/>
 			</div>
@@ -100,7 +100,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
 								</div>
 							}
 						>
-							<span class="text-lg font-semibold text-rose-500">
+							<span class="text-lg font-semibold text-rose-600 dark:text-rose-400">
 								{error() || "Result not found"}
 							</span>
 							<Button variant="primary-alt" onClick={closeDialog}>
@@ -133,7 +133,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
 												class={`branch-badge ${branchName().toLowerCase()} inline-block ps-2 pe-0.5 rounded-lg text-sm`}
 											>
 												CGPA
-												<em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 rounded-md">
+												<em class="inline-block not-italic ms-1 px-1.5 py-0.5 my-0.5 bg-white/75 dark:bg-black/30 rounded-md">
 													{(cgpa() / 100).toFixed(2)}
 												</em>
 											</span>
@@ -161,7 +161,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
 
 							<div class="grid gap-4 p-4">
 								<div class="grid grid-cols-1 xs:grid-cols-2 gap-4">
-									<div class="grid gap-1 place-items-center bg-zinc-100 rounded-lg p-6">
+									<div class="grid gap-1 place-items-center bg-surface rounded-lg p-6 border-[0.07rem] border-border-subtle">
 										<h2 class="uppercase font-semibold text-dim-fg text-sm">
 											Obtained Marks
 										</h2>
@@ -179,7 +179,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
 										<span class="text-dim-fg">Out of {detail().total_max}</span>
 									</div>
 
-									<div class="grid gap-1 place-items-center bg-zinc-100 rounded-lg p-6">
+									<div class="grid gap-1 place-items-center bg-surface rounded-lg p-6 border-[0.07rem] border-border-subtle">
 										<h2 class="uppercase font-semibold text-dim-fg text-sm">
 											SGPA
 										</h2>
@@ -219,7 +219,7 @@ export function DetailsDialog(props: DetailsDialogProps) {
 				<Button
 					variant="secondary"
 					size="icon"
-					class="rounded-full bg-zinc-50 hover:text-accent-fg"
+					class="rounded-full bg-surface text-normal-fg hover:text-accent-fg"
 					onClick={closeDialog}
 				>
 					<XIcon />
@@ -251,7 +251,7 @@ function SubjectCategory(props: SubjectCategoryProps) {
 
 function SubjectMarksDetails(props: { sub: SubjectDetail }) {
 	return (
-		<div class="grid gap-3 bg-zinc-100 rounded-lg px-4 py-3 border-[0.07rem] border-zinc-200 tabular-nums">
+		<div class="grid gap-3 bg-surface rounded-lg px-4 py-3 border-[0.07rem] border-border-subtle tabular-nums">
 			<div class="h-fit flex gap-3 items-center">
 				<span class="text-lg leading-tight font-medium">{props.sub.name}</span>
 				<span

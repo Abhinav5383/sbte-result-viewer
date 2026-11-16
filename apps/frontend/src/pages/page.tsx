@@ -34,11 +34,17 @@ function HeroSection(props: { total: number; loading: boolean; error?: string })
 
 					<p class="max-w-[48ch] text-normal-fg text-base @min-mobile:text-lg">
 						Instantly search, filter, check the{" "}
-						<A href="/leaderboard" class="text-accent-fg-dark">
+						<A
+							href="/leaderboard"
+							class="text-accent-fg-dark dark:text-accent-fg-light"
+						>
 							leaderboard
 						</A>
 						, and{" "}
-						<A href="/tools/csv-export" class="text-accent-fg-dark">
+						<A
+							href="/tools/csv-export"
+							class="text-accent-fg-dark dark:text-accent-fg-light"
+						>
 							export
 						</A>{" "}
 						detailed student results from any government polytechnic college in Bihar.
@@ -46,7 +52,7 @@ function HeroSection(props: { total: number; loading: boolean; error?: string })
 				</header>
 
 				<div class="grid place-content-center">
-					<div class="inline-flex flex-wrap items-baseline justify-center gap-3 px-5 py-3 border-[0.13rem] border-border rounded-md bg-white">
+					<div class="inline-flex flex-wrap items-baseline justify-center gap-3 px-5 py-3 border-[0.13rem] border-border rounded-md bg-surface">
 						<div class="text-3xl font-semibold text-bright-fg tabular-nums">
 							<Show
 								when={!props.loading && !props.error && props.total > 0}
@@ -63,7 +69,7 @@ function HeroSection(props: { total: number; loading: boolean; error?: string })
 
 				<Show when={props.error}>
 					{(err) => (
-						<div class="border-[0.13rem] border-border rounded-md p-4 text-left bg-white">
+						<div class="border-[0.13rem] border-border rounded-md p-4 text-left bg-surface">
 							<div class="text-sm font-semibold text-pink-600">
 								Failed to load results
 							</div>

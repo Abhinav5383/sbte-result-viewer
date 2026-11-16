@@ -1,42 +1,44 @@
 .page-header {
 	isolation: isolate;
-	anchor-name: --nav;
 	background-image: linear-gradient(
 		90deg,
-		lch(from var(--color-accent-bg) calc(l - 10) c calc(h + 10)),
+		oklch(from var(--color-accent-bg) calc(l - 0.08) c calc(h + 10)),
 		var(--color-accent-bg)
 	);
+}
 
-	nav::after {
+.links {
+	position: relative;
+	isolation: isolate;
+
+	&::after {
 		content: "";
 		position: absolute;
 		z-index: -1;
-
 		position-anchor: --nav;
 		top: anchor(top);
 		bottom: anchor(bottom);
 		left: anchor(left);
 		right: anchor(right);
-
-		transition: all 250ms ease;
+		transition:
+			all 220ms ease,
+			opacity 180ms ease;
 		border-radius: 0.5em;
-		background: #fff0;
+		background: oklch(100% 0 0 / 0.2);
+		pointer-events: none;
+		opacity: 0;
 	}
 
-	nav:has(a:is(:hover, :focus-visible))::after {
-		background: #fff3;
-
-		top: anchor(top);
-		left: anchor(left);
-		bottom: anchor(bottom);
-		right: anchor(right);
+	&:has(a.nav-target:is(:hover, :focus-visible))::after,
+	&:has(a.nav-target.active)::after {
+		opacity: 1;
 	}
 
-	nav:not(:has(a:is(:hover, :focus-visible))) .curr-focus {
+	a.nav-target:is(:hover, :focus-visible) {
 		anchor-name: --nav;
 	}
 
-	nav a:is(:hover, :focus-visible) {
+	&:not(:has(a.nav-target:is(:hover, :focus-visible))) a.nav-target.active {
 		anchor-name: --nav;
 	}
 }
@@ -49,8 +51,20 @@
 	padding: 0.5em 1em;
 	color: inherit;
 	font-weight: 600;
+	border-radius: 0.5em;
+	transition: background-color 180ms ease;
 
 	&:where(:focus-visible, :hover) {
 		text-decoration: none;
+	}
+}
+
+@supports not (anchor-name: --nav) {
+	.nav-target.active {
+		background: oklch(100% 0 0 / 0.2);
+	}
+
+	.nav-target:is(:hover, :focus-visible) {
+		background: oklch(100% 0 0 / 0.28);
 	}
 }

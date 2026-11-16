@@ -21,7 +21,7 @@ export function BranchBadge(props: BranchBadgeProps) {
 
 			<Show when={typeof props.semester === "string" && props.semester} keyed>
 				{(sem) => (
-					<em class="inline-block not-italic px-1.5 py-0.5 bg-white/75 rounded-md">
+					<em class="inline-block not-italic px-1.5 py-0.5 bg-white/75 dark:bg-black/30 rounded-md">
 						{sem}
 						{OrdinalSuffix(sem)} sem
 					</em>

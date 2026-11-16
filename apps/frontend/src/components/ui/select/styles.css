@@ -53,6 +53,8 @@
 			align-items: center;
 			grid-template-columns: 1fr min-content;
 			gap: 0.7em;
+			padding: 0.4rem 0.6rem;
+			color: inherit;
 		}
 
 		.select::picker(select) {
@@ -62,8 +64,8 @@
 			padding-block-start: 0.4rem;
 			scrollbar-width: thin;
 
-			background-color: var(--color-white);
-			box-shadow: 2px 6px 8px #0006;
+			background-color: var(--color-surface);
+			box-shadow: 2px 6px 8px oklch(0% 0 0 / 0.4);
 			border-radius: var(--radius-md);
 			border: 2px solid var(--color-border);
 
@@ -93,7 +95,7 @@
 			outline: transparent;
 			font-size: 0.93rem;
 			border-radius: 0.3rem;
-			color: var(--color-zinc-600);
+			color: var(--color-normal-fg);
 
 			&:last-of-type {
 				margin-block-end: 0;
@@ -106,20 +108,15 @@
 			.checkmark {
 				font-size: 0.9em;
 				visibility: hidden;
-				color: lch(from var(--color-accent-bg) calc(l * 0.7) c h);
+				color: var(--color-accent-fg);
 			}
 			&:checked .checkmark {
 				visibility: visible;
 			}
 
-			&:hover {
-				color: var(--color-zinc-900);
-				background-color: lch(from var(--color-accent-bg) l c h / 0.17);
-			}
-
-			&:focus {
-				color: var(--color-zinc-900);
-				background-color: lch(from var(--color-accent-bg) l c h / 0.3);
+			&:is(:hover, :focus, :focus-visible) {
+				color: var(--color-bright-fg);
+				background-color: var(--color-hover);
 			}
 
 			.opt-content {

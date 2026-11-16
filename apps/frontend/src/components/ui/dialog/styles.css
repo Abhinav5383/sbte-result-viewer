@@ -13,6 +13,8 @@ body:has(dialog[open]) {
 		max-height: calc(100% - max(4rem, 5vh));
 		border: none;
 		outline: none;
+		background-color: var(--color-app);
+		color: var(--color-normal-fg);
 
 		opacity: 1;
 		transform: translateY(0);
@@ -31,8 +33,8 @@ body:has(dialog[open]) {
 	.__dialog::backdrop {
 		background-image: linear-gradient(
 			0deg,
-			#000a,
-			lch(from var(--color-accent-fg-dark) calc(l - 90) c h / 0.8)
+			oklch(0% 0 0 / 0.65),
+			oklch(from var(--color-accent-fg-dark) 10% c h / 0.8)
 		);
 		backdrop-filter: blur(3px);
 		opacity: 1;

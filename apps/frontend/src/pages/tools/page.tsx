@@ -19,14 +19,14 @@ export function ToolsPage() {
 	];
 
 	return (
-		<main class="p-8 grid gap-4 content-start bg-zinc-100">
+		<main class="p-8 grid gap-4 content-start bg-app">
 			<h1 class="text-5xl font-bold text-normal-fg">Tools</h1>
 			<ul class="tools-list grid grid-cols-[repeat(auto-fit,minmax(min(100%,20rem),1fr))]">
 				<For each={tools}>
 					{(tool) => (
 						<li class="grid">
 							<A href={tool.path} class="tool-link grid p-1">
-								<div class="grid p-4 bg-white hover:shadow-xl focus-visible:shadow-xl">
+								<div class="grid p-4 bg-surface rounded-lg border border-border-subtle hover:shadow-xl focus-visible:shadow-xl">
 									<h2 class="flex justify-between text-lg font-semibold">
 										{tool.name}
 										<ChevronRightIcon />

@@ -62,7 +62,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
 				when={!props.error}
 				fallback={
 					<div class="flex flex-col items-center justify-center gap-3 py-16 text-dim-fg">
-						<span class="text-2xl font-semibold text-rose-500">
+						<span class="text-2xl font-semibold text-rose-600 dark:text-rose-400">
 							Oops! Something went wrong
 						</span>
 						<span class="text-sm text-dim-fg">{props.error}</span>
@@ -140,7 +140,7 @@ export function ResultsListTable(props: ResultsListTableProps) {
 						<Show when={props.loading}>
 							<div class="absolute top-0 inset-x-0 h-0.5 bg-accent animate-pulse z-20" />
 						</Show>
-						<div class="hidden @min-desktop:grid z-10 sticky top-0 col-span-full grid-cols-subgrid gap-x-0 *:px-4 *:py-3 border-be-[0.07rem] border-border bg-zinc-700 text-zinc-200">
+						<div class="hidden @min-desktop:grid z-10 sticky top-0 col-span-full grid-cols-subgrid gap-x-0 *:px-4 *:py-3 border-be-[0.07rem] border-border bg-zinc-700 dark:bg-subtle text-zinc-200 dark:text-dim-fg">
 							<div>
 								<strong>#</strong>
 							</div>
@@ -217,7 +217,7 @@ export function SortableHeaderItem(props: SortableHeaderItemProps) {
 			type="button"
 			class={cn(
 				"h-full rounded-none justify-between text-start",
-				"grid grid-cols-[1fr_min-content] items-center hover:bg-zinc-950 cursor-pointer transition-colors px-4 py-3",
+				"grid grid-cols-[1fr_min-content] items-center hover:bg-zinc-800 dark:hover:bg-hover cursor-pointer transition-colors px-4 py-3",
 			)}
 			onClick={() => {
 				if (props.sortBy === props.value) {
@@ -342,11 +342,15 @@ interface RowVariantProps extends ResultRowProps {
 
 function MobileResultRow(props: RowVariantProps) {
 	const meta = useMeta();
+	const isOdd = props.index % 2 === 1;
 
 	return (
 		// biome-ignore lint/a11y/useSemanticElements: grid row container
 		<div
-			class="group/row @min-desktop:hidden grid grid-cols-[max-content_1fr] gap-3 px-3 py-5 border-be-[0.07rem] border-border hover:bg-zinc-100/50 active:bg-zinc-100 cursor-pointer focus-ring"
+			class={cn(
+				"group/row @min-desktop:hidden grid grid-cols-[max-content_1fr] gap-3 px-3 py-5 border-be-[0.07rem] border-border hover:bg-hover/50 active:bg-hover cursor-pointer focus-ring",
+				isOdd && "bg-subtle/40 dark:bg-surface/30",
+			)}
 			onClick={props.onSelect}
 			onKeyDown={(e) => handleRowKbEvent(e, props.onSelect)}
 			tabIndex={0}
@@ -382,7 +386,7 @@ function MobileResultRow(props: RowVariantProps) {
 				</div>
 
 				<div class="grid grid-cols-2 gap-4">
-					<div class="grid place-items-center bg-zinc-50/50 p-3 rounded-lg border-[0.07rem] border-zinc-200">
+					<div class="grid place-items-center bg-subtle p-3 rounded-lg border-[0.07rem] border-border-subtle">
 						<span class="text-dim-fg font-medium uppercase text-xs opacity-70 whitespace-nowrap">
 							Marks Obtained
 						</span>
@@ -396,7 +400,7 @@ function MobileResultRow(props: RowVariantProps) {
 						</div>
 					</div>
 
-					<div class="grid place-items-center bg-zinc-50/50 p-3 rounded-lg border-[0.07rem] border-zinc-200">
+					<div class="grid place-items-center bg-subtle p-3 rounded-lg border-[0.07rem] border-border-subtle">
 						<span class="text-dim-fg font-medium uppercase text-xs opacity-70">
 							SGPA
 						</span>
@@ -417,13 +421,15 @@ function MobileResultRow(props: RowVariantProps) {
 
 function DesktopResultRow(props: RowVariantProps) {
 	const meta = useMeta();
+	const isOdd = props.index % 2 === 1;
 
 	return (
 		// biome-ignore lint/a11y/useSemanticElements: grid row container
 		<div
 			class={cn(
 				"hidden @min-desktop:grid",
-				"items-center col-span-full grid-cols-subgrid py-3 border-be-[0.07rem] border-border hover:bg-zinc-100 cursor-pointer px-6",
+				"items-center col-span-full grid-cols-subgrid py-3 border-be-[0.07rem] border-border hover:bg-hover/50 active:bg-hover cursor-pointer px-6",
+				isOdd && "bg-subtle/40 dark:bg-surface/30",
 				"focus-ring",
 			)}
 			onClick={props.onSelect}

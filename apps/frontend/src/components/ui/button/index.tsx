@@ -12,11 +12,14 @@ const VARIANTS = {
 	primary: "bg-accent-bg text-accent-bg-text hover:bg-accent-bg/90",
 	"primary-alt": "bg-accent-fg/15 text-accent-fg hover:bg-accent-bg hover:text-accent-bg-text",
 	"primary-alt-hover": "text-accent-fg hover:bg-accent-bg/15",
-	secondary: "text-dim-fg hover:text-normal-fg hover:bg-zinc-100",
+	secondary: "text-dim-fg hover:text-normal-fg hover:bg-hover",
 	danger: "bg-rose-500 text-rose-50 hover:bg-rose-500/90",
-	"danger-alt": "bg-rose-100 text-rose-600 hover:bg-rose-500 hover:text-rose-50",
-	"danger-alt-hover": "text-rose-500 hover:bg-rose-100",
-	"danger-muted": "text-dim-fg hover:bg-rose-100 hover:text-rose-500 focus-visible:text-rose-500",
+	"danger-alt":
+		"bg-rose-100 dark:bg-rose-500/15 text-rose-600 dark:text-rose-400 hover:bg-rose-500 hover:text-rose-50",
+	"danger-alt-hover":
+		"text-rose-600 dark:text-rose-400 hover:bg-rose-500/10 dark:hover:bg-rose-400/15 dark:hover:text-rose-300",
+	"danger-muted":
+		"text-dim-fg hover:bg-rose-500/10 dark:hover:bg-rose-400/15 hover:text-rose-600 dark:hover:text-rose-400 focus-visible:text-rose-500",
 } as const;
 
 interface ButtonProps extends JSX.ButtonHTMLAttributes<HTMLButtonElement> {
