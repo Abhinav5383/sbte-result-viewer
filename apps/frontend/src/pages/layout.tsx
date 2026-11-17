@@ -1,12 +1,18 @@
 import { useLocation } from "@solidjs/router";
-import { createEffect, type JSX } from "solid-js";
+import { createEffect, type JSX, Show } from "solid-js";
 import Navbar from "~/components/navbar";
+import BouncingDotsLoader from "~/components/ui/loaders/bouncing-dots";
+import { useMeta } from "~/hooks/use-meta";
 
 const oldHosts = ["abhinav5383.github.io"];
 const currHost = "https://sbte-results.kabhinav.dev";
 
 export default function RootLayout(props: { children: JSX.Element }) {
 	const loc = useLocation();
+	const meta = useMeta();
+
+	const hasQuery = () => loc.search.length > 0 || window.location.search.length > 0;
+	const shouldWaitForMeta = () => hasQuery() && meta.loading() && !meta.error();
 
 	createEffect(() => {
 		let query = "";
@@ -28,7 +34,16 @@ export default function RootLayout(props: { children: JSX.Element }) {
 	return (
 		<div class="min-h-screen min-h-lvh grid grid-cols-1 grid-rows-[auto_1fr_auto]">
 			<Navbar />
-			{props.children}
+			<Show
+				when={!shouldWaitForMeta()}
+				fallback={
+					<div class="flex flex-col items-center justify-center min-h-[60svh] py-20 text-dim-fg gap-4">
+						<BouncingDotsLoader class="w-24 text-accent-fg" />
+					</div>
+				}
+			>
+				{props.children}
+			</Show>
 			<Footer />
 		</div>
 	);
