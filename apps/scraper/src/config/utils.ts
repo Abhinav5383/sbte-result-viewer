@@ -3,9 +3,9 @@ import { numRange } from "~/lib/utils";
 import { CURRENT_EXAM_CONFIG, type ExamConfig } from "./exam";
 
 const SPECIAL_ROLLS = [
-    ...numRange(301, 310), // Extra spots
-    ...numRange(351, 360),
-    ...numRange(601, 610)  // Lateral entry students
+	...numRange(301, 310), // Extra spots
+	...numRange(351, 360),
+	...numRange(601, 610), // Lateral entry students
 ];
 
 export function buildRollList(totalSeats: number): number[] {
@@ -19,7 +19,7 @@ export interface ScrapeTarget {
 	branchName: string;
 	semester: number;
 	admissionYear: number;
-    getRolls: () => number[]
+	getRolls: () => number[];
 }
 
 export async function getScrapeTargets(
@@ -52,7 +52,7 @@ export async function getScrapeTargets(
 				branchName: o.branch_name,
 				semester: sem.semester,
 				admissionYear: sem.admissionYear,
-                getRolls: () => buildRollList(o.seats + o.extra_seats)
+				getRolls: () => buildRollList(o.seats + o.extra_seats),
 			});
 		}
 	}
