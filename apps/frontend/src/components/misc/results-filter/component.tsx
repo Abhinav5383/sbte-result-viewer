@@ -63,7 +63,7 @@ export function ResultsFilter(props: ResultsFilterProps) {
 	const debouncedSearch = useDebouncedState(
 		() => res.query(),
 		(val) => res.setQuery(val),
-		{ delay: 750 },
+		{ delay: 2000 },
 	);
 
 	return (
@@ -81,6 +81,7 @@ export function ResultsFilter(props: ResultsFilterProps) {
 						placeholder="Search by name or roll..."
 						value={debouncedSearch.value()}
 						onInput={(e) => debouncedSearch.setValue(e.currentTarget.value)}
+						onBlur={() => debouncedSearch.flush()}
 						onKeyDown={(e) => {
 							if (e.key === "Enter") {
 								debouncedSearch.flush();
