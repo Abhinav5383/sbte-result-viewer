@@ -25,13 +25,7 @@
             try {
                 const theme = localStorage.getItem("sbte_theme") || "system";
                 const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
-                if (isDark) {
-                    document.documentElement.classList.add("dark");
-                    document.documentElement.setAttribute("data-theme-variant", "dark");
-                } else {
-                    document.documentElement.classList.remove("dark");
-                    document.documentElement.setAttribute("data-theme-variant", "light");
-                }
+                document.documentElement.classList.toggle("dark", isDark);
             } catch {}
         })();
     </script>

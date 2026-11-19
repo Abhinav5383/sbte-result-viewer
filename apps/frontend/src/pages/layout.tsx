@@ -11,8 +11,8 @@ export default function RootLayout(props: { children: JSX.Element }) {
 	const loc = useLocation();
 	const meta = useMeta();
 
-	const hasQuery = () => loc.search.length > 0 || window.location.search.length > 0;
-	const shouldWaitForMeta = () => hasQuery() && meta.loading() && !meta.error();
+	const hadInitialQuery = loc.search.length > 0 || window.location.search.length > 0;
+	const shouldWaitForMeta = () => hadInitialQuery && meta.loading() && !meta.error();
 
 	createEffect(() => {
 		let query = "";

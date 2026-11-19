@@ -36,6 +36,14 @@ function parseArrayParam(val: unknown): string[] {
 	return [];
 }
 
+function arrayEquals<T>(a: readonly T[], b: readonly T[]): boolean {
+	return a.length === b.length && a.every((v, i) => v === b[i]);
+}
+
+function createArrayMemo<T>(fn: () => T[]) {
+	return createMemo(fn, undefined, { equals: arrayEquals });
+}
+
 function parseNumberArrayParam(val: unknown): number[] {
 	return parseArrayParam(val)
 		.map((v) => Number.parseInt(v, 10))
@@ -49,14 +57,16 @@ export function useFilterControls(defaults?: UseFilterControlsOptions): FilterCo
 	const meta = useMeta();
 	const [searchParams, setSearchParams] = useSearchParams();
 
-	const rawCollegeParams = () => parseArrayParam(searchParams[FilterParams.COLLEGE]);
+	const rawCollegeParams = createArrayMemo(() =>
+		parseArrayParam(searchParams[FilterParams.COLLEGE]),
+	);
 
-	const collegeNames = createMemo(() => {
+	const collegeNames = createArrayMemo(() => {
 		const raw = rawCollegeParams();
 		return raw.map((entry) => meta.getCollegeCanonicalName(entry)).filter(Boolean);
 	});
 
-	const college = createMemo(() => {
+	const college = createArrayMemo(() => {
 		const raw = rawCollegeParams();
 		return raw
 			.map((entry) => meta.getCollegeCode(entry))
@@ -74,14 +84,16 @@ export function useFilterControls(defaults?: UseFilterControlsOptions): FilterCo
 		);
 	}
 
-	const rawBranchParams = () => parseArrayParam(searchParams[FilterParams.BRANCH]);
+	const rawBranchParams = createArrayMemo(() =>
+		parseArrayParam(searchParams[FilterParams.BRANCH]),
+	);
 
-	const branchNames = createMemo(() => {
+	const branchNames = createArrayMemo(() => {
 		const raw = rawBranchParams();
 		return raw.map((entry) => meta.getBranchCanonicalName(entry)).filter(Boolean);
 	});
 
-	const branch = createMemo(() => {
+	const branch = createArrayMemo(() => {
 		const raw = rawBranchParams();
 		return raw
 			.map((entry) => meta.getBranchCode(entry))
@@ -99,7 +111,9 @@ export function useFilterControls(defaults?: UseFilterControlsOptions): FilterCo
 		);
 	}
 
-	const semester = () => parseNumberArrayParam(searchParams[FilterParams.SEMESTER]);
+	const semester = createArrayMemo(() =>
+		parseNumberArrayParam(searchParams[FilterParams.SEMESTER]),
+	);
 	function setSemester(vals: number[]) {
 		const sorted = [...vals].sort((a, b) => a - b);
 		setSearchParams(
@@ -110,7 +124,7 @@ export function useFilterControls(defaults?: UseFilterControlsOptions): FilterCo
 		);
 	}
 
-	const session = () => parseArrayParam(searchParams[FilterParams.SESSION]);
+	const session = createArrayMemo(() => parseArrayParam(searchParams[FilterParams.SESSION]));
 	function setSession(vals: string[]) {
 		const sorted = [...vals].sort((a, b) => a.localeCompare(b));
 		setSearchParams(
@@ -161,15 +175,14 @@ export function useFilterControls(defaults?: UseFilterControlsOptions): FilterCo
 		);
 	}
 
-	const anyFilterActive = createMemo(() => {
-		return (
+	const anyFilterActive = createMemo(
+		() =>
 			rawCollegeParams().length > 0 ||
 			rawBranchParams().length > 0 ||
 			semester().length > 0 ||
 			session().length > 0 ||
-			queryFromUrl().trim().length > 0
-		);
-	});
+			queryFromUrl().trim().length > 0,
+	);
 
 	function clearFilters() {
 		setSearchParams(RESET_FILTERS_PAYLOAD, { replace: true });

@@ -342,14 +342,13 @@ interface RowVariantProps extends ResultRowProps {
 
 function MobileResultRow(props: RowVariantProps) {
 	const meta = useMeta();
-	const isOdd = props.index % 2 === 1;
 
 	return (
 		// biome-ignore lint/a11y/useSemanticElements: grid row container
 		<div
 			class={cn(
 				"group/row @min-desktop:hidden grid grid-cols-[max-content_1fr] gap-3 px-3 py-5 border-be-[0.07rem] border-border hover:bg-hover/50 active:bg-hover cursor-pointer focus-ring",
-				isOdd && "bg-subtle/40 dark:bg-surface/30",
+				props.index % 2 === 0 && "bg-subtle/40 dark:bg-surface/30",
 			)}
 			onClick={props.onSelect}
 			onKeyDown={(e) => handleRowKbEvent(e, props.onSelect)}
@@ -421,7 +420,6 @@ function MobileResultRow(props: RowVariantProps) {
 
 function DesktopResultRow(props: RowVariantProps) {
 	const meta = useMeta();
-	const isOdd = props.index % 2 === 1;
 
 	return (
 		// biome-ignore lint/a11y/useSemanticElements: grid row container
@@ -429,7 +427,7 @@ function DesktopResultRow(props: RowVariantProps) {
 			class={cn(
 				"hidden @min-desktop:grid",
 				"items-center col-span-full grid-cols-subgrid py-3 border-be-[0.07rem] border-border hover:bg-hover/50 active:bg-hover cursor-pointer px-6",
-				isOdd && "bg-subtle/40 dark:bg-surface/30",
+				props.index % 2 === 0 && "bg-subtle/40 dark:bg-surface/30",
 				"focus-ring",
 			)}
 			onClick={props.onSelect}

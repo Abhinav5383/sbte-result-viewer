@@ -1,4 +1,4 @@
-import { type Accessor, createEffect, createSignal, onCleanup } from "solid-js";
+import { type Accessor, createEffect, createSignal, on, onCleanup } from "solid-js";
 
 export interface UseDebouncedStateOptions {
 	delay?: number;
@@ -10,70 +10,50 @@ export function useDebouncedState<T>(
 	onCommit: (val: T) => void,
 	options?: UseDebouncedStateOptions,
 ) {
-	const delay = () => options?.delay ?? 300;
-	const isImmediate = () => options?.immediate ?? false;
+	const delay = options?.delay ?? 300;
+	const immediate = options?.immediate ?? false;
 
-	const [internalValue, setInternalValue] = createSignal<T>(externalValue());
+	const [value, setInternalValue] = createSignal<T>(externalValue());
 	let timer: ReturnType<typeof setTimeout> | undefined;
 
-	createEffect(() => {
-		const ext = externalValue();
-		if (timer !== undefined) {
-			clearTimeout(timer);
-			timer = undefined;
-		}
-		setInternalValue(ext as never);
-	});
+	function clearTimer() {
+		clearTimeout(timer);
+		timer = undefined;
+	}
+
+	createEffect(
+		on(
+			externalValue,
+			(ext) => {
+				clearTimer();
+				setInternalValue(() => ext);
+			},
+			{ defer: true },
+		),
+	);
 
 	function commit(val: T) {
-		if (timer !== undefined) {
-			clearTimeout(timer);
-			timer = undefined;
-		}
+		clearTimer();
 		onCommit(val);
 	}
 
-	function setValue(next: T | ((prev: T) => T)) {
-		const nextVal =
-			typeof next === "function" ? (next as (prev: T) => T)(internalValue()) : next;
-		setInternalValue(nextVal as never);
+	function setValue(next: T) {
+		setInternalValue(() => next);
 
-		if (isImmediate()) {
-			commit(nextVal);
-		} else {
-			if (timer !== undefined) {
-				clearTimeout(timer);
-			}
-			timer = setTimeout(() => {
-				commit(internalValue());
-			}, delay());
+		if (immediate) {
+			commit(next);
+			return;
 		}
+
+		clearTimeout(timer);
+		timer = setTimeout(() => commit(value()), delay);
 	}
 
 	function flush() {
-		if (timer !== undefined) {
-			commit(internalValue());
-		}
+		if (timer !== undefined) commit(value());
 	}
 
-	function cancel() {
-		if (timer !== undefined) {
-			clearTimeout(timer);
-			timer = undefined;
-		}
-	}
+	onCleanup(clearTimer);
 
-	onCleanup(() => {
-		if (timer !== undefined) {
-			clearTimeout(timer);
-		}
-	});
-
-	return {
-		value: internalValue,
-		setValue,
-		flush,
-		cancel,
-		isPending: () => timer !== undefined,
-	};
+	return { value, setValue, flush };
 }

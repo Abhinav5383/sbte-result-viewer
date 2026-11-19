@@ -124,16 +124,13 @@ export const ExportQuerySchema = ResultQuerySchema.omit({
 	fields: z
 		.string()
 		.optional()
-		.transform((v?: string) =>
-			v
-				? v
-						.split(",")
-						.map((f: string) => f.trim())
-						.filter((f): f is ExportField =>
-							ALL_EXPORT_FIELDS.includes(f as ExportField),
-						)
-				: ALL_EXPORT_FIELDS,
-		),
+		.transform((v?: string) => {
+			const fields = (v ?? "")
+				.split(",")
+				.map((f) => f.trim())
+				.filter((f): f is ExportField => ALL_EXPORT_FIELDS.includes(f as ExportField));
+			return fields.length > 0 ? fields : ALL_EXPORT_FIELDS;
+		}),
 });
 
 export type ExportQuery = z.infer<typeof ExportQuerySchema>;

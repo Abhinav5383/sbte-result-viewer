@@ -106,7 +106,7 @@ export default function CsvExportPage() {
 
 	function setSelectedFields(fields: ExportField[]) {
 		const valid = getValidCsvKeys(fields);
-		setSearchParams({ fields: valid.join("__") });
+		setSearchParams({ fields: valid.join("__") }, { replace: true });
 	}
 
 	function handleExport() {

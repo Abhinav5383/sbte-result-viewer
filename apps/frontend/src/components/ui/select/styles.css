@@ -124,9 +124,8 @@
 			}
 		}
 
-		/* biome-ignore lint/correctness/noUnknownTypeSelector: Customizable Select API */
 		.select selectedcontent {
-			/* biome-ignore lint/style/noDescendingSpecificity: Customizable Select API */
+			/* biome-ignore lint/style/noDescendingSpecificity: -- */
 			.checkmark {
 				display: none;
 			}

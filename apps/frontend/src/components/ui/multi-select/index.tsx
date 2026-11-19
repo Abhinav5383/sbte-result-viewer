@@ -37,19 +37,8 @@ export default function MultiSelect(props: SelectProps) {
 		},
 	);
 
-	const selectedLabels = () => {
-		const list: string[] = [];
-		for (const op of debounced.value()) {
-			const option = props.options.find((o) => o.value === op);
-
-			if (option?.label) {
-				list.push(option.label);
-			} else {
-				list.push(op);
-			}
-		}
-		return list;
-	};
+	const selectedLabels = () =>
+		debounced.value().map((v) => props.options.find((o) => o.value === v)?.label || v);
 
 	function handleChange(value: string, checked: boolean) {
 		const current = debounced.value();
@@ -64,7 +53,7 @@ export default function MultiSelect(props: SelectProps) {
 			requestAnimationFrame(() => {
 				contentRef?.focus();
 			});
-		} else if (props.immediate !== true) {
+		} else {
 			debounced.flush();
 		}
 	}
@@ -126,7 +115,7 @@ export default function MultiSelect(props: SelectProps) {
 
 	return (
 		<Popover
-			id={`"multi-select-popover-${props.id}`}
+			id={`multi-select-popover-${props.id}`}
 			class="multi-select-popover"
 			trigger={(args) => (
 				<button
