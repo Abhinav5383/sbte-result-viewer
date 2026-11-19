@@ -13,8 +13,6 @@ import { marksClass, sgpaClass } from "~/lib/grade-utils";
 import { DetailsDialog } from "~/pages/results/components/details-dialog";
 import { handleRowKbEvent, SortableHeaderItem } from "~/pages/results/components/results-table";
 
-import "~/pages/results/components/results-table.css";
-
 interface LeaderboardTableProps {
 	results: LeaderboardRow[];
 	total: number | undefined;

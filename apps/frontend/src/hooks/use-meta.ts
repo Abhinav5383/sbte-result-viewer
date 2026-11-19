@@ -1,6 +1,7 @@
 import type { BranchMeta, CollegeMeta } from "@app/shared/dto";
 import { createMemo, createResource } from "solid-js";
 import { fetchMeta } from "~/lib/api/results";
+import { sortBranches, sortColleges } from "~/lib/meta-order";
 
 const [metaResource, { refetch }] = createResource(() => fetchMeta());
 
@@ -26,6 +27,9 @@ export function useMeta() {
 		}
 		return map;
 	});
+
+	const colleges = createMemo(() => sortColleges(data()?.colleges ?? []));
+	const branches = createMemo(() => sortBranches(data()?.branches ?? [], data()?.colleges ?? []));
 
 	function getCollege(code: number): CollegeMeta | undefined {
 		return collegeMap().get(code);
@@ -94,8 +98,8 @@ export function useMeta() {
 		loading,
 		error,
 		refetch,
-		colleges: () => data()?.colleges ?? [],
-		branches: () => data()?.branches ?? [],
+		colleges,
+		branches,
 		semesters: () => data()?.semesters ?? [1, 2, 3, 4, 5, 6],
 		sessions: () => data()?.sessions ?? [],
 		totalResults: () => data()?.total_results ?? 0,

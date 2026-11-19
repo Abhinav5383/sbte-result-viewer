@@ -41,7 +41,7 @@ async function scrapeBranch(
 	existingRolls: Set<string>,
 	stats: ScrapeRunStats,
 ): Promise<void> {
-	const allRolls = formatRollList(target.rollList, target);
+	const allRolls = formatRollList(target.getRolls(), target);
 
 	// Only fetch rolls we haven't successfully scraped yet
 	const toFetch = allRolls.filter((roll) => !invalidRolls.has(roll) && !existingRolls.has(roll));

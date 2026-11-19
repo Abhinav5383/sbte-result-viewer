@@ -85,10 +85,24 @@ export type ResultDetailData = {
 
 export type ResultDetailResponse = ApiResponse<ResultDetailData>;
 
+export enum CollegeType {
+	GOVT = "govt",
+	PRIVATE = "private",
+}
+
+export type CollegeBranchMeta = {
+	code: number;
+	seats: number;
+	extra_seats: number;
+};
+
 export type CollegeMeta = {
 	code: number;
 	short_name: string;
 	full_name: string;
+	type: CollegeType;
+	total_seats: number;
+	branches: CollegeBranchMeta[];
 };
 
 export type BranchMeta = {

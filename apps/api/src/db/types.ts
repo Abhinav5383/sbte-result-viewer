@@ -29,6 +29,14 @@ export interface College {
 	code: number;
 	full_name: string;
 	short_name: string;
+	type: Generated<string>;
+}
+
+export interface CollegeBranch {
+	branch_code: number;
+	college_code: number;
+	extra_seats: Generated<number>;
+	seats: number;
 }
 
 export interface DataVersion {
@@ -100,6 +108,7 @@ export interface DB {
 	_migrations: _Migrations;
 	branch: Branch;
 	college: College;
+	college_branch: CollegeBranch;
 	data_version: DataVersion;
 	invalid_roll: InvalidRoll;
 	remark: Remark;

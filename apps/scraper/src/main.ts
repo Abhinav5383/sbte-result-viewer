@@ -10,11 +10,9 @@ console.log(
 	`Active semesters: ${CURRENT_EXAM_CONFIG.semesters.map((s) => `sem${s.semester} (admission ${s.admissionYear})`).join(", ")}`,
 );
 
-// Fetch real colleges & branches from DB for current exam semesters
 const targets = await getScrapeTargets(CURRENT_EXAM_CONFIG);
 console.log(`Generated ${targets.length} target branch/semester combinations from DB.`);
 
-// Pre-load remark/subject/student/college/branch caches to avoid per-row DB round trips
 await loadCaches();
 
 const stats: ScrapeRunStats = {
@@ -27,7 +25,6 @@ const stats: ScrapeRunStats = {
 
 await scrapeAllBranches(targets, stats);
 
-// Bump data_version so API clients know cache is stale
 const newVersion = await bumpDataVersion();
 
 const elapsed = ((Date.now() - startedAt) / 1000).toFixed(1);
@@ -40,7 +37,7 @@ console.log(
   Skipped  : ${stats.skipped}
   Invalid  : ${stats.invalid}
   Errors   : ${stats.errors}
-  DB version → ${newVersion}
+  DB version : ${newVersion}
 `.trim(),
 );
 

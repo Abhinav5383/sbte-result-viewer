@@ -181,6 +181,7 @@ export default function CsvExportPage() {
 								value: f.key,
 							})).sort((a, b) => a.label.localeCompare(b.label))}
 							class="w-stretch @min-desktop:w-[42ch]"
+							searchThreshold={null}
 						/>
 
 						<Button

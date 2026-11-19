@@ -14,8 +14,6 @@ import { useMeta } from "~/hooks/use-meta";
 import { marksClass, sgpaClass } from "~/lib/grade-utils";
 import { DetailsDialog } from "./details-dialog";
 
-import "./results-table.css";
-
 interface ResultsListTableProps {
 	results: ResultRow[];
 	total: number | undefined;

@@ -1,5 +1,5 @@
 import CheckIcon from "lucide-solid/icons/check";
-import { createSignal, For, Show } from "solid-js";
+import { createMemo, createSignal, For, Show } from "solid-js";
 import ChevronDown from "~/components/icons/chevron-down";
 import Popover from "~/components/ui/popover";
 import { cn } from "~/components/utils";
@@ -11,6 +11,8 @@ interface SelectOption {
 	value: string;
 	label?: string;
 	description?: string;
+	// extra strings that can be matched with this item (used for search)
+	keywords?: string[];
 }
 
 interface SelectProps {
@@ -22,11 +24,29 @@ interface SelectProps {
 	onChange: (selected: string[]) => void;
 	immediate?: boolean;
 	debounceDelay?: number;
+	searchThreshold?: number | null;
 }
 
 export default function MultiSelect(props: SelectProps) {
 	const [isOpen, setIsOpen] = createSignal(false);
+	const [searchQuery, setSearchQuery] = createSignal("");
 	let contentRef: HTMLDivElement | undefined;
+	let searchRef: HTMLInputElement | undefined;
+
+	const showSearch = () => {
+		if (props.searchThreshold === null) return false;
+		return props.options.length > (props.searchThreshold ?? 7);
+	};
+
+	const filteredOptions = createMemo(() => {
+		const q = searchQuery().trim().toLowerCase();
+		if (!q || !showSearch()) return props.options;
+		return props.options.filter((o) =>
+			[o.label ?? o.value, o.value, ...(o.keywords ?? [])].some((text) =>
+				text.toLowerCase().includes(q),
+			),
+		);
+	});
 
 	const debounced = useDebouncedState(
 		() => props.selected,
@@ -46,15 +66,39 @@ export default function MultiSelect(props: SelectProps) {
 		debounced.setValue(next);
 	}
 
+	function scrollToFirstChecked() {
+		const target = contentRef?.querySelector<HTMLElement>(
+			'.multi-select-option[data-checked="true"]',
+		);
+
+		target?.scrollIntoView({ behavior: "instant", block: "nearest" });
+	}
+
 	function setPopoverState(openState: boolean) {
 		setIsOpen(openState);
 
 		if (openState) {
 			requestAnimationFrame(() => {
-				contentRef?.focus();
+				(showSearch() ? searchRef : contentRef)?.focus({ preventScroll: true });
+				scrollToFirstChecked();
 			});
 		} else {
+			setSearchQuery("");
 			debounced.flush();
+		}
+	}
+
+	function handleSearchKeyDown(e: KeyboardEvent) {
+		if (e.key === "ArrowDown") {
+			e.preventDefault();
+			contentRef?.querySelector<HTMLElement>(".multi-select-option")?.focus();
+		} else if (e.key === "Enter") {
+			e.preventDefault();
+			const matches = filteredOptions();
+			if (matches.length === 1) {
+				const value = matches[0].value;
+				handleChange(value, !debounced.value().includes(value));
+			}
 		}
 	}
 
@@ -80,6 +124,8 @@ export default function MultiSelect(props: SelectProps) {
 				e.preventDefault();
 				if (currentIndex > 0) {
 					options[currentIndex - 1]?.focus();
+				} else if (searchRef) {
+					searchRef.focus();
 				}
 				break;
 			}
@@ -142,6 +188,22 @@ export default function MultiSelect(props: SelectProps) {
 			isOpen={isOpen()}
 			onChange={setPopoverState}
 		>
+			<Show when={showSearch()}>
+				<div class="multi-select-search">
+					<input
+						ref={searchRef}
+						type="text"
+						autocomplete="off"
+						spellcheck={false}
+						placeholder="Search..."
+						aria-label="Search options"
+						value={searchQuery()}
+						onInput={(e) => setSearchQuery(e.currentTarget.value)}
+						onKeyDown={handleSearchKeyDown}
+						class="no-focus-ring border-border focus:border-accent-bg w-full text-sm"
+					/>
+				</div>
+			</Show>
 			{/** biome-ignore lint/a11y/noStaticElementInteractions: meh */}
 			<div
 				class="multi-select-content"
@@ -149,7 +211,10 @@ export default function MultiSelect(props: SelectProps) {
 				onKeyDown={handleKeyDown}
 				tabindex={0}
 			>
-				<For each={props.options}>
+				<Show when={filteredOptions().length === 0}>
+					<div class="px-3 py-2 text-sm text-dim-fg">No matches</div>
+				</Show>
+				<For each={filteredOptions()}>
 					{(option) => (
 						<Option
 							value={option.value}

@@ -6,6 +6,7 @@ import { OrdinalSuffix } from "~/components/utils";
 import { useDebouncedState } from "~/hooks/use-debounce";
 import { useMeta } from "~/hooks/use-meta";
 import { type FilterControls, SortBy, SortDirection } from "./types";
+import { untrack } from "solid-js";
 
 export interface ResultsFilterProps {
 	hook: FilterControls;
@@ -19,30 +20,48 @@ export function ResultsFilter(props: ResultsFilterProps) {
 	const res = props.hook;
 
 	const collegeOptions = () => {
-		const ngpName = "NGP Patna-13";
-		const colleges = meta.colleges();
-		const ngp = colleges.find((c) => c.short_name === ngpName);
-		const others = colleges
-			.filter((c) => c.short_name !== ngpName)
-			.slice()
-			.sort((a, b) => a.short_name.localeCompare(b.short_name));
+		const selectedBranches = new Set(res.branch());
+		const selectedColleges = new Set(untrack(res.college));
 
-		const sorted = ngp ? [ngp, ...others] : others;
-		return sorted.map((c) => ({
-			value: c.short_name,
-			label: c.short_name,
-		}));
+		return meta
+			.colleges()
+			.filter(
+				(c) =>
+					selectedBranches.size === 0 ||
+					selectedColleges.has(c.code) ||
+					c.branches.some((b) => selectedBranches.has(b.code)),
+			)
+			.map((c) => ({
+				value: c.short_name,
+				label: c.short_name,
+				keywords: [c.full_name, String(c.code)],
+			}));
 	};
 
-	const branchOptions = () =>
-		meta
+	const branchOptions = () => {
+		const selectedColleges = new Set(res.college());
+		const selectedBranches = new Set(untrack(res.branch));
+
+		const available = new Set<number>();
+		for (const c of meta.colleges()) {
+			if (selectedColleges.has(c.code)) {
+				for (const b of c.branches) available.add(b.code);
+			}
+		}
+
+		return meta
 			.branches()
-			.slice()
-			.sort((a, b) => a.name.localeCompare(b.name))
+			.filter(
+				(b) =>
+					selectedColleges.size === 0 ||
+					available.has(b.code) ||
+					selectedBranches.has(b.code),
+			)
 			.map((b) => ({
 				value: b.name,
 				label: b.name,
 			}));
+	};
 
 	const semesterOptions = () =>
 		meta.semesters().map((sem) => ({

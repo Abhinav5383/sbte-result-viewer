@@ -33,6 +33,15 @@
 		border: 0.12rem solid var(--color-border);
 	}
 
+	.multi-select-search {
+		position: sticky;
+		top: -0.4rem;
+		z-index: 1;
+		margin-block-start: -0.4rem;
+		padding-block: 0.4rem 0.3rem;
+		background-color: var(--color-surface);
+	}
+
 	.multi-select-content:focus-visible {
 		outline-color: transparent;
 	}
